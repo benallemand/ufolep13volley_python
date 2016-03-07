@@ -2,6 +2,7 @@
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.header import Header
 import environment
 
 if environment.environment is "DEV":
@@ -26,7 +27,6 @@ def email_login():
     password = environment.globEmailPassword
     # The actual mail send
     server = smtplib.SMTP(environment.globEmailSmtp)
-    server.starttls()
     server.login(username, password)
     return
 
@@ -35,7 +35,7 @@ def email_send_account_recap(account):
     me = 'noreply@ufolep13volley.org'
     msg = MIMEMultipart('alternative')
     you = account['email']
-    msg['Subject'] = "Récapitulatif de vos identifiants Ufolep13Volley"
+    msg['Subject'] = Header("Récapitulatif de vos identifiants Ufolep13Volley", 'latin-1')
     msg['From'] = me
     msg['To'] = you
     string_message = """
@@ -85,7 +85,7 @@ def send_emails_for_activity(activities):
     if environment.environment is "DEV":
         you = "benallemand@gmail.com"
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = "Activité"
+    msg['Subject'] = Header("Activité", 'latin-1')
     msg['From'] = me
     msg['To'] = you
     string_message = """
@@ -229,7 +229,7 @@ def email_players_without_licence_number_per_leader(players_without_licence_numb
         recipients = ['benallemand@gmail.com']
     you = ", ".join(recipients)
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = "[UFOLEP13VOLLEY]Joueurs sans numéro de licence"
+    msg['Subject'] = Header("[UFOLEP13VOLLEY]Joueurs sans numéro de licence", 'latin-1')
     msg['From'] = me
     msg['To'] = you
     string_message = """
@@ -274,6 +274,80 @@ def email_players_without_licence_number_per_leader(players_without_licence_numb
            players_without_licence_number_per_leader['club'],
            players_without_licence_number_per_leader['equipe'],
            players_without_licence_number_per_leader['responsable'])
+    msg.attach(MIMEText(html, 'html'))
+    server.sendmail(me, recipients, msg.as_string())
+    return
+
+
+def email_send_test():
+    email_login()
+    me = 'noreply@ufolep13volley.org'
+    msg = MIMEMultipart('alternative')
+    you = "benallemand@gmail.com"
+    msg['Subject'] = "Email test"
+    msg['From'] = me
+    msg['To'] = you
+    string_message = "This is a test"
+    html = """
+    <html>
+        <head></head>
+        <body>
+            %s
+        </body>
+    </html>
+    """ % string_message
+    msg.attach(MIMEText(html, 'html'))
+    server.sendmail(me, you, msg.as_string())
+    return
+
+
+def email_match_not_reported(match_not_reported):
+    me = 'noreply@ufolep13volley.org'
+    recipients = [
+        match_not_reported['responsable_reception'],
+        match_not_reported['responsable_visiteur'],
+        'benallemand@gmail.com'
+    ]
+    if environment.environment is "DEV":
+        recipients = ['benallemand@gmail.com']
+    you = ", ".join(recipients)
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = Header("[UFOLEP13VOLLEY]Saisie Internet des résultats", 'latin-1')
+    msg['From'] = me
+    msg['To'] = you
+    string_message = """
+    <p>
+        Aux équipes de %s et %s<br/>
+        <br/>
+        Comme vous avez dû le lire sur le règlement, la saisie des informations sur le site internet doit être rigoureuse (pour le suivi de la commission Volley et pour l'intérêt qu'y portent les joueurs)<br/>
+        <br/>
+        Pour résumer, sur le site, 10 jours après la date indiquée pour le match (qui peut être en rouge si le match a été reportée), il doit y avoir un résultat affiché.<br/>
+        <br/>
+        Pour votre match du <b>%s</b> cela n'est pas le cas. Puisqu'il s'agit d'un premier message d'alerte, nous vous donnons un délai supplémentaire de 5 jours pour que :<br/>
+        <br/>
+        - soit le résultat soit indiqué<br/>
+        - soit une autre date de match soit affichée (pour cela il faut la communiquer au responsable des classements)<br/>
+        <br/>
+        Je vous rappelle que les deux équipes doivent veiller à ce que cette règle soit suivie: les deux pourraient donc être pénalisées.<br/>
+        <br/>
+        Bonne journée<br/>
+        <br/>
+        Cordialement,<br/>
+        La CTSD<br/>
+        http://www.ufolep13volley.org<br/>
+    </p>""" % (
+        match_not_reported['equipe_reception'],
+        match_not_reported['equipe_visiteur'],
+        match_not_reported['date_reception']
+    )
+    html = """
+    <html>
+        <head></head>
+        <body>
+            %s
+        </body>
+    </html>
+    """ % string_message
     msg.attach(MIMEText(html, 'html'))
     server.sendmail(me, recipients, msg.as_string())
     return

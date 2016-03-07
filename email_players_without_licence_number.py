@@ -1,5 +1,4 @@
 # coding=latin-1
-import environment
 import email_manager
 import sql_manager
 
