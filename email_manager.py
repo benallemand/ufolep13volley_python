@@ -27,6 +27,8 @@ def email_login():
     password = environment.globEmailPassword
     # The actual mail send
     server = smtplib.SMTP(environment.globEmailSmtp)
+    server.ehlo()
+    server.starttls()
     server.login(username, password)
     return
 
