@@ -1,5 +1,5 @@
 # coding=latin-1
-import MySQLdb
+import pymysql
 import environment
 
 if environment.environment is "DEV":
@@ -14,7 +14,7 @@ db = None
 
 def sql_connect():
     global db
-    db = MySQLdb.connect(host=environment.globSqlHost,
+    db = pymysql.connect(host=environment.globSqlHost,
                          user=environment.globSqlUser,
                          passwd=environment.globSqlPassword,
                          db=environment.globSqlDbName)
@@ -242,3 +242,57 @@ def activate_players(licences):
     db.commit()
     db.close()
     return
+
+
+def sql_get_matches_not_reported():
+    global db
+    sql_connect()
+    cur = db.cursor()
+    cur.execute("""
+        SELECT
+        m.code_match,
+        c1.nom AS club_reception,
+        CONCAT(e1.nom_equipe, ' (', comp.libelle, ')') AS equipe_reception,
+        jresp1.email AS responsable_reception,
+        c2.nom AS club_visiteur,
+        CONCAT(e2.nom_equipe, ' (', comp.libelle, ')') AS equipe_visiteur,
+        jresp2.email AS responsable_visiteur,
+        DATE_FORMAT(m.date_reception, '%d/%m/%Y') AS date_reception
+        FROM matches m
+        JOIN competitions comp ON comp.code_competition = m.code_competition
+        JOIN equipes e1 ON e1.id_equipe = m.id_equipe_dom
+        JOIN equipes e2 ON e2.id_equipe = m.id_equipe_ext
+        JOIN joueur_equipe jeresp1 ON jeresp1.id_equipe = e1.id_equipe AND jeresp1.is_leader+0 > 0
+        JOIN joueur_equipe jeresp2 ON jeresp2.id_equipe = e2.id_equipe AND jeresp2.is_leader+0 > 0
+        JOIN joueurs jresp1 ON jresp1.id = jeresp1.id_joueur
+        JOIN joueurs jresp2 ON jresp2.id = jeresp2.id_joueur
+        JOIN clubs c1 ON c1.id = jresp1.id_club
+        JOIN clubs c2 ON c2.id = jresp2.id_club
+        WHERE
+        (
+        (m.score_equipe_dom+m.score_equipe_ext+0=0)
+        OR
+        ((m.set_1_dom+m.set_1_ext=0) AND (m.score_equipe_dom+m.score_equipe_ext>0))
+        OR
+        ((m.set_1_dom+m.set_1_ext>0) AND (m.score_equipe_dom+m.score_equipe_ext+0=0))
+        )
+        AND m.date_reception < CURDATE() - INTERVAL 5 DAY
+        ORDER BY m.code_match ASC
+    """)
+    list_result = []
+    for row in cur.fetchall():
+        list_result.append(
+            {
+                'code_match': row[0],
+                'club_reception': row[1],
+                'equipe_reception': row[2],
+                'responsable_reception': row[3],
+                'club_visiteur': row[4],
+                'equipe_visiteur': row[5],
+                'responsable_visiteur': row[6],
+                'date_reception': row[7]
+            }
+        )
+    cur.close()
+    db.close()
+    return list_result
