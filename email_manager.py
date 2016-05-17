@@ -28,7 +28,13 @@ def email_login():
     # The actual mail send
     server = smtplib.SMTP(environment.globEmailSmtp)
     server.ehlo()
-    server.starttls()
+    try:
+        server.starttls()
+    except:
+        server = smtplib.SMTP(environment.globEmailSmtp)
+        server.ehlo()
+        server.login(username, password)
+        return
     server.login(username, password)
     return
 
@@ -350,6 +356,70 @@ def email_match_not_reported(match_not_reported):
         </body>
     </html>
     """ % string_message
+    msg.attach(MIMEText(html, 'html'))
+    server.sendmail(me, recipients, msg.as_string())
+    return
+
+
+def email_team_leaders_without_email(team_leaders_without_email):
+    me = 'noreply@ufolep13volley.org'
+    recipients = [
+        'laurent.gorlier@ufolep13volley.org',
+        'benallemand@gmail.com'
+    ]
+    you = ", ".join(recipients)
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = Header("Responsables d'équipe sans adresse email", 'latin-1')
+    msg['From'] = me
+    msg['To'] = you
+    string_message = """
+    <p>
+        Bonjour Laurent,<br/>
+        <br/>
+        Certains responsables d'équipe n'ont pas encore renseigné leur adresse email sur le site.<br/>
+        <br/>
+        De ce fait il est impossible de les contacter pour une demande de report ou pour leur rappeler de saisir un résultat de match.<br/>
+        <br/>
+        Peux-tu leur rappeler de consulter les alertes lorsqu'ils se connectent au portail Ufolep 13 Volley ? Il y a déjà une alerte qui leur indiquera la marche à suivre.<br/>
+        <br/>
+        Bonne journée<br/>
+        <br/>
+        Cordialement,<br/>
+        La CTSD<br/>
+        http://www.ufolep13volley.org<br/>
+    </p>"""
+    string_team_leaders_without_email = ""
+    for team_leader_without_email in team_leaders_without_email:
+        string_team_leaders_without_email = """
+        %s
+        <tr>
+            <td>%s</td>
+            <td>%s</td>
+            <td>%s</td>
+            <td>%s</td>
+        </tr>
+        """ % (string_team_leaders_without_email,
+               team_leader_without_email['prenom'],
+               team_leader_without_email['nom'],
+               team_leader_without_email['competition'],
+               team_leader_without_email['equipe'])
+    html = """
+    <html>
+        <head></head>
+        <body>
+            %s
+            <table border="1">
+                <tr>
+                    <th>Prénom</th>
+                    <th>Nom</th>
+                    <th>Compétition</th>
+                    <th>Equipe</th>
+                </tr>
+                %s
+            </table>
+        </body>
+    </html>
+    """ % (string_message, string_team_leaders_without_email)
     msg.attach(MIMEText(html, 'html'))
     server.sendmail(me, recipients, msg.as_string())
     return

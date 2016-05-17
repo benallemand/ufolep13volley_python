@@ -303,3 +303,36 @@ def sql_get_matches_not_reported():
     cur.close()
     db.close()
     return list_result
+
+
+def sql_get_team_leaders_without_email():
+    global db
+    sql_connect()
+    cur = db.cursor()
+    cur.execute("""
+SELECT DISTINCT
+  j.prenom,
+  j.nom,
+  c.libelle,
+  e.nom_equipe
+FROM classements cl
+  JOIN joueur_equipe je ON je.id_equipe = cl.id_equipe
+  JOIN joueurs j ON j.id = je.id_joueur
+  JOIN equipes e ON e.id_equipe = je.id_equipe
+  JOIN competitions c ON c.code_competition = e.code_competition
+WHERE je.is_leader + 0 > 0
+      AND j.email = ''
+    """)
+    list_result = []
+    for row in cur.fetchall():
+        list_result.append(
+            {
+                'prenom': row[0],
+                'nom': row[1],
+                'competition': row[2],
+                'equipe': row[3]
+            }
+        )
+    cur.close()
+    db.close()
+    return list_result
