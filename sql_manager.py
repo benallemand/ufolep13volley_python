@@ -283,7 +283,7 @@ def sql_get_matches_not_reported():
         OR
         ((m.set_1_dom+m.set_1_ext>0) AND (m.score_equipe_dom+m.score_equipe_ext+0=0))
         )
-        AND m.date_reception < CURDATE() - INTERVAL 5 DAY
+        AND m.date_reception < CURDATE() - INTERVAL 10 DAY
         ORDER BY m.code_match ASC
     """)
     list_result = []
