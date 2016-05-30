@@ -331,10 +331,10 @@ def email_match_not_reported(match_not_reported):
         <br/>
         Pour résumer, sur le site, 10 jours après la date indiquée pour le match (qui peut être en rouge si le match a été reportée), il doit y avoir un résultat affiché.<br/>
         <br/>
-        Pour votre match du <b>%s</b> cela n'est pas le cas. Puisqu'il s'agit d'un premier message d'alerte, nous vous donnons un délai supplémentaire de 5 jours pour que :<br/>
+        Pour votre match du <b>%s</b> cela n'est pas le cas. Nous vous demandons donc :<br/>
         <br/>
-        - soit le résultat soit indiqué<br/>
-        - soit une autre date de match soit affichée (pour cela il faut la communiquer au responsable des classements)<br/>
+        - soit que le résultat soit indiqué<br/>
+        - soit qu'une autre date de match soit affichée (pour cela il faut la communiquer au responsable des classements)<br/>
         <br/>
         Je vous rappelle que les deux équipes doivent veiller à ce que cette règle soit suivie: les deux pourraient donc être pénalisées.<br/>
         <br/>
