@@ -244,7 +244,14 @@ def activate_players(licences):
     global db
     sql_connect()
     cur = db.cursor()
-    cur.execute("update joueurs set est_actif = 1 where num_licence in (%s)" % ", ".join(licences))
+    for licence in licences:
+        cur.execute("""
+        UPDATE joueurs SET
+          est_actif = 1,
+          date_homologation = STR_TO_DATE('{activation_date}', '%d/%m/%Y')
+        WHERE num_licence = '{licence_number}'""".format(
+            activation_date=licence['activation_date'],
+            licence_number=licence['licence_number']))
     cur.close()
     db.commit()
     db.close()
