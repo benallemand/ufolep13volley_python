@@ -1,0 +1,22 @@
+ALTER TABLE classements
+  DROP COLUMN points;
+ALTER TABLE classements
+  DROP COLUMN joues;
+ALTER TABLE classements
+  DROP COLUMN gagnes;
+ALTER TABLE classements
+  DROP COLUMN perdus;
+ALTER TABLE classements
+  DROP COLUMN sets_pour;
+ALTER TABLE classements
+  DROP COLUMN sets_contre;
+ALTER TABLE classements
+  DROP COLUMN difference;
+ALTER TABLE classements
+  DROP COLUMN coeff_sets;
+ALTER TABLE classements
+  DROP COLUMN points_pour;
+ALTER TABLE classements
+  DROP COLUMN points_contre;
+ALTER TABLE classements
+  DROP COLUMN coeff_points;
