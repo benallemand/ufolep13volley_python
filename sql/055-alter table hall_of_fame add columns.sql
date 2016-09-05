@@ -1,0 +1,1 @@
+ALTER TABLE hall_of_fame ADD COLUMN league VARCHAR(100) NOT NULL DEFAULT '';
