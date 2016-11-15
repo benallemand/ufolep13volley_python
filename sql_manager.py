@@ -330,6 +330,7 @@ FROM classements cl
   JOIN competitions c ON c.code_competition = e.code_competition
 WHERE je.is_leader + 0 > 0
       AND j.email = ''
+      AND e.id_equipe IN (SELECT id_equipe FROM classements)
     """)
     list_result = []
     for row in cur.fetchall():

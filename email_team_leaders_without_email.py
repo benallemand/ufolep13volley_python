@@ -8,4 +8,3 @@ if len(team_leaders_without_email) <= 0:
 email_manager.email_login()
 email_manager.email_team_leaders_without_email(team_leaders_without_email)
 email_manager.email_logout()
-#TODO Add python script to Jenkins
