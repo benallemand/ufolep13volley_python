@@ -251,7 +251,7 @@ def activate_players(licences):
           date_homologation = STR_TO_DATE('{activation_date}', '%d/%m/%Y')
         WHERE num_licence = '{licence_number}'""".format(
             activation_date=licence['activation_date'],
-            licence_number=licence['licence_number']))
+            licence_number=licence['licence_number'].replace(' ','')))
     cur.close()
     db.commit()
     db.close()
