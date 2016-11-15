@@ -222,6 +222,7 @@ def sql_get_players_without_licence_number():
         JOIN competitions comp ON comp.code_competition = e.code_competition
         JOIN clubs c ON c.id = j.id_club
         WHERE j.num_licence = ''
+        AND e.id_equipe IN (SELECT id_equipe FROM classements)
         GROUP BY jresp.email
         ORDER BY equipe ASC
     """)
