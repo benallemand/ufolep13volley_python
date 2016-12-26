@@ -252,7 +252,7 @@ def activate_players(licences):
           date_homologation = STR_TO_DATE('{activation_date}', '%d/%m/%Y')
         WHERE num_licence = '{licence_number}'""".format(
             activation_date=licence['activation_date'],
-            licence_number=licence['licence_number'].replace(' ','')))
+            licence_number=licence['licence_number'].replace(' ', '')))
     cur.close()
     db.commit()
     db.close()
@@ -345,3 +345,43 @@ WHERE je.is_leader + 0 > 0
     cur.close()
     db.close()
     return list_result
+
+
+def sql_get_unused_photo_paths():
+    global db
+    sql_connect()
+    cur = db.cursor()
+    cur.execute("""
+    SELECT
+      p.path_photo,
+      p.id
+    FROM photos p
+      LEFT JOIN equipes e ON e.id_photo = p.id
+      LEFT JOIN joueurs j ON j.id_photo = p.id
+    WHERE e.id_photo IS NULL AND j.id_photo IS NULL
+    ORDER BY p.path_photo ASC
+        """)
+    list_result = []
+    for row in cur.fetchall():
+        list_result.append(
+            {
+                'path_photo': row[0],
+                'id': int(row[1])
+            }
+        )
+    cur.close()
+    db.close()
+    return list_result
+
+
+def delete_photo(id_photo=None):
+    global db
+    sql_connect()
+    cur = db.cursor()
+    cur.execute("DELETE FROM photos WHERE id = %(id_photo)s", {
+        'id_photo': id_photo
+    })
+    cur.close()
+    db.commit()
+    db.close()
+    return
