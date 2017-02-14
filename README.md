@@ -21,3 +21,6 @@ Please add environment.py file, with:
     globSqlDbName = "<db name>"
 
 listing volley.csv may be needed too
+csv file MUST have these headers:
+
+    N° Asso;Nom Asso;Id_Pp;Civilite;Nom;Prénom;Date_Homologation;Date;Cat;;;;;;;Visite Medicale;
