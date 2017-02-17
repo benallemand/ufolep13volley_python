@@ -1,0 +1,2 @@
+ALTER TABLE matches
+  ADD COLUMN report_status VARCHAR(100) DEFAULT 'NOT_ASKED';
