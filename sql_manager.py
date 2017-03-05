@@ -1,5 +1,5 @@
 # coding=latin-1
-import pymysql
+import MySQLdb
 import environment
 
 if environment.environment is "DEV":
@@ -14,7 +14,7 @@ db = None
 
 def sql_connect():
     global db
-    db = pymysql.connect(host=environment.globSqlHost,
+    db = MySQLdb.connect(host=environment.globSqlHost,
                          user=environment.globSqlUser,
                          passwd=environment.globSqlPassword,
                          db=environment.globSqlDbName)
