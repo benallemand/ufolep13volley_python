@@ -33,7 +33,7 @@ def remove_photo(path_photo=None):
     if environment.environment is "DEV":
         web_path = "C:\workspace_phpstorm\ufolep13volley"
     else:
-        web_path = "~/www"
+        web_path = "/homez.71/ufolepvocb/www"
     if os.path.exists(os.path.join(web_path, path_photo)):
         print "Removing file %s..." % path_photo
         os.remove(os.path.join(web_path, path_photo))
