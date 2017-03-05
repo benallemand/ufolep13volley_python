@@ -9,7 +9,7 @@ if environment.environment is "DEV":
 elif environment.environment is "PROD":
     pass
 else:
-    raise EnvironmentError("Environnement inconnu")
+    raise EnvironmentError("Unknown environment")
 
 
 def get_listing_volley_licences():
@@ -32,14 +32,11 @@ def remove_photo(path_photo=None):
     """
     if environment.environment is "DEV":
         web_path = "C:\workspace_phpstorm\ufolep13volley"
-        if os.path.exists("%s/%s" % (web_path, path_photo)):
-            print "Removing file %s..." % path_photo
-            os.remove("%s/%s" % (web_path, path_photo))
-            print "File %s removed" % path_photo
-        else:
-            print "Skipping file %s, it does not exist..." % path_photo
     else:
+        web_path = "~/www"
+    if os.path.exists(os.path.join(web_path, path_photo)):
         print "Removing file %s..." % path_photo
-        # TODO Add FTP connection ability
+        os.remove(os.path.join(web_path, path_photo))
         print "File %s removed" % path_photo
-    return
+    else:
+        print "Skipping file %s, it does not exist..." % path_photo
