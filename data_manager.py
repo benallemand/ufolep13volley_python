@@ -40,3 +40,16 @@ def remove_photo(path_photo=None):
         print "File %s removed" % path_photo
     else:
         print "Skipping file %s, it does not exist..." % path_photo
+
+
+def get_existing_photo_paths():
+    if environment.environment is "DEV":
+        web_path = "C:\workspace_phpstorm\ufolep13volley"
+    else:
+        web_path = "/homez.71/ufolepvocb/www"
+    result_array = []
+    for file_name in os.listdir(os.path.join(web_path, "players_pics")):
+        result_array.append(os.path.join("players_pics", file_name))
+    for file_name in os.listdir(os.path.join(web_path, "teams_pics")):
+        result_array.append(os.path.join("teams_pics", file_name))
+    return result_array

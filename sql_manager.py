@@ -1,4 +1,6 @@
 # coding=latin-1
+import os
+
 import MySQLdb
 import environment
 
@@ -393,3 +395,25 @@ def delete_photo(id_photo=None):
     db.commit()
     db.close()
     return
+
+
+def is_photo_path_in_database(photo_path):
+    global db
+    sql_connect()
+    cur = db.cursor()
+    cur.execute("""
+        SELECT
+          p.path_photo
+        FROM photos p
+        WHERE p.path_photo = '{photo_path}'
+            """.format(photo_path=photo_path.replace(os.path.sep, '/')))
+    list_result = []
+    for row in cur.fetchall():
+        list_result.append(
+            {
+                'path_photo': row[0]
+            }
+        )
+    cur.close()
+    db.close()
+    return len(list_result) > 0
