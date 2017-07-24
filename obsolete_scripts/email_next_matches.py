@@ -1,6 +1,6 @@
 # coding=latin-1
-import environment
 import email_manager
+import environment
 import sql_manager
 
 team_ids = sql_manager.sql_get_ids_team_requesting_next_matches()

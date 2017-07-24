@@ -1,6 +1,6 @@
 # coding=latin-1
-import environment
 import email_manager
+import environment
 import sql_manager
 
 accounts = sql_manager.sql_get_accounts()
