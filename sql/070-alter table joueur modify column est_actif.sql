@@ -1,0 +1,1 @@
+ALTER TABLE joueurs ALTER COLUMN est_actif SET DEFAULT b'0';
