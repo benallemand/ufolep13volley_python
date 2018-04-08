@@ -1,7 +1,7 @@
 # coding=latin-1
 import os
 
-import MySQLdb
+import mysql.connector
 import environment
 
 if environment.environment is "DEV":
@@ -16,10 +16,10 @@ db = None
 
 def sql_connect():
     global db
-    db = MySQLdb.connect(host=environment.globSqlHost,
-                         user=environment.globSqlUser,
-                         passwd=environment.globSqlPassword,
-                         db=environment.globSqlDbName)
+    db = mysql.connector.connect(host=environment.globSqlHost,
+                                 user=environment.globSqlUser,
+                                 passwd=environment.globSqlPassword,
+                                 db=environment.globSqlDbName)
 
 
 def activate_players(licences):
