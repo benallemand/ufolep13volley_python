@@ -1,0 +1,2 @@
+ALTER TABLE creneau
+  ADD COLUMN usage_priority SMALLINT(10) NOT NULL DEFAULT 1;
