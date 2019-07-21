@@ -26,8 +26,8 @@ CREATE TABLE emails_files
     id_email INT          NOT NULL,
     id_file  SMALLINT(10) NOT NULL,
     CONSTRAINT `PRIMARY` PRIMARY KEY (id_email, id_file),
-    CONSTRAINT fk_emails_files_email FOREIGN KEY (id_email) REFERENCES emails (id),
-    CONSTRAINT fk_emails_files_file FOREIGN KEY (id_file) REFERENCES files (id)
+    CONSTRAINT fk_emails_files_email FOREIGN KEY (id_email) REFERENCES emails (id) ON DELETE CASCADE,
+    CONSTRAINT fk_emails_files_file FOREIGN KEY (id_file) REFERENCES files (id) ON DELETE CASCADE
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = latin1;
