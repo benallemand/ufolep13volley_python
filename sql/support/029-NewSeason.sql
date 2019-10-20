@@ -1,7 +1,7 @@
 DELETE FROM activity where activity_date < '2015-09-01';
 DELETE FROM classements;
 DELETE FROM competitions;
-INSERT INTO competitions SET code_competition = 'f', libelle = 'Championnat Féminin', id_compet_maitre = 'f';
+INSERT INTO competitions SET code_competition = 'f', libelle = 'Championnat Fï¿½minin', id_compet_maitre = 'f';
 INSERT INTO competitions SET code_competition = 'm', libelle = 'Championnat Masculin', id_compet_maitre = 'm';
 INSERT INTO competitions SET code_competition = 'mo', libelle = 'Championnat Mixte', id_compet_maitre = 'mo';
 INSERT INTO competitions SET code_competition = 'i', libelle = 'Coupe Isoardi', id_compet_maitre = 'm';
@@ -11,5 +11,7 @@ INSERT INTO competitions SET code_competition = 'kf', libelle = 'Coupe Khoury Ha
 DELETE FROM dates_limite;
 DELETE FROM journees;
 DELETE FROM matches;
-update joueurs set est_actif = 0;
+update joueurs set est_actif = 0, date_homologation = NULL;
 delete from equipes where code_competition = 'kh';
+DELETE FROM matches_files;
+DELETE FROM files;
