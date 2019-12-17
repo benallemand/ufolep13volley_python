@@ -1,0 +1,16 @@
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS friendships;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE IF NOT EXISTS friendships
+(
+    id        SMALLINT(10) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    id_club_1 SMALLINT(10)             NOT NULL,
+    id_club_2 SMALLINT(10)             NOT NULL,
+    FOREIGN KEY (id_club_1) REFERENCES clubs (id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (id_club_2) REFERENCES clubs (id)
+        ON DELETE CASCADE
+)
+    ENGINE = InnoDB
+    DEFAULT CHARSET = latin1;
