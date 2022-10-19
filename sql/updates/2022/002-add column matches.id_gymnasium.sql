@@ -1,0 +1,8 @@
+-- DEV: DONE 221019
+-- PROD: DONE 221019
+SET FOREIGN_KEY_CHECKS = 0;
+ALTER TABLE matches DROP FOREIGN KEY fk_matches_gymnasium;
+ALTER TABLE matches DROP COLUMN id_gymnasium;
+ALTER TABLE matches ADD COLUMN id_gymnasium SMALLINT(10) DEFAULT NULL;
+ALTER TABLE matches ADD CONSTRAINT fk_matches_gymnasium FOREIGN KEY (id_gymnasium) REFERENCES gymnase (id);
+SET FOREIGN_KEY_CHECKS = 1;
