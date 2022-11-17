@@ -1,10 +1,48 @@
--- DEV: DONE 221026
--- PROD: DONE 221026
+-- DEV: reDONE 221117
+-- PROD: reDONE 221117
 CREATE OR REPLACE VIEW matchs_view AS
 SELECT m.id_match,
        IF(m.forfait_dom + m.forfait_ext > 0, 1, 0)                                     AS is_forfait,
-       IF(m.id_match IN (SELECT DISTINCT id_match FROM match_player), 1, 0)            AS is_match_player_filled,
-       IF((m.id_match NOT IN (SELECT DISTINCT id_match FROM match_player))
+       IF(m.id_match IN (SELECT b.id_match
+                         FROM (SELECT a.id_match, SUM(a.count_dom), SUM(a.count_ext)
+                               FROM ((select m.id_match, COUNT(DISTINCT mp.id_player) AS count_dom, 0 AS count_ext
+                                      FROM match_player mp
+                                               JOIN matches m on mp.id_match = m.id_match
+                                               JOIN joueur_equipe jed
+                                                    on jed.id_equipe = m.id_equipe_dom and jed.id_joueur = mp.id_player
+                                      WHERE m.match_status = 'CONFIRMED'
+                                      GROUP BY m.id_match)
+                                     UNION ALL
+                                     (select m.id_match, 0 AS count_dom, COUNT(DISTINCT mp.id_player) AS count_ext
+                                      FROM match_player mp
+                                               JOIN matches m on mp.id_match = m.id_match
+                                               JOIN joueur_equipe jee
+                                                    on jee.id_equipe = m.id_equipe_ext and jee.id_joueur = mp.id_player
+                                      WHERE m.match_status = 'CONFIRMED'
+                                      GROUP BY m.id_match)) a
+                               GROUP BY a.id_match
+                               HAVING SUM(a.count_dom) > 0
+                                  AND SUM(a.count_ext) > 0) b), 1, 0)                  AS is_match_player_filled,
+       IF((m.id_match NOT IN (SELECT b.id_match
+                              FROM (SELECT a.id_match, SUM(a.count_dom), SUM(a.count_ext)
+                                    FROM ((select m.id_match, COUNT(DISTINCT mp.id_player) AS count_dom, 0 AS count_ext
+                                           FROM match_player mp
+                                                    JOIN matches m on mp.id_match = m.id_match
+                                                    JOIN joueur_equipe jed
+                                                         on jed.id_equipe = m.id_equipe_dom and jed.id_joueur = mp.id_player
+                                           WHERE m.match_status = 'CONFIRMED'
+                                           GROUP BY m.id_match)
+                                          UNION ALL
+                                          (select m.id_match, 0 AS count_dom, COUNT(DISTINCT mp.id_player) AS count_ext
+                                           FROM match_player mp
+                                                    JOIN matches m on mp.id_match = m.id_match
+                                                    JOIN joueur_equipe jee
+                                                         on jee.id_equipe = m.id_equipe_ext and jee.id_joueur = mp.id_player
+                                           WHERE m.match_status = 'CONFIRMED'
+                                           GROUP BY m.id_match)) a
+                                    GROUP BY a.id_match
+                                    HAVING SUM(a.count_dom) > 0
+                                       AND SUM(a.count_ext) > 0) b))
               AND (m.forfait_dom + m.forfait_ext = 0)
               AND (m.sheet_received > 0)
               AND (m.certif = 0)
