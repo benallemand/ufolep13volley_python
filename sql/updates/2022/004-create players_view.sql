@@ -1,5 +1,5 @@
--- DEV: DONE 221024
--- PROD: DONE 221024
+-- DEV: reDONE 221126
+-- PROD: reDONE 221126
 CREATE OR REPLACE VIEW players_view AS
 SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')') AS full_name,
        j.prenom,
@@ -13,13 +13,38 @@ SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')
        j.departement_affiliation,
        CASE
            WHEN (j.date_homologation IS NULL) THEN 0
+           WHEN (j.date_homologation > CURRENT_TIMESTAMP) THEN 0
+           WHEN (j.num_licence IS NULL) THEN 0
            WHEN j.id NOT IN (SELECT id_joueur
                              FROM joueur_equipe
                              WHERE id_equipe IN (SELECT id_equipe
                                                  FROM classements))
                THEN 0
-           WHEN j.date_homologation < (comp.start_date - INTERVAL 90 DAY) THEN 0
-           WHEN j.date_homologation >= (comp.start_date - INTERVAL 90 DAY) AND j.num_licence IS NOT NULL THEN 1
+           -- si la compet est en 1ere 1/2 saison (commence en 2022 finit en 2023)
+           WHEN MONTH(comp.start_date) > 7 THEN
+               CASE
+                   -- si homologué la même année
+                   WHEN YEAR(j.date_homologation) = YEAR(comp.start_date)
+                       -- licence aout+
+                       AND MONTH(j.date_homologation) > 7 THEN 1
+                   -- si homologué l'année suivante
+                   WHEN YEAR(j.date_homologation) = YEAR(comp.start_date) + 1
+                       THEN 1
+                   ELSE 0
+                   END
+           -- si la compet est en 2e 1/2 saison (commence et finit en 2023)
+           WHEN MONTH(comp.start_date) <= 7 THEN
+               CASE
+                   -- si homologué l'année précédente
+                   WHEN YEAR(j.date_homologation) = YEAR(comp.start_date) - 1
+                       -- licence aout+
+                       AND MONTH(j.date_homologation) > 7
+                       THEN 1
+                   -- si homologué la même année
+                   WHEN YEAR(j.date_homologation) = YEAR(comp.start_date)
+                       THEN 1
+                   ELSE 0
+                   END
            ELSE 0
            END                                                                   AS est_actif,
        j.id_club,
@@ -45,6 +70,7 @@ FROM joueurs j
          LEFT JOIN photos p ON p.id = j.id_photo
          LEFT JOIN classements cl ON cl.id_equipe = e.id_equipe
          LEFT JOIN competitions comp ON comp.code_competition = e.code_competition
+         LEFT JOIN dates_limite dl ON dl.code_competition = comp.code_competition
 WHERE 1 = 1
 GROUP BY j.id, j.sexe, UPPER(j.nom)
 ORDER BY j.sexe, UPPER(j.nom);
