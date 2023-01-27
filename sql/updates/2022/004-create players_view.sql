@@ -1,13 +1,13 @@
--- DEV: reDONE 230122
--- PROD: reDONE 230122
+-- DEV: reDONE 230127
+-- PROD: reDONE 230127
 CREATE OR REPLACE VIEW players_view AS
-SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')') AS full_name,
+SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')        AS full_name,
        j.prenom,
-       UPPER(j.nom)                                                              AS nom,
+       UPPER(j.nom)                                                                     AS nom,
        j.telephone,
        j.email,
        j.num_licence,
-       CONCAT(LPAD(j.departement_affiliation, 3, '0'), j.num_licence)            AS num_licence_ext,
+       CONCAT(LPAD(j.departement_affiliation, 3, '0'), j.num_licence)                   AS num_licence_ext,
        p.path_photo,
        j.sexe,
        j.departement_affiliation,
@@ -70,23 +70,29 @@ SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')
                            END
                    END
            ELSE 0
-           END                                                                   AS est_actif,
+           END                                                                          AS est_actif,
        j.id_club,
-       c.nom                                                                     AS club,
+       c.nom                                                                            AS club,
        j.telephone2,
        j.email2,
-       j.est_responsable_club + 0                                                AS est_responsable_club,
-       je.is_captain + 0                                                         AS is_captain,
-       je.is_vice_leader + 0                                                     AS is_vice_leader,
-       je.is_leader + 0                                                          AS is_leader,
-       j.show_photo + 0                                                          AS show_photo,
+       j.est_responsable_club + 0                                                       AS est_responsable_club,
+       IF(j.id IN (SELECT id_joueur FROM joueur_equipe WHERE is_captain = 1), 1, 0)     AS is_captain,
+       IF(j.id IN (SELECT id_joueur FROM joueur_equipe WHERE is_vice_leader = 1), 1, 0) AS is_vice_leader,
+       IF(j.id IN (SELECT id_joueur FROM joueur_equipe WHERE is_leader = 1), 1, 0)      AS is_leader,
+       GROUP_CONCAT(DISTINCT je_cap.id_equipe SEPARATOR ',')                            AS id_captain,
+       GROUP_CONCAT(DISTINCT je_vl.id_equipe SEPARATOR ',')                             AS id_vl,
+       GROUP_CONCAT(DISTINCT je_l.id_equipe SEPARATOR ',')                              AS id_l,
+       j.show_photo + 0                                                                 AS show_photo,
        j.id,
        GROUP_CONCAT(DISTINCT concat(e.nom_equipe, ' (', comp.libelle, ')', ' (D', cl.division, ')')
                     SEPARATOR
-                    '<br/>')                                                     AS teams_list,
-       GROUP_CONCAT(DISTINCT e2.nom_equipe SEPARATOR '<br/>')                    AS team_leader_list,
-       DATE_FORMAT(j.date_homologation, '%d/%m/%Y')                              AS date_homologation
+                    '<br/>')                                                            AS teams_list,
+       GROUP_CONCAT(DISTINCT e2.nom_equipe SEPARATOR '<br/>')                           AS team_leader_list,
+       DATE_FORMAT(j.date_homologation, '%d/%m/%Y')                                     AS date_homologation
 FROM joueurs j
+         LEFT JOIN joueur_equipe je_cap ON je_cap.id_joueur = j.id AND je_cap.is_captain = 1
+         LEFT JOIN joueur_equipe je_vl ON je_vl.id_joueur = j.id AND je_vl.is_vice_leader = 1
+         LEFT JOIN joueur_equipe je_l ON je_l.id_joueur = j.id AND je_l.is_leader = 1
          LEFT JOIN joueur_equipe je ON je.id_joueur = j.id
          LEFT JOIN joueur_equipe je2 ON je2.id_joueur = j.id AND je2.is_leader + 0 > 0
          LEFT JOIN equipes e ON e.id_equipe = je.id_equipe
