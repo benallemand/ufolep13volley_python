@@ -1,5 +1,5 @@
--- DEV: reDONE 230122
--- PROD: reDONE 230122
+-- DEV: reDONE 230301
+-- PROD: DONE 230301
 CREATE OR REPLACE VIEW matchs_view AS
 SELECT m.id_match,
        IF(m.forfait_dom + m.forfait_ext > 0, 1, 0)                                     AS is_forfait,
@@ -91,11 +91,16 @@ SELECT m.id_match,
        UNIX_TIMESTAMP(m.date_reception + INTERVAL 23 HOUR + INTERVAL 59 MINUTE) * 1000 AS date_reception_raw,
        DATE_FORMAT(m.date_original, '%d/%m/%Y')                                        AS date_original,
        UNIX_TIMESTAMP(m.date_original + INTERVAL 23 HOUR + INTERVAL 59 MINUTE) * 1000  AS date_original_raw,
-       m.forfait_dom + 0                                                               AS forfait_dom,
-       m.forfait_ext + 0                                                               AS forfait_ext,
-       m.sheet_received + 0                                                            AS sheet_received,
+       m.forfait_dom                                                                   AS forfait_dom,
+       m.forfait_ext                                                                   AS forfait_ext,
+       CASE
+           WHEN m.is_sign_team_ext = 1
+               AND m.is_sign_team_dom = 1
+               AND m.is_sign_match_ext = 1
+               AND m.is_sign_match_dom = 1 THEN 1
+           ELSE m.sheet_received END                                                   AS sheet_received,
        m.note,
-       m.certif + 0                                                                    AS certif,
+       m.certif                                                                        AS certif,
        m.report_status,
        (
            CASE
@@ -107,11 +112,21 @@ SELECT m.id_match,
            )                                                                           AS retard,
        IF(mf.id_file IS NOT NULL, 1, 0)                                                AS is_file_attached,
        m.match_status,
-       GROUP_CONCAT(f.path_file SEPARATOR '|')                                         AS files_paths
+       GROUP_CONCAT(f.path_file SEPARATOR '|')                                         AS files_paths,
+       m.is_sign_match_dom,
+       m.is_sign_match_ext,
+       m.is_sign_team_dom,
+       m.is_sign_team_ext,
+       jresp_dom.email                                                                 AS email_dom,
+       jresp_ext.email                                                                 AS email_ext
 FROM matches m
          JOIN competitions c ON c.code_competition = m.code_competition
          JOIN equipes e1 ON e1.id_equipe = m.id_equipe_dom
+         LEFT JOIN joueur_equipe jeresp_dom on jeresp_dom.id_equipe = e1.id_equipe AND jeresp_dom.is_leader = 1
+         LEFT JOIN joueurs jresp_dom ON jeresp_dom.id_joueur = jresp_dom.id
          JOIN equipes e2 ON e2.id_equipe = m.id_equipe_ext
+         LEFT JOIN joueur_equipe jeresp_ext on jeresp_ext.id_equipe = e2.id_equipe AND jeresp_ext.is_leader = 1
+         LEFT JOIN joueurs jresp_ext ON jeresp_ext.id_joueur = jresp_ext.id
          LEFT JOIN journees j ON m.id_journee = j.id
          LEFT JOIN creneau cr ON cr.id_equipe = m.id_equipe_dom
     AND cr.jour = ELT(WEEKDAY(m.date_reception) + 2,
