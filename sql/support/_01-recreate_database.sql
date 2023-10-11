@@ -1,2 +1,2 @@
-DROP DATABASE ufolep_13volley;
+DROP DATABASE IF EXISTS ufolep_13volley;
 CREATE DATABASE ufolep_13volley;
