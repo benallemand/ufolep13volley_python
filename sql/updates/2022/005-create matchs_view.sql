@@ -1,5 +1,5 @@
--- DEV: reDONE 230301
--- PROD: DONE 230301
+-- DEV: reDONE 231028
+-- PROD: reDONE 231028
 CREATE OR REPLACE VIEW matchs_view AS
 SELECT m.id_match,
        IF(m.forfait_dom + m.forfait_ext > 0, 1, 0)                                     AS is_forfait,
@@ -118,7 +118,8 @@ SELECT m.id_match,
        m.is_sign_team_dom,
        m.is_sign_team_ext,
        jresp_dom.email                                                                 AS email_dom,
-       jresp_ext.email                                                                 AS email_ext
+       jresp_ext.email                                                                 AS email_ext,
+       m.referee
 FROM matches m
          JOIN competitions c ON c.code_competition = m.code_competition
          JOIN equipes e1 ON e1.id_equipe = m.id_equipe_dom
