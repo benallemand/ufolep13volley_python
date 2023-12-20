@@ -1,5 +1,5 @@
--- DEV: reDONE 231028
--- PROD: reDONE 231028
+-- DEV: reDONE 231220
+-- PROD: reDONE 231220
 CREATE OR REPLACE VIEW matchs_view AS
 SELECT m.id_match,
        IF(m.forfait_dom + m.forfait_ext > 0, 1, 0)                                     AS is_forfait,
@@ -51,7 +51,7 @@ SELECT m.id_match,
                          FROM match_player
                                   JOIN players_view j2 on match_player.id_player = j2.id
                          WHERE (j2.est_actif = 0 OR
-                                j2.date_homologation > m.date_reception
+                                STR_TO_DATE(j2.date_homologation, '%d/%m/%Y') > m.date_reception
                              OR j2.date_homologation IS NULL
                              OR j2.num_licence IS NULL))
            , 1, 0)                                                                     AS has_forbidden_player,
