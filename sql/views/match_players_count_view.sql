@@ -10,10 +10,14 @@ SELECT a.id_match,
        SUM(a.count_masc_ext) AS count_masc_ext,
        SUM(a.count_fem_ext)  AS count_fem_ext,
        CASE
-           WHEN a.code_competition IN ('kh', 'kf') AND SUM(a.count_fem_dom) < 2
+           WHEN a.code_competition IN ('kh', 'kf', 'ut') AND SUM(a.count_fem_dom) < 2
                THEN 'pas assez de filles à domicile'
-           WHEN a.code_competition IN ('kh', 'kf') AND SUM(a.count_fem_ext) < 2
+           WHEN a.code_competition IN ('kh', 'kf', 'ut') AND SUM(a.count_fem_ext) < 2
                THEN 'pas assez de filles à l\'extérieur'
+           WHEN a.code_competition IN ('mo', 'ut') AND (SUM(a.count_masc_dom) = 0 OR SUM(a.count_fem_dom) = 0)
+               THEN 'mixité obligatoire à domicile non respectée'
+           WHEN a.code_competition IN ('mo', 'ut') AND (SUM(a.count_masc_ext) = 0 OR SUM(a.count_fem_ext) = 0)
+               THEN 'mixité obligatoire à l\'extérieur non respectée'
            END               AS count_status
 FROM ((select m.id_match,
               m.code_competition,
