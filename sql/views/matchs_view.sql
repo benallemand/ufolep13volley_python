@@ -1,10 +1,11 @@
--- DEV: reDONE 240120
--- PROD: reDONE 240120
+-- DEV: reDONE 240218
+-- PROD: reDONE 240218
 CREATE OR REPLACE VIEW matchs_view AS
 SELECT m.id_match,
        IF(m.forfait_dom + m.forfait_ext > 0, 1, 0)                               AS is_forfait,
-       IF(filled_matches.id_match IS NOT NULL, 1, 0)                             AS is_match_player_filled,
-       IF(filled_matches.id_match IS NULL
+       IF(mpcv.id_match IS NOT NULL, 1, 0)                                       AS is_match_player_filled,
+       mpcv.count_status                                                         AS count_status,
+       IF(mpcv.id_match IS NULL
               AND (m.forfait_dom + m.forfait_ext = 0)
               AND (m.certif = 0), 1, 0)                                          AS is_match_player_requested,
        IF(m.id_match IN (SELECT id_match
@@ -105,33 +106,7 @@ FROM matches m
          LEFT JOIN gymnase g ON m.id_gymnasium = g.id
          LEFT JOIN matches_files mf ON mf.id_match = m.id_match
          LEFT JOIN files f on mf.id_file = f.id
-         LEFT JOIN (SELECT b.id_match
-                    FROM (SELECT a.id_match, SUM(a.count_dom), SUM(a.count_ext)
-                          FROM ((select m.id_match,
-                                        m.code_competition,
-                                        COUNT(DISTINCT mp.id_player) AS count_dom,
-                                        0                            AS count_ext
-                                 FROM match_player mp
-                                          JOIN matches m on mp.id_match = m.id_match
-                                          JOIN joueur_equipe jed
-                                               on jed.id_equipe = m.id_equipe_dom and jed.id_joueur = mp.id_player
-                                 WHERE m.match_status = 'CONFIRMED'
-                                 GROUP BY m.id_match, m.code_competition)
-                                UNION ALL
-                                (select m.id_match,
-                                        m.code_competition,
-                                        0                            AS count_dom,
-                                        COUNT(DISTINCT mp.id_player) AS count_ext
-                                 FROM match_player mp
-                                          JOIN matches m on mp.id_match = m.id_match
-                                          JOIN joueur_equipe jee
-                                               on jee.id_equipe = m.id_equipe_ext and jee.id_joueur = mp.id_player
-                                 WHERE m.match_status = 'CONFIRMED'
-                                 GROUP BY m.id_match, m.code_competition)) a
-                          GROUP BY a.id_match, a.code_competition
-                          HAVING SUM(a.count_dom) >= IF(a.code_competition IN ('m', 'c', 'cf'), 5, 3)
-                             AND SUM(a.count_ext) >= IF(a.code_competition IN ('m', 'c', 'cf'), 5, 3)) b) filled_matches
-                   ON filled_matches.id_match = m.id_match
+         LEFT JOIN match_players_count_view mpcv ON mpcv.id_match = m.id_match
 WHERE 1 = 1
 GROUP BY code_competition, division, numero_journee, code_match
 ORDER BY code_competition, division, numero_journee, code_match;
