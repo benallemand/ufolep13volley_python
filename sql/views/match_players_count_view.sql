@@ -1,5 +1,5 @@
--- DEV: DONE 240218
--- PROD: DONE 240218
+-- DEV: reDONE 240303
+-- PROD: reDONE 240303
 CREATE OR REPLACE VIEW match_players_count_view AS
 SELECT a.id_match,
        a.code_competition,
@@ -9,6 +9,7 @@ SELECT a.id_match,
        SUM(a.count_ext)      AS count_ext,
        SUM(a.count_masc_ext) AS count_masc_ext,
        SUM(a.count_fem_ext)  AS count_fem_ext,
+       SUM(a.count_renfort)  AS count_renfort,
        CASE
            WHEN a.code_competition IN ('kh', 'kf', 'ut') AND SUM(a.count_fem_dom) < 2
                THEN 'pas assez de filles à domicile'
@@ -26,7 +27,8 @@ FROM ((select m.id_match,
               COUNT(DISTINCT j_fem.id)     AS count_fem_dom,
               0                            AS count_ext,
               0                            AS count_masc_ext,
-              0                            AS count_fem_ext
+              0                            AS count_fem_ext,
+              0                            AS count_renfort
        FROM match_player mp
                 JOIN matches m on mp.id_match = m.id_match
                 JOIN joueur_equipe jed
@@ -43,7 +45,8 @@ FROM ((select m.id_match,
               0                            AS count_fem_dom,
               COUNT(DISTINCT mp.id_player) AS count_ext,
               COUNT(DISTINCT j_masc.id)    AS count_masc_ext,
-              COUNT(DISTINCT j_fem.id)     AS count_fem_ext
+              COUNT(DISTINCT j_fem.id)     AS count_fem_ext,
+              0                            AS count_renfort
        FROM match_player mp
                 JOIN matches m on mp.id_match = m.id_match
                 JOIN joueur_equipe jee
@@ -51,7 +54,23 @@ FROM ((select m.id_match,
                 LEFT JOIN joueurs j_masc ON jee.id_joueur = j_masc.id AND j_masc.sexe IN ('M')
                 LEFT JOIN joueurs j_fem ON jee.id_joueur = j_fem.id AND j_fem.sexe IN ('F')
        WHERE m.match_status = 'CONFIRMED'
+       GROUP BY m.id_match, m.code_competition)
+      UNION ALL
+      (select m.id_match,
+              m.code_competition,
+              0                   AS count_dom,
+              0                   AS count_masc_dom,
+              0                   AS count_fem_dom,
+              0                   AS count_ext,
+              0                   AS count_masc_ext,
+              0                   AS count_fem_ext,
+              COUNT(mp.id_player) AS count_renfort
+       FROM match_player mp
+                JOIN matches m ON mp.id_match = m.id_match
+       WHERE mp.id_player NOT IN
+             (SELECT id_joueur FROM joueur_equipe WHERE id_equipe IN (m.id_equipe_dom, m.id_equipe_ext))
+         AND m.match_status = 'CONFIRMED'
        GROUP BY m.id_match, m.code_competition)) a
 GROUP BY a.id_match, a.code_competition
-HAVING SUM(a.count_dom) >= IF(a.code_competition IN ('m', 'c', 'cf'), 5, 3)
-   AND SUM(a.count_ext) >= IF(a.code_competition IN ('m', 'c', 'cf'), 5, 3)
+HAVING ((SUM(a.count_dom)+SUM(a.count_renfort)) >= IF(a.code_competition IN ('m', 'c', 'cf'), 5, 3)
+    AND (SUM(a.count_ext)+SUM(a.count_renfort)) >= IF(a.code_competition IN ('m', 'c', 'cf'), 5, 3))
