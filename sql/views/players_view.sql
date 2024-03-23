@@ -1,5 +1,5 @@
--- DEV: reDONE 230127
--- PROD: reDONE 230127
+-- DEV: reDONE 240323
+-- PROD: reDONE 240323
 CREATE OR REPLACE VIEW players_view AS
 SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')        AS full_name,
        j.prenom,
@@ -9,6 +9,7 @@ SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')
        j.num_licence,
        CONCAT(LPAD(j.departement_affiliation, 3, '0'), j.num_licence)                   AS num_licence_ext,
        p.path_photo,
+       REPLACE(p.path_photo, 'players_pics', 'players_pics_low') AS path_photo_low,
        j.sexe,
        j.departement_affiliation,
        CASE
