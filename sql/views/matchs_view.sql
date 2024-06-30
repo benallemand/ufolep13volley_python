@@ -1,8 +1,9 @@
--- DEV: reDONE 240218
--- PROD: reDONE 240218
+-- DEV: reDONE 240630
+-- PROD: reDONE 240630
 CREATE OR REPLACE VIEW matchs_view AS
 SELECT m.id_match,
        IF(m.forfait_dom + m.forfait_ext > 0, 1, 0)                               AS is_forfait,
+       IF(m.score_equipe_dom = 3 OR m.score_equipe_ext = 3, 1, 0)                AS is_match_score_filled,
        IF(mpcv.id_match IS NOT NULL, 1, 0)                                       AS is_match_player_filled,
        mpcv.count_status                                                         AS count_status,
        IF(mpcv.id_match IS NULL
