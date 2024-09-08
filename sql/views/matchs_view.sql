@@ -1,5 +1,5 @@
--- DEV: reDONE 240630
--- PROD: reDONE 240630
+-- DEV: reDONE 240908
+-- PROD: reDONE 240908
 CREATE OR REPLACE VIEW matchs_view AS
 SELECT m.id_match,
        IF(m.forfait_dom + m.forfait_ext > 0, 1, 0)                               AS is_forfait,
