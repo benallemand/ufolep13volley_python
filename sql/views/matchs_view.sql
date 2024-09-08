@@ -84,7 +84,9 @@ SELECT m.id_match,
        m.is_sign_team_ext,
        jresp_dom.email                                                           AS email_dom,
        jresp_ext.email                                                           AS email_ext,
-       m.referee
+       m.referee,
+       IF(s_dom.id IS NOT NULL, 1, 0)                                            AS is_survey_filled_dom,
+       IF(s_ext.id IS NOT NULL, 1, 0)                                            AS is_survey_filled_ext
 FROM matches m
          JOIN competitions c ON c.code_competition = m.code_competition
          JOIN equipes e1 ON e1.id_equipe = m.id_equipe_dom
@@ -108,6 +110,12 @@ FROM matches m
          LEFT JOIN matches_files mf ON mf.id_match = m.id_match
          LEFT JOIN files f on mf.id_file = f.id
          LEFT JOIN match_players_count_view mpcv ON mpcv.id_match = m.id_match
+         LEFT JOIN survey s_dom ON m.id_match = s_dom.id_match AND s_dom.user_id IN (SELECT ca.id
+                                                                                     FROM comptes_acces ca
+                                                                                     WHERE ca.id_equipe = m.id_equipe_dom)
+         LEFT JOIN survey s_ext ON m.id_match = s_ext.id_match AND s_ext.user_id IN (SELECT ca.id
+                                                                                     FROM comptes_acces ca
+                                                                                     WHERE ca.id_equipe = m.id_equipe_ext)
 WHERE 1 = 1
 GROUP BY code_competition, division, numero_journee, code_match
 ORDER BY code_competition, division, numero_journee, code_match;
