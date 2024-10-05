@@ -1,5 +1,5 @@
--- DEV: reDONE 240323
--- PROD: reDONE 240323
+-- DEV: reDONE 241005
+-- PROD: reDONE 241005
 CREATE OR REPLACE VIEW players_view AS
 SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')        AS full_name,
        j.prenom,
@@ -9,7 +9,7 @@ SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')
        j.num_licence,
        CONCAT(LPAD(j.departement_affiliation, 3, '0'), j.num_licence)                   AS num_licence_ext,
        p.path_photo,
-       REPLACE(p.path_photo, 'players_pics', 'players_pics_low') AS path_photo_low,
+       REPLACE(p.path_photo, 'players_pics', 'players_pics_low')                        AS path_photo_low,
        j.sexe,
        j.departement_affiliation,
        CASE
@@ -85,19 +85,18 @@ SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')
        GROUP_CONCAT(DISTINCT je_l.id_equipe SEPARATOR ',')                              AS id_l,
        j.show_photo + 0                                                                 AS show_photo,
        j.id,
-       GROUP_CONCAT(DISTINCT concat(e.nom_equipe, ' (', comp.libelle, ')', ' (D', cl.division, ')')
+       GROUP_CONCAT(DISTINCT concat(e.nom_equipe, ' (', comp.libelle, ')')
                     SEPARATOR
                     '<br/>')                                                            AS teams_list,
-       GROUP_CONCAT(DISTINCT e2.nom_equipe SEPARATOR '<br/>')                           AS team_leader_list,
+       GROUP_CONCAT(DISTINCT e_l.nom_equipe SEPARATOR '<br/>')                          AS team_leader_list,
        DATE_FORMAT(j.date_homologation, '%d/%m/%Y')                                     AS date_homologation
 FROM joueurs j
          LEFT JOIN joueur_equipe je_cap ON je_cap.id_joueur = j.id AND je_cap.is_captain = 1
          LEFT JOIN joueur_equipe je_vl ON je_vl.id_joueur = j.id AND je_vl.is_vice_leader = 1
          LEFT JOIN joueur_equipe je_l ON je_l.id_joueur = j.id AND je_l.is_leader = 1
          LEFT JOIN joueur_equipe je ON je.id_joueur = j.id
-         LEFT JOIN joueur_equipe je2 ON je2.id_joueur = j.id AND je2.is_leader + 0 > 0
          LEFT JOIN equipes e ON e.id_equipe = je.id_equipe
-         LEFT JOIN equipes e2 ON e2.id_equipe = je2.id_equipe
+         LEFT JOIN equipes e_l ON e_l.id_equipe = je_l.id_equipe
          LEFT JOIN clubs c ON c.id = j.id_club
          LEFT JOIN photos p ON p.id = j.id_photo
          LEFT JOIN classements cl ON cl.id_equipe = e.id_equipe
