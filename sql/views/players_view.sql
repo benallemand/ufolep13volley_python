@@ -1,5 +1,5 @@
--- DEV: reDONE 241005
--- PROD: reDONE 241005
+-- DEV: reDONE 241105
+-- PROD: reDONE 241105
 CREATE OR REPLACE VIEW players_view AS
 SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')        AS full_name,
        j.prenom,
@@ -85,6 +85,14 @@ SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')
        GROUP_CONCAT(DISTINCT je_l.id_equipe SEPARATOR ',')                              AS id_l,
        j.show_photo + 0                                                                 AS show_photo,
        j.id,
+       GROUP_CONCAT(DISTINCT
+                    CASE WHEN cl.id IS NOT NULL THEN concat(e.nom_equipe, ' (', comp.libelle, ')') END
+                    SEPARATOR '<br/>'
+       )                                                                                AS active_teams_list,
+       GROUP_CONCAT(DISTINCT
+                    CASE WHEN cl.id IS NULL THEN concat(e.nom_equipe, ' (', comp.libelle, ')') END
+                    SEPARATOR '<br/>'
+       )                                                                                AS inactive_teams_list,
        GROUP_CONCAT(DISTINCT concat(e.nom_equipe, ' (', comp.libelle, ')')
                     SEPARATOR
                     '<br/>')                                                            AS teams_list,
