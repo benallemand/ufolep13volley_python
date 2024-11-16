@@ -1,5 +1,5 @@
--- DEV: reDONE 240908
--- PROD: reDONE 240908
+-- DEV: reDONE 241116
+-- PROD: reDONE 241116
 CREATE OR REPLACE VIEW matchs_view AS
 SELECT m.id_match,
        IF(m.forfait_dom + m.forfait_ext > 0, 1, 0)                               AS is_forfait,
@@ -86,7 +86,8 @@ SELECT m.id_match,
        jresp_ext.email                                                           AS email_ext,
        m.referee,
        IF(s_dom.id IS NOT NULL, 1, 0)                                            AS is_survey_filled_dom,
-       IF(s_ext.id IS NOT NULL, 1, 0)                                            AS is_survey_filled_ext
+       IF(s_ext.id IS NOT NULL, 1, 0)                                            AS is_survey_filled_ext,
+       GROUP_CONCAT(DISTINCT com.email) AS contact_com
 FROM matches m
          JOIN competitions c ON c.code_competition = m.code_competition
          JOIN equipes e1 ON e1.id_equipe = m.id_equipe_dom
@@ -116,6 +117,8 @@ FROM matches m
          LEFT JOIN survey s_ext ON m.id_match = s_ext.id_match AND s_ext.user_id IN (SELECT ca.id
                                                                                      FROM comptes_acces ca
                                                                                      WHERE ca.id_equipe = m.id_equipe_ext)
+        LEFT JOIN commission_division cd ON cd.division = CONCAT('d',m.division, m.code_competition)
+        LEFT JOIN commission com ON cd.id_commission = com.id_commission
 WHERE 1 = 1
 GROUP BY code_competition, division, numero_journee, code_match
 ORDER BY code_competition, division, numero_journee, code_match;
