@@ -1,21 +1,56 @@
--- DEV: reDONE 241116
--- PROD: reDONE 241116
+-- DEV: reDONE 241204
+-- PROD: reDONE 241204
 CREATE OR REPLACE VIEW matchs_view AS
+WITH computed_forfait AS (SELECT m.id_match,
+                                 IF(m.set_1_dom = 25 AND m.set_1_ext = 0
+                                        AND m.set_2_dom = 25 AND m.set_2_ext = 0
+                                        AND m.set_3_dom = 25 AND m.set_3_ext = 0
+                                        AND m.is_sign_match_dom AND m.is_sign_match_ext,
+                                    1, 0)                                                      AS forfait_ext,
+                                 IF(m.set_1_dom = 0 AND m.set_1_ext = 25
+                                        AND m.set_2_dom = 0 AND m.set_2_ext = 25
+                                        AND m.set_3_dom = 0 AND m.set_3_ext = 25
+                                        AND m.is_sign_match_dom AND m.is_sign_match_ext, 1, 0) AS forfait_dom,
+                                 IF((m.set_1_dom = 25 AND m.set_1_ext = 0 AND
+                                     m.set_2_dom = 25 AND m.set_2_ext = 0 AND
+                                     m.set_3_dom = 25 AND m.set_3_ext = 0
+                                     AND m.is_sign_match_dom AND m.is_sign_match_ext) OR
+                                    (m.set_1_dom = 0 AND m.set_1_ext = 25 AND
+                                     m.set_2_dom = 0 AND m.set_2_ext = 25 AND
+                                     m.set_3_dom = 0 AND m.set_3_ext = 25
+                                        AND m.is_sign_match_dom AND m.is_sign_match_ext),
+                                    1,
+                                    0)                                                         AS is_forfait
+                          FROM matches m),
+     computed_score AS (SELECT m.id_match,
+                               IF(m.set_1_dom >= 25 AND m.set_1_dom >= m.set_1_ext + 2, 1, 0) +
+                               IF(m.set_2_dom >= 25 AND m.set_2_dom >= m.set_2_ext + 2, 1, 0) +
+                               IF(m.set_3_dom >= 25 AND m.set_3_dom >= m.set_3_ext + 2, 1, 0) +
+                               IF(m.set_4_dom >= 25 AND m.set_4_dom >= m.set_4_ext + 2, 1, 0) +
+                               IF(m.set_5_dom >= 15 AND m.set_5_dom >= m.set_5_ext + 2, 1, 0) AS score_equipe_dom,
+                               IF(m.set_1_ext >= 25 AND m.set_1_ext >= m.set_1_dom + 2, 1, 0) +
+                               IF(m.set_2_ext >= 25 AND m.set_2_ext >= m.set_2_dom + 2, 1, 0) +
+                               IF(m.set_3_ext >= 25 AND m.set_3_ext >= m.set_3_dom + 2, 1, 0) +
+                               IF(m.set_4_ext >= 25 AND m.set_4_ext >= m.set_4_dom + 2, 1, 0) +
+                               IF(m.set_5_ext >= 15 AND m.set_5_ext >= m.set_5_dom + 2, 1, 0) AS score_equipe_ext
+                        FROM matches m)
 SELECT m.id_match,
-       IF(m.forfait_dom + m.forfait_ext > 0, 1, 0)                               AS is_forfait,
-       IF(m.score_equipe_dom = 3 OR m.score_equipe_ext = 3, 1, 0)                AS is_match_score_filled,
+       cf.forfait_dom,
+       cf.forfait_ext,
+       cf.is_forfait,
+       IF(cs.score_equipe_dom = 3 OR cs.score_equipe_ext = 3, 1, 0)              AS is_match_score_filled,
        IF(mpcv.id_match IS NOT NULL, 1, 0)                                       AS is_match_player_filled,
        mpcv.count_status                                                         AS count_status,
        IF(mpcv.id_match IS NULL
-              AND (m.forfait_dom + m.forfait_ext = 0)
-              AND (m.certif = 0), 1, 0)                                          AS is_match_player_requested,
+              AND cf.is_forfait = 0
+              AND m.certif = 0, 1, 0)                                            AS is_match_player_requested,
        IF(m.id_match IN (SELECT id_match
                          FROM match_player
                                   JOIN players_view j2 on match_player.id_player = j2.id
                          WHERE (j2.est_actif = 0 OR
                                 STR_TO_DATE(j2.date_homologation, '%d/%m/%Y') > m.date_reception
                              OR j2.date_homologation IS NULL
-                             OR j2.num_licence IS NULL))
+                             OR j2.num_licence IS NULL)) AND cf.is_forfait = 0
            , 1,
           0)                                                                     AS has_forbidden_player,
        m.code_match,
@@ -35,8 +70,8 @@ SELECT m.id_match,
        e1.nom_equipe                                                             AS equipe_dom,
        m.id_equipe_ext,
        e2.nom_equipe                                                             AS equipe_ext,
-       m.score_equipe_dom + 0                                                    AS score_equipe_dom,
-       m.score_equipe_ext + 0                                                    AS score_equipe_ext,
+       cs.score_equipe_dom,
+       cs.score_equipe_ext,
        m.set_1_dom,
        m.set_1_ext,
        m.set_2_dom,
@@ -56,28 +91,22 @@ SELECT m.id_match,
        DATE_FORMAT(m.date_original, '%d/%m/%Y')                                  AS date_original,
        UNIX_TIMESTAMP(m.date_original + INTERVAL 23 HOUR + INTERVAL 59 MINUTE) *
        1000                                                                      AS date_original_raw,
-       m.forfait_dom                                                             AS forfait_dom,
-       m.forfait_ext                                                             AS forfait_ext,
-       CASE
-           WHEN m.is_sign_team_ext = 1
-               AND m.is_sign_team_dom = 1
-               AND m.is_sign_match_ext = 1
-               AND m.is_sign_match_dom = 1 THEN 1
-           ELSE m.sheet_received END                                             AS sheet_received,
+       IF(m.is_sign_team_ext = 1
+              AND m.is_sign_team_dom = 1
+              AND m.is_sign_match_ext = 1
+              AND m.is_sign_match_dom = 1, 1, 0)                                 AS sheet_received,
        m.note,
-       m.certif                                                                  AS certif,
+       m.certif,
        m.report_status,
        (
            CASE
-               WHEN (m.score_equipe_dom + m.score_equipe_ext > 0) THEN 0
+               WHEN (cs.score_equipe_dom + cs.score_equipe_ext > 0) THEN 0
                WHEN m.date_reception >= curdate() THEN 0
                WHEN curdate() >= DATE_ADD(m.date_reception, INTERVAL 10 DAY) THEN 2
                WHEN curdate() >= DATE_ADD(m.date_reception, INTERVAL 5 DAY) THEN 1
                END
            )                                                                     AS retard,
-       IF(mf.id_file IS NOT NULL, 1, 0)                                          AS is_file_attached,
        m.match_status,
-       GROUP_CONCAT(f.path_file SEPARATOR '|')                                   AS files_paths,
        m.is_sign_match_dom,
        m.is_sign_match_ext,
        m.is_sign_team_dom,
@@ -87,8 +116,10 @@ SELECT m.id_match,
        m.referee,
        IF(s_dom.id IS NOT NULL, 1, 0)                                            AS is_survey_filled_dom,
        IF(s_ext.id IS NOT NULL, 1, 0)                                            AS is_survey_filled_ext,
-       GROUP_CONCAT(DISTINCT com.email) AS contact_com
+       GROUP_CONCAT(DISTINCT com.email)                                          AS contact_com
 FROM matches m
+         JOIN computed_forfait cf ON m.id_match = cf.id_match
+         JOIN computed_score cs ON m.id_match = cs.id_match
          JOIN competitions c ON c.code_competition = m.code_competition
          JOIN equipes e1 ON e1.id_equipe = m.id_equipe_dom
          LEFT JOIN joueur_equipe jeresp_dom on jeresp_dom.id_equipe = e1.id_equipe AND jeresp_dom.is_leader = 1
@@ -108,8 +139,6 @@ FROM matches m
                       'Samedi')
     AND cr.id_gymnase = m.id_gymnasium
          LEFT JOIN gymnase g ON m.id_gymnasium = g.id
-         LEFT JOIN matches_files mf ON mf.id_match = m.id_match
-         LEFT JOIN files f on mf.id_file = f.id
          LEFT JOIN match_players_count_view mpcv ON mpcv.id_match = m.id_match
          LEFT JOIN survey s_dom ON m.id_match = s_dom.id_match AND s_dom.user_id IN (SELECT ca.id
                                                                                      FROM comptes_acces ca
@@ -117,8 +146,8 @@ FROM matches m
          LEFT JOIN survey s_ext ON m.id_match = s_ext.id_match AND s_ext.user_id IN (SELECT ca.id
                                                                                      FROM comptes_acces ca
                                                                                      WHERE ca.id_equipe = m.id_equipe_ext)
-        LEFT JOIN commission_division cd ON cd.division = CONCAT('d',m.division, m.code_competition)
-        LEFT JOIN commission com ON cd.id_commission = com.id_commission
+         LEFT JOIN commission_division cd ON cd.division = CONCAT('d', m.division, m.code_competition)
+         LEFT JOIN commission com ON cd.id_commission = com.id_commission
 WHERE 1 = 1
 GROUP BY code_competition, division, numero_journee, code_match
 ORDER BY code_competition, division, numero_journee, code_match;
