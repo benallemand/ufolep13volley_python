@@ -112,4 +112,4 @@ FROM joueurs j
          JOIN competitions min_comp ON min_comp.start_date = (SELECT MIN(start_date) FROM competitions)
 WHERE 1 = 1
 GROUP BY j.id, j.sexe, UPPER(j.nom)
-ORDER BY j.sexe, UPPER(j.nom);
+ORDER BY UPPER(full_name);
