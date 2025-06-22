@@ -1,5 +1,5 @@
--- DEV: reDONE 240303
--- PROD: reDONE 240303
+-- DEV: reDONE 250622
+-- PROD: reDONE 250622
 CREATE OR REPLACE VIEW match_players_count_view AS
 SELECT a.id_match,
        a.code_match,
