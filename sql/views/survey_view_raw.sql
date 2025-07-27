@@ -1,5 +1,5 @@
--- DEV: DONE 240624
--- PROD: DONE 240624
+-- DEV: reDONE 250721
+-- PROD: reDONE 250727
 CREATE OR REPLACE view survey_view_raw AS
 SELECT s.id,
        e_sondeuse.id_equipe    AS id_team_sondeuse,
@@ -33,7 +33,8 @@ SELECT s.id,
 FROM survey s
          JOIN matches m on s.id_match = m.id_match
          JOIN comptes_acces ca on ca.id = s.user_id
-         JOIN equipes e_sondeuse on ca.id_equipe = e_sondeuse.id_equipe
+         JOIN users_teams ut on ca.id = ut.user_id
+         JOIN equipes e_sondeuse on ut.team_id = e_sondeuse.id_equipe
          JOIN equipes e_sondee
               on ((e_sondee.id_equipe IN (m.id_equipe_dom, m.id_equipe_ext) AND
                    e_sondeuse.id_equipe IN (m.id_equipe_dom, m.id_equipe_ext))
@@ -41,4 +42,4 @@ FROM survey s
          JOIN clubs c_sondee ON e_sondee.id_club = c_sondee.id
          JOIN classements c ON e_sondee.id_equipe = c.id_equipe AND c.code_competition = m.code_competition
 WHERE s.on_time + s.spirit + s.referee + s.catering + s.global > 0
-ORDER BY id
+ORDER BY id;

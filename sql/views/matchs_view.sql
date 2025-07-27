@@ -1,5 +1,5 @@
--- DEV: reDONE 250208
--- PROD: reDONE 250208
+-- DEV: reDONE 250721
+-- PROD: reDONE 250727
 CREATE OR REPLACE VIEW matchs_view AS
 WITH computed_forfait AS (SELECT m.id_match,
                                  IF(m.set_1_dom = 25 AND m.set_1_ext = 0
@@ -142,10 +142,12 @@ FROM matches m
          LEFT JOIN match_players_count_view mpcv ON mpcv.id_match = m.id_match
          LEFT JOIN survey s_dom ON m.id_match = s_dom.id_match AND s_dom.user_id IN (SELECT ca.id
                                                                                      FROM comptes_acces ca
-                                                                                     WHERE ca.id_equipe = m.id_equipe_dom)
+                                                                                              JOIN users_teams ut ON ca.id = ut.user_id
+                                                                                     WHERE ut.team_id = m.id_equipe_dom)
          LEFT JOIN survey s_ext ON m.id_match = s_ext.id_match AND s_ext.user_id IN (SELECT ca.id
                                                                                      FROM comptes_acces ca
-                                                                                     WHERE ca.id_equipe = m.id_equipe_ext)
+                                                                                              JOIN users_teams ut ON ca.id = ut.user_id
+                                                                                     WHERE ut.team_id = m.id_equipe_ext)
          LEFT JOIN commission_division cd ON cd.division = CONCAT('d', m.division, m.code_competition)
          LEFT JOIN commission com ON cd.id_commission = com.id_commission
 WHERE 1 = 1
