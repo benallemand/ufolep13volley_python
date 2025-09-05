@@ -1,0 +1,3 @@
+DELETE
+FROM register
+WHERE 1 = 1;
