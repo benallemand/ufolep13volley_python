@@ -443,8 +443,8 @@ class UfolepMySQLScheduler:
         print(f"[INFO] {spacing_constraints_count} contraintes d'espacement ajoutées")
     
     def _add_home_percentage_constraints(self, model: cp_model.CpModel, matches_data: list) -> None:
-        """Contrainte : Équipes avec créneaux de réception doivent jouer ≥30% de leurs matchs à domicile."""
-        print("[INFO] Application contrainte : 30% domicile pour équipes avec réception...")
+        """Contrainte : Équipes avec créneaux de réception doivent jouer ≥40% de leurs matchs à domicile."""
+        print("[INFO] Application contrainte : 40% domicile pour équipes avec réception...")
         
         # Identifier les équipes ayant des créneaux de réception (time_slots)
         teams_with_reception = set()
@@ -454,7 +454,7 @@ class UfolepMySQLScheduler:
         
         print(f"[INFO] {len(teams_with_reception)} équipes avec créneaux de réception identifiées")
         
-        # Compter les matchs par équipe et appliquer la contrainte 30%
+        # Compter les matchs par équipe et appliquer la contrainte 40%
         team_home_vars = {}
         
         for match_data in matches_data:
@@ -466,7 +466,7 @@ class UfolepMySQLScheduler:
                 team_home_vars[home_team.id] = []
             team_home_vars[home_team.id].append(var)
         
-        # Appliquer la contrainte 30% pour les équipes avec réception
+        # Appliquer la contrainte 40% pour les équipes avec réception
         constraints_added = 0
         for team_id in teams_with_reception:
             if team_id in team_home_vars:
@@ -479,15 +479,15 @@ class UfolepMySQLScheduler:
                     if team_division:
                         total_matches = len(team_division.teams) - 1  # Contre toutes les autres équipes
                         home_vars = team_home_vars[team_id]
-                        min_home_matches = math.ceil(total_matches * 0.3)  # 30% minimum, arrondi vers le haut
+                        min_home_matches = math.ceil(total_matches * 0.4)  # 40% minimum, arrondi vers le haut
                         
-                        # Contrainte: nombre de matchs à domicile ≥ 30% du total
+                        # Contrainte: nombre de matchs à domicile ≥ 40% du total
                         model.Add(sum(home_vars) >= min_home_matches)
                         constraints_added += 1
                         
-                        print(f"[CONTRAINTE] {team.nom}: >={min_home_matches}/{total_matches} matchs domicile (30%)")
+                        print(f"[CONTRAINTE] {team.nom}: >={min_home_matches}/{total_matches} matchs domicile (40%)")
         
-        print(f"[INFO] {constraints_added} contraintes 30% domicile ajoutées")
+        print(f"[INFO] {constraints_added} contraintes 40% domicile ajoutées")
     
     def _add_optimization_objective(self, model: cp_model.CpModel, team_week_vars: dict) -> None:
         """Fonction objectif : Minimiser le nombre d'équipes jouant 2 fois dans la même semaine."""
@@ -831,10 +831,10 @@ class UfolepMySQLScheduler:
             
             return True
     
-    def validate_30_percent_home_rule(self):
-        """Valide la règle des 30% minimum de matchs à domicile pour équipes avec réception"""
+    def validate_40_percent_home_rule(self):
+        """Valide la règle des 40% minimum de matchs à domicile pour équipes avec réception"""
         print("\n" + "="*80)
-        print("VALIDATION RÈGLE 30% DOMICILE (ÉQUIPES AVEC RÉCEPTION)")
+        print("VALIDATION RÈGLE 40% DOMICILE (ÉQUIPES AVEC RÉCEPTION)")
         print("="*80)
         
         # Identifier les équipes avec créneaux de réception
@@ -866,13 +866,13 @@ class UfolepMySQLScheduler:
                 team_stats[away_team_id]['away'] += 1
                 team_stats[away_team_id]['total'] += 1
         
-        # Analyser le respect de la règle 30%
+        # Analyser le respect de la règle 40%
         compliant_teams = 0
         violation_teams = 0
         no_reception_teams = 0
         
         print("\nDétail par équipe:")
-        print("Equipe | Domicile | Total | % Dom. | Min 30% | Reception | Statut")
+        print("Equipe | Domicile | Total | % Dom. | Min 40% | Reception | Statut")
         print("-" * 75)
         
         for team_id, stats in team_stats.items():
@@ -882,7 +882,7 @@ class UfolepMySQLScheduler:
             home = stats['home']
             total = stats['total']
             home_percentage = (home / total) * 100 if total > 0 else 0
-            min_required = math.ceil(total * 0.3)  # 30% minimum, arrondi vers le haut
+            min_required = math.ceil(total * 0.4)  # 40% minimum, arrondi vers le haut
             has_reception = stats['has_reception']
             
             if not has_reception:
@@ -904,16 +904,16 @@ class UfolepMySQLScheduler:
         print("\n" + "-" * 75)
         print("STATISTIQUES GLOBALES:")
         print(f"  Equipes avec creneaux de reception: {total_with_reception}")
-        print(f"  Equipes conformes (>=30% domicile): {compliant_teams}/{total_with_reception} ({compliant_teams/total_with_reception*100:.1f}%)" if total_with_reception > 0 else "  Aucune equipe avec reception")
-        print(f"  Equipes en violation (<30% domicile): {violation_teams}/{total_with_reception} ({violation_teams/total_with_reception*100:.1f}%)" if total_with_reception > 0 else "")
+        print(f"  Equipes conformes (>=40% domicile): {compliant_teams}/{total_with_reception} ({compliant_teams/total_with_reception*100:.1f}%)" if total_with_reception > 0 else "  Aucune equipe avec reception")
+        print(f"  Equipes en violation (<40% domicile): {violation_teams}/{total_with_reception} ({violation_teams/total_with_reception*100:.1f}%)" if total_with_reception > 0 else "")
         print(f"  Equipes sans reception: {no_reception_teams}")
         
         # Resultat final
         if violation_teams == 0:
-            print("\n[OK SUCCES] REGLE 30% DOMICILE RESPECTEE")
-            print("Toutes les equipes avec reception jouent au moins 30% de leurs matchs a domicile.")
+            print("\n[OK SUCCES] REGLE 40% DOMICILE RESPECTEE")
+            print("Toutes les equipes avec reception jouent au moins 40% de leurs matchs a domicile.")
         else:
-            print(f"\n[X ECHEC] {violation_teams} VIOLATIONS DE LA REGLE 30% DOMICILE")
+            print(f"\n[X ECHEC] {violation_teams} VIOLATIONS DE LA REGLE 40% DOMICILE")
             print("Certaines equipes avec reception ne jouent pas assez de matchs a domicile.")
         
         return violation_teams == 0
@@ -1138,7 +1138,7 @@ class UfolepMySQLScheduler:
             print("\n[✅ TRÈS BON] OPTIMISATION RÉUSSIE!")
             print(f"Seulement {teams_twice_count} cas sur {total_team_weeks} ({teams_twice_count/total_team_weeks*100:.1f}%)")
             print("Résultat excellent avec la période étendue.")
-        elif teams_twice_count <= total_team_weeks * 0.3:  # Moins de 30%
+        elif teams_twice_count <= total_team_weeks * 0.4:  # Moins de 40%
             print("\n[✅ BON] OPTIMISATION EFFICACE")
             print(f"{teams_twice_count} cas sur {total_team_weeks} ({teams_twice_count/total_team_weeks*100:.1f}%)")
             print("Amélioration significative par rapport à une génération sans optimisation.")
@@ -1599,8 +1599,8 @@ def main():
             print("Veuillez corriger les problèmes avant de continuer.")
             return
         
-        # Validation de la règle 30% domicile pour équipes avec réception
-        scheduler.validate_30_percent_home_rule()
+        # Validation de la règle 40% domicile pour équipes avec réception
+        scheduler.validate_40_percent_home_rule()
         
         # Validation de la règle espacement minimum 2 jours entre matchs
         scheduler.validate_minimum_rest_days()
