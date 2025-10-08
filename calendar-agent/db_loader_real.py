@@ -44,8 +44,8 @@ class CreneauData:
 class ClassementData:
     """Données de classement (liaison équipe-division)."""
     id: str
-    code_competition: str  # M, F, MIXTE
-    division: int  # 1,2,3,4...
+    code_competition: str
+    division: str  # Peut contenir des lettres comme '7a'
     id_equipe: str
 
 
@@ -62,10 +62,10 @@ class EquipeData:
 @dataclass
 class DivisionVirtuelle:
     """Division reconstituée depuis les classements."""
-    id: str  # ex: "M_1", "F_2", "MIXTE_3"
-    nom: str  # ex: "Division Masculine 1"
+    id: str  # ex: "M_1", "F_2a", "MIXTE_3b"
+    nom: str  # ex: "Division Masculine 1A"
     code_competition: str  # M, F, MIXTE
-    division: int  # 1,2,3,4...
+    division: str  # Peut contenir des lettres comme '7a', '7b', etc.
     equipes: List[str]  # IDs des équipes
 
 
@@ -242,7 +242,7 @@ class UfolepDatabaseLoader:
             classement = ClassementData(
                 id=str(row['id']),
                 code_competition=row['code_competition'],
-                division=int(row['division']),
+                division=str(row['division']),  # Conversion en chaîne au lieu de int
                 id_equipe=str(row['id_equipe'])
             )
             self.classements[classement.id] = classement
