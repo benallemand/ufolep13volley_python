@@ -1430,8 +1430,7 @@ class UfolepMySQLScheduler:
             for i, match in enumerate(self.matches, 1):
                 match_code = self.generate_match_code(match, i)
                 
-                # Combiner date et heure pour datetime
-                match_datetime = datetime.combine(match.date, match.time_slot.heure_debut)
+                # Utiliser seulement la date (pas l'heure)
                 
                 match_row = (
                     match_code,                           # code_match
@@ -1439,7 +1438,7 @@ class UfolepMySQLScheduler:
                     match.division.division_num,          # division
                     match.equipe_domicile.id,            # id_equipe_dom
                     match.equipe_exterieur.id,           # id_equipe_ext
-                    match_datetime,                       # date_reception
+                    match.date,                           # date_reception (date seulement)
                     'NOT_CONFIRMED',                      # match_status
                     match.time_slot.gymnase_id           # id_gymnasium
                 )
@@ -1518,12 +1517,11 @@ class UfolepMySQLScheduler:
                     # Utiliser la même méthode de génération de code
                     match_code = self.generate_match_code(match, i)
                     
-                    # Combiner date et heure pour datetime (même logique)
-                    match_datetime = datetime.combine(match.date, match.time_slot.heure_debut)
-                    datetime_str = match_datetime.strftime('%Y-%m-%d %H:%M:%S')
+                    # Utiliser seulement la date (pas l'heure)
+                    date_str = match.date.strftime('%Y-%m-%d')
                     
                     # Créer la ligne de valeurs avec les mêmes données
-                    values = f"('{match_code}', '{match.division.code_competition}', '{match.division.division_num}', '{match.equipe_domicile.id}', '{match.equipe_exterieur.id}', '{datetime_str}', 'NOT_CONFIRMED', '{match.time_slot.gymnase_id}')"
+                    values = f"('{match_code}', '{match.division.code_competition}', '{match.division.division_num}', '{match.equipe_domicile.id}', '{match.equipe_exterieur.id}', '{date_str}', 'NOT_CONFIRMED', '{match.time_slot.gymnase_id}')"
                     match_values.append(values)
                 
                 # Écrire toutes les valeurs
