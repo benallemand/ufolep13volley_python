@@ -96,7 +96,7 @@ class UfolepMySQLScheduler:
         
         # Période de championnat
         self.start_date = date(2025, 11, 3)
-        self.end_date = date(2026, 1, 13)
+        self.end_date = date(2025, 12, 19)
         
         # Jours de la semaine autorisés (1=Lundi, 5=Vendredi)
         self.allowed_weekdays = [1, 2, 3, 4, 5]
