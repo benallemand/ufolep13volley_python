@@ -1375,15 +1375,16 @@ class UfolepMySQLScheduler:
         return f"{match.division.code_competition.upper()}_{match.division.division_num}_{date_str}_{match_index:03d}"
     
     def clear_existing_matches(self) -> bool:
-        """Supprime tous les matchs existants de la base de données."""
+        """Supprime uniquement les matchs NOT_CONFIRMED des championnats m/f/mo."""
         try:
             connection = mysql.connector.connect(**DB_CONFIG)
             cursor = connection.cursor()
             
-            # Supprimer tous les matchs des compétitions filtrées
+            # Supprimer uniquement les matchs NOT_CONFIRMED des compétitions filtrées
             query = f"""
             DELETE FROM {TABLE_NAMES['matchs']} 
             WHERE {COLUMN_MAPPING['matches']['code_competition']} IN ('m', 'f', 'mo')
+            AND {COLUMN_MAPPING['matches']['match_status']} = 'NOT_CONFIRMED'
             """
             
             cursor.execute(query)
@@ -1476,6 +1477,84 @@ class UfolepMySQLScheduler:
         
         print("[SUCCÈS] Calendrier sauvegardé avec succès dans la base MySQL!")
         return True
+    
+    def generate_sql_file(self, filename: str = "insert_matches.sql") -> bool:
+        """Génère un fichier SQL pour insérer les matchs via phpMyAdmin.
+        Utilise exactement la même logique que save_matches_to_database()."""
+        if not self.matches:
+            print("[ERREUR] Aucun match à exporter")
+            return False
+        
+        try:
+            with open(filename, 'w', encoding='utf-8') as f:
+                # En-tête du fichier
+                f.write("-- Fichier SQL généré automatiquement par le générateur UFOLEP\n")
+                f.write(f"-- Date de génération: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                f.write(f"-- Nombre de matchs: {len(self.matches)}\n")
+                f.write("-- À exécuter dans phpMyAdmin\n\n")
+                
+                # Suppression des matchs existants (même logique que clear_existing_matches)
+                f.write("-- Suppression uniquement des matchs NOT_CONFIRMED\n")
+                f.write(f"DELETE FROM {TABLE_NAMES['matchs']} \n")
+                f.write(f"WHERE {COLUMN_MAPPING['matches']['code_competition']} IN ('m', 'f', 'mo')\n")
+                f.write(f"AND {COLUMN_MAPPING['matches']['match_status']} = 'NOT_CONFIRMED';\n\n")
+                
+                # Insertion des nouveaux matchs (même structure que save_matches_to_database)
+                f.write("-- Insertion des nouveaux matchs\n")
+                f.write(f"INSERT INTO {TABLE_NAMES['matchs']} (\n")
+                f.write(f"    {COLUMN_MAPPING['matches']['code_match']},\n")
+                f.write(f"    {COLUMN_MAPPING['matches']['code_competition']},\n")
+                f.write(f"    {COLUMN_MAPPING['matches']['division']},\n")
+                f.write(f"    {COLUMN_MAPPING['matches']['id_equipe_dom']},\n")
+                f.write(f"    {COLUMN_MAPPING['matches']['id_equipe_ext']},\n")
+                f.write(f"    {COLUMN_MAPPING['matches']['date_reception']},\n")
+                f.write(f"    {COLUMN_MAPPING['matches']['match_status']},\n")
+                f.write(f"    {COLUMN_MAPPING['matches']['id_gymnasium']}\n")
+                f.write(") VALUES\n")
+                
+                # Préparer les données exactement comme dans save_matches_to_database
+                match_values = []
+                for i, match in enumerate(self.matches, 1):
+                    # Utiliser la même méthode de génération de code
+                    match_code = self.generate_match_code(match, i)
+                    
+                    # Combiner date et heure pour datetime (même logique)
+                    match_datetime = datetime.combine(match.date, match.time_slot.heure_debut)
+                    datetime_str = match_datetime.strftime('%Y-%m-%d %H:%M:%S')
+                    
+                    # Créer la ligne de valeurs avec les mêmes données
+                    values = f"('{match_code}', '{match.division.code_competition}', '{match.division.division_num}', '{match.equipe_domicile.id}', '{match.equipe_exterieur.id}', '{datetime_str}', 'NOT_CONFIRMED', '{match.time_slot.gymnase_id}')"
+                    match_values.append(values)
+                
+                # Écrire toutes les valeurs
+                f.write(',\n'.join(match_values))
+                f.write(';\n\n')
+                
+                # Statistiques finales
+                f.write("-- Statistiques\n")
+                f.write(f"-- Total matchs insérés: {len(self.matches)}\n")
+                
+                divisions_count = {}
+                for match in self.matches:
+                    div_key = f"{match.division.code_competition}{match.division.division_num}"
+                    divisions_count[div_key] = divisions_count.get(div_key, 0) + 1
+                
+                for div, count in sorted(divisions_count.items()):
+                    f.write(f"-- Division {div}: {count} matchs\n")
+            
+            print(f"[SUCCÈS] Fichier SQL généré: {filename}")
+            print(f"[INFO] Ce fichier utilise exactement la même logique que la sauvegarde directe")
+            print(f"[INFO] Vous pouvez maintenant:")
+            print(f"[INFO] 1. Ouvrir phpMyAdmin")
+            print(f"[INFO] 2. Sélectionner votre base de données")
+            print(f"[INFO] 3. Aller dans l'onglet 'SQL'")
+            print(f"[INFO] 4. Copier-coller le contenu de {filename}")
+            print(f"[INFO] 5. Exécuter la requête")
+            return True
+            
+        except Exception as e:
+            print(f"[ERREUR] Impossible de générer le fichier SQL: {e}")
+            return False
 
 def main():
     """Fonction principale."""
@@ -1534,24 +1613,40 @@ def main():
         # Validation de l'optimisation : équipes jouant 2 fois/semaine
         scheduler.validate_teams_playing_twice_per_week()
         
-        # Demander si l'utilisateur veut sauvegarder en base
+        # Demander le mode de sauvegarde
         print("\n" + "="*60)
-        try:
-            save_choice = input("Voulez-vous sauvegarder ce calendrier dans la base MySQL ? (o/n): ").lower().strip()
-        except EOFError:
-            print("Pas d'entrée interactive disponible. Calendrier généré avec succès mais non sauvegardé.")
-            print("Pour sauvegarder, relancez le script dans un environnement interactif.")
-            return
+        print("OPTIONS DE SAUVEGARDE:")
+        print("1. Sauvegarde directe en base MySQL (connexion directe requise)")
+        print("2. Génération fichier SQL pour phpMyAdmin (recommandé pour OVH)")
+        print("3. Ne pas sauvegarder maintenant")
         
-        if save_choice in ['o', 'oui', 'y', 'yes']:
+        try:
+            save_choice = input("Votre choix (1/2/3): ").strip()
+        except EOFError:
+            print("Pas d'entrée interactive disponible. Génération du fichier SQL par défaut...")
+            save_choice = "2"
+        
+        if save_choice == "1":
+            # Sauvegarde directe
             if scheduler.save_schedule_to_database():
                 print("\n🎉 CALENDRIER SAUVEGARDÉ AVEC SUCCÈS!")
                 print(f"Les {len(scheduler.matches)} matchs ont été insérés dans votre base MySQL.")
                 print("Status: Prêt pour validation UFOLEP.")
             else:
-                print("\n❌ ERREUR lors de la sauvegarde.")
+                print("\n❌ ERREUR lors de la sauvegarde directe.")
+                print("Génération du fichier SQL en alternative...")
+                scheduler.generate_sql_file()
+                
+        elif save_choice == "2":
+            # Génération fichier SQL
+            if scheduler.generate_sql_file():
+                print("\n📄 FICHIER SQL GÉNÉRÉ AVEC SUCCÈS!")
+                print("Vous pouvez maintenant l'utiliser dans phpMyAdmin.")
+            else:
+                print("\n❌ ERREUR lors de la génération du fichier SQL.")
+                
         else:
-            print("\n📋 Calendrier généré mais non sauvegardé en base.")
+            print("\n📋 Calendrier généré mais non sauvegardé.")
             print("Vous pouvez relancer le programme pour sauvegarder plus tard.")
     else:
         print("[ERREUR] Échec de la génération du calendrier")
