@@ -1,0 +1,4 @@
+-- DEV: DONE 251018
+-- PROD: DONE 251018
+ALTER TABLE joueurs
+    DROP COLUMN show_photo;
