@@ -1,0 +1,490 @@
+GÉNÉRATEUR DE CALENDRIER UFOLEP - VERSION MYSQL FINALE
+Compétitions: ['c', 'kh']
+Fichier log: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\generation_c_kh.log
+============================================================
+[INFO] Chargement des données MySQL UFOLEP pour ['c', 'kh']...
+[OK] Connexion reussie a la base ufolep_13volley
+[INFO] Chargement des donnees UFOLEP reelles...
+[INFO] 34 clubs charges
+[INFO] 39 gymnases charges
+[INFO] 86 equipes chargees
+[INFO] 86 classements charges
+[INFO] Chargement créneaux 'kh' depuis table register...
+[INFO] 43 créneaux 'kh' chargés depuis register
+[INFO] Chargement créneaux 'c' depuis équipes 'm' inscrites à la coupe...
+[INFO] 58 créneaux 'c' chargés
+[INFO] 101 creneaux charges au total
+[INFO] 2 dates de competition chargees
+[INFO] 23 divisions virtuelles creees
+[INFO] Historique: 374 paires, 0 avec déséquilibre
+[OK] Toutes les donnees chargees avec succes
+[INFO] Connexion MySQL fermee
+[OK] Période compétition: 2026-01-19 au 2026-02-13
+[OK] Données chargées: 86 équipes, 23 divisions, 101 créneaux
+[OK] Conversion terminée: 23 divisions, 86 équipes programmées, 101 créneaux
+
+[INFO] ANALYSE DES CRÉNEAUX:
+   - Équipes avec créneaux de réception: 86
+   - Équipes sans créneaux (joueront toujours à l'extérieur): 0
+[INFO] Division c 1: 4 équipes = 6 matchs
+[INFO] Division c 2: 4 équipes = 6 matchs
+[INFO] Division c 3: 4 équipes = 6 matchs
+[INFO] Division c 4: 4 équipes = 6 matchs
+[INFO] Division c 5: 3 équipes = 3 matchs
+[INFO] Division c 6: 3 équipes = 3 matchs
+[INFO] Division c 7: 3 équipes = 3 matchs
+[INFO] Division c 8: 4 équipes = 6 matchs
+[INFO] Division c 9: 4 équipes = 6 matchs
+[INFO] Division c 10: 4 équipes = 6 matchs
+[INFO] Division c 11: 4 équipes = 6 matchs
+[INFO] Division c 12: 3 équipes = 3 matchs
+[INFO] Division c 13: 3 équipes = 3 matchs
+[INFO] Division c 14: 3 équipes = 3 matchs
+[INFO] Division kh 1: 4 équipes = 6 matchs
+[INFO] Division kh 2: 4 équipes = 6 matchs
+[INFO] Division kh 3: 4 équipes = 6 matchs
+[INFO] Division kh 4: 4 équipes = 6 matchs
+[INFO] Division kh 5: 4 équipes = 6 matchs
+[INFO] Division kh 6: 4 équipes = 6 matchs
+[INFO] Division kh 7: 4 équipes = 6 matchs
+[INFO] Division kh 8: 4 équipes = 6 matchs
+[INFO] Division kh 9: 4 équipes = 6 matchs
+[INFO] 12 paires longue distance (>50.0km), 1 réceptions forcées par historique
+[OK] 120 matchs programmés
+
+================================================================================
+CALENDRIER
+================================================================================
+
+Lundi 19/01/2026
+--------------------------------------------------
+  19:30 | Division c 8
+    MUST1 vs Massalia
+  19:30 | Division kh 3
+    Les branquignoles vs LES TRETS D'UNION
+  19:30 | Division kh 7
+    Les crains degun vs pelissanne KH3
+  20:30 | Division c 2
+    EGUILLES 2 vs AH2, Les Tigres
+  20:30 | Division c 8
+    les Brux d'eyguières vs pelissanne 6x6
+  20:30 | Division c 11
+    CVFVB1 vs Grans AIL 1
+  20:30 | Division c 13
+    CARIBOU vs Trets 1H
+  20:30 | Division c 14
+    Les Moux d'Eyguières vs Aix'otic
+  20:45 | Division kh 8
+    pelissanne KH1 vs Apé Roq
+  20:45 | Division kh 9
+    pelissanne KH2 vs Foxperier
+
+Mardi 20/01/2026
+--------------------------------------------------
+  20:00 | Division kh 1
+    Les Casse-Gueules vs BLOCK LIGNE
+  20:30 | Division c 1
+    Fuveau2 vs MVtapeur
+  20:30 | Division kh 3
+    Furie Bond vs Périer tout court !
+
+Mercredi 21/01/2026
+--------------------------------------------------
+  20:00 | Division c 9
+    Roq'n'Ball vs Fuveau 1
+
+Jeudi 22/01/2026
+--------------------------------------------------
+  19:30 | Division c 3
+    Trets 2H vs Aix'plosif
+  20:00 | Division c 10
+    AH1, les Panthères vs La Ciotat 1
+  20:00 | Division kh 2
+    AH2 mi vs 20H31
+  20:00 | Division kh 2
+    AHpero vs AHpero2
+
+Vendredi 23/01/2026
+--------------------------------------------------
+  19:00 | Division kh 9
+    Team Rocket vs 4 pintes d'Eyguières
+  19:30 | Division c 4
+    Périer original vs Must2
+  19:30 | Division c 12
+    Marseille Volley 1 vs ASPTT AIX 1
+  19:30 | Division kh 4
+    MV4kh vs Fuveau KH
+  19:30 | Division kh 6
+    Perier t(r)anche vs Ventartiflette
+  20:00 | Division c 2
+    Ventapéro vs T-raix
+  20:00 | Division c 11
+    aixecuteurs vs AIXTASY
+  20:00 | Division kh 1
+    SMC MIA vs ROUSSET KH1
+  20:00 | Division kh 4
+    Ces fous vs Les ambitieux
+  20:00 | Division kh 5
+    2 gars 2 filles vs NEW TEAM
+  20:00 | Division kh 5
+    family business vs Ventabimés
+  20:00 | Division kh 6
+    Carnoux vs Les 4 fantastiques KH
+  20:30 | Division c 4
+    VELAUXIRAPTOR 2 vs Fosamax
+
+Lundi 26/01/2026
+--------------------------------------------------
+  19:30 | Division c 4
+    Must2 vs Fosamax
+  19:30 | Division kh 6
+    Les 4 fantastiques KH vs Perier t(r)anche
+  20:00 | Division c 10
+    La Ciotat 1 vs ST MARTIN 1M
+  20:30 | Division c 8
+    les Brux d'eyguières vs Massalia
+
+Mardi 27/01/2026
+--------------------------------------------------
+  20:00 | Division kh 1
+    Les Casse-Gueules vs SMC MIA
+  20:00 | Division kh 5
+    Ventabimés vs NEW TEAM
+  20:30 | Division c 9
+    Fuveau 1 vs Grans 2
+
+Mercredi 28/01/2026
+--------------------------------------------------
+  20:00 | Division c 3
+    LES VETERANS vs Trets 2H
+  20:00 | Division kh 8
+    Apé Roq vs Les Casseurs2valises
+  20:00 | Division kh 9
+    4 pintes d'Eyguières vs pelissanne KH2
+  20:30 | Division c 2
+    T-raix vs EGUILLES 2
+
+Jeudi 29/01/2026
+--------------------------------------------------
+  19:30 | Division kh 3
+    LES TRETS D'UNION vs Furie Bond
+  20:00 | Division c 6
+    Gardanne 1m vs Saint Cannat
+  20:00 | Division c 10
+    AH1, les Panthères vs VELAUXIRAPTOR
+  20:00 | Division c 12
+    Les loutres vs Marseille Volley 1
+  20:00 | Division kh 2
+    AH2 mi vs AHpero
+  20:15 | Division c 5
+    Meyrargues vs Ventateens
+  20:45 | Division c 8
+    pelissanne 6x6 vs MUST1
+
+Vendredi 30/01/2026
+--------------------------------------------------
+  19:00 | Division kh 1
+    ROUSSET KH1 vs BLOCK LIGNE
+  19:00 | Division kh 9
+    Foxperier vs Team Rocket
+  19:30 | Division c 7
+    Les Condors de Périer vs CBVB2
+  19:30 | Division c 13
+    Marseille Volley 2 vs CARIBOU
+  19:30 | Division kh 4
+    MV4kh vs Ces fous
+  19:45 | Division c 3
+    MARSEILLE VOLLEY 3 vs Aix'plosif
+  20:00 | Division c 1
+    Les Revenants vs Trets 3H
+  20:00 | Division c 9
+    Marseille Est 3 vs Roq'n'Ball
+  20:00 | Division c 14
+    Aix'otic vs BOUC BEL AIR
+  20:00 | Division kh 3
+    Périer tout court ! vs Les branquignoles
+  20:00 | Division kh 5
+    2 gars 2 filles vs family business
+  20:00 | Division kh 7
+    Familly and Co vs Tamalous upgrade
+  20:00 | Division kh 8
+    LES BOUCS vs pelissanne KH1
+  20:30 | Division c 4
+    VELAUXIRAPTOR 2 vs Périer original
+
+Lundi 02/02/2026
+--------------------------------------------------
+  19:30 | Division c 13
+    Trets 1H vs Marseille Volley 2
+  19:30 | Division kh 7
+    Les crains degun vs Familly and Co
+  20:00 | Division kh 4
+    Les ambitieux vs MV4kh
+  20:30 | Division c 8
+    les Brux d'eyguières vs MUST1
+  20:30 | Division c 11
+    CVFVB1 vs AIXTASY
+  20:45 | Division kh 7
+    pelissanne KH3 vs Tamalous upgrade
+  20:45 | Division kh 9
+    pelissanne KH2 vs Team Rocket
+
+Mardi 03/02/2026
+--------------------------------------------------
+  19:30 | Division c 12
+    ASPTT AIX 1 vs Les loutres
+  20:00 | Division c 2
+    Ventapéro vs AH2, Les Tigres
+  20:00 | Division c 5
+    Ventateens vs KARNAGE
+  20:15 | Division c 7
+    CBVB2 vs Lambestix
+  20:15 | Division c 10
+    ST MARTIN 1M vs AH1, les Panthères
+  20:30 | Division c 1
+    Fuveau2 vs Les Revenants
+  20:30 | Division kh 3
+    Furie Bond vs Les branquignoles
+  20:30 | Division kh 4
+    Fuveau KH vs Ces fous
+
+Jeudi 05/02/2026
+--------------------------------------------------
+  19:30 | Division c 1
+    Trets 3H vs MVtapeur
+  19:30 | Division kh 8
+    Les Casseurs2valises vs LES BOUCS
+  20:00 | Division kh 2
+    AHpero2 vs AH2 mi
+  20:00 | Division kh 2
+    AHpero vs 20H31
+  20:30 | Division c 6
+    Saint Cannat vs MARIGNANE VB
+  20:45 | Division c 11
+    Grans AIL 1 vs aixecuteurs
+
+Vendredi 06/02/2026
+--------------------------------------------------
+  19:45 | Division c 3
+    MARSEILLE VOLLEY 3 vs LES VETERANS
+  20:00 | Division c 9
+    Marseille Est 3 vs Grans 2
+  20:00 | Division kh 5
+    NEW TEAM vs family business
+  20:00 | Division kh 6
+    Carnoux vs Ventartiflette
+  20:30 | Division c 4
+    VELAUXIRAPTOR 2 vs Must2
+  20:30 | Division c 10
+    VELAUXIRAPTOR vs La Ciotat 1
+
+Lundi 09/02/2026
+--------------------------------------------------
+  19:30 | Division c 8
+    Massalia vs pelissanne 6x6
+  20:30 | Division c 2
+    EGUILLES 2 vs Ventapéro
+  20:30 | Division c 11
+    CVFVB1 vs aixecuteurs
+  20:45 | Division c 5
+    KARNAGE vs Meyrargues
+
+Mardi 10/02/2026
+--------------------------------------------------
+  19:30 | Division c 11
+    AIXTASY vs Grans AIL 1
+  20:00 | Division c 6
+    MARIGNANE VB vs Gardanne 1m
+  20:30 | Division c 1
+    Fuveau2 vs Trets 3H
+  20:30 | Division c 9
+    Fuveau 1 vs Marseille Est 3
+  20:30 | Division kh 4
+    Fuveau KH vs Les ambitieux
+
+Mercredi 11/02/2026
+--------------------------------------------------
+  20:00 | Division kh 7
+    Tamalous upgrade vs Les crains degun
+  20:00 | Division kh 9
+    4 pintes d'Eyguières vs Foxperier
+  20:30 | Division c 3
+    Aix'plosif vs LES VETERANS
+  20:30 | Division c 7
+    Lambestix vs Les Condors de Périer
+
+Jeudi 12/02/2026
+--------------------------------------------------
+  19:30 | Division kh 3
+    LES TRETS D'UNION vs Périer tout court !
+  19:30 | Division kh 8
+    Les Casseurs2valises vs pelissanne KH1
+  20:00 | Division c 2
+    AH2, Les Tigres vs T-raix
+  20:45 | Division c 4
+    Fosamax vs Périer original
+  20:45 | Division c 9
+    Grans 2 vs Roq'n'Ball
+
+Vendredi 13/02/2026
+--------------------------------------------------
+  19:00 | Division kh 1
+    ROUSSET KH1 vs Les Casse-Gueules
+  19:30 | Division c 1
+    MVtapeur vs Les Revenants
+  19:30 | Division kh 6
+    Perier t(r)anche vs Carnoux
+  19:45 | Division c 3
+    MARSEILLE VOLLEY 3 vs Trets 2H
+  20:00 | Division c 14
+    BOUC BEL AIR vs Les Moux d'Eyguières
+  20:00 | Division kh 5
+    2 gars 2 filles vs Ventabimés
+  20:00 | Division kh 6
+    Ventartiflette vs Les 4 fantastiques KH
+  20:00 | Division kh 7
+    Familly and Co vs pelissanne KH3
+  20:00 | Division kh 8
+    LES BOUCS vs Apé Roq
+  20:30 | Division c 10
+    VELAUXIRAPTOR vs ST MARTIN 1M
+  20:45 | Division kh 1
+    BLOCK LIGNE vs SMC MIA
+  20:45 | Division kh 2
+    20H31 vs AHpero2
+
+================================================================================
+MATCHS PAR DIVISION
+================================================================================
+  Division c 1: 6 matchs
+  Division c 10: 6 matchs
+  Division c 11: 6 matchs
+  Division c 12: 3 matchs
+  Division c 13: 3 matchs
+  Division c 14: 3 matchs
+  Division c 2: 6 matchs
+  Division c 3: 6 matchs
+  Division c 4: 6 matchs
+  Division c 5: 3 matchs
+  Division c 6: 3 matchs
+  Division c 7: 3 matchs
+  Division c 8: 6 matchs
+  Division c 9: 6 matchs
+  Division kh 1: 6 matchs
+  Division kh 2: 6 matchs
+  Division kh 3: 6 matchs
+  Division kh 4: 6 matchs
+  Division kh 5: 6 matchs
+  Division kh 6: 6 matchs
+  Division kh 7: 6 matchs
+  Division kh 8: 6 matchs
+  Division kh 9: 6 matchs
+
+Total: 120 matchs programmés
+
+================================================================================
+RÉCEPTIONS / DÉPLACEMENTS PAR ÉQUIPE
+================================================================================
+Équipe                         | Dom | Ext | Total
+--------------------------------------------------
+2 gars 2 filles                |   3 |   0 |     3
+20H31                          |   1 |   2 |     3
+4 pintes d'Eyguières           |   2 |   1 |     3
+AH1, les Panthères             |   2 |   1 |     3
+AH2 mi                         |   2 |   1 |     3
+AH2, Les Tigres                |   1 |   2 |     3
+AHpero                         |   2 |   1 |     3
+AHpero2                        |   1 |   2 |     3
+AIXTASY                        |   1 |   2 |     3
+ASPTT AIX 1                    |   1 |   1 |     2
+Aix'otic                       |   1 |   1 |     2
+Aix'plosif                     |   1 |   2 |     3
+Apé Roq                        |   1 |   2 |     3
+BLOCK LIGNE                    |   1 |   2 |     3
+BOUC BEL AIR                   |   1 |   1 |     2
+CARIBOU                        |   1 |   1 |     2
+CBVB2                          |   1 |   1 |     2
+CVFVB1                         |   3 |   0 |     3
+Carnoux                        |   2 |   1 |     3
+Ces fous                       |   1 |   2 |     3
+EGUILLES 2                     |   2 |   1 |     3
+Familly and Co                 |   2 |   1 |     3
+Fosamax                        |   1 |   2 |     3
+Foxperier                      |   1 |   2 |     3
+Furie Bond                     |   2 |   1 |     3
+Fuveau 1                       |   2 |   1 |     3
+Fuveau KH                      |   2 |   1 |     3
+Fuveau2                        |   3 |   0 |     3
+Gardanne 1m                    |   1 |   1 |     2
+Grans 2                        |   1 |   2 |     3
+Grans AIL 1                    |   1 |   2 |     3
+KARNAGE                        |   1 |   1 |     2
+LES BOUCS                      |   2 |   1 |     3
+LES TRETS D'UNION              |   2 |   1 |     3
+LES VETERANS                   |   1 |   2 |     3
+La Ciotat 1                    |   1 |   2 |     3
+Lambestix                      |   1 |   1 |     2
+Les 4 fantastiques KH          |   1 |   2 |     3
+Les Casse-Gueules              |   2 |   1 |     3
+Les Casseurs2valises           |   2 |   1 |     3
+Les Condors de Périer          |   1 |   1 |     2
+Les Moux d'Eyguières           |   1 |   1 |     2
+Les Revenants                  |   1 |   2 |     3
+Les ambitieux                  |   1 |   2 |     3
+Les branquignoles              |   1 |   2 |     3
+Les crains degun               |   2 |   1 |     3
+Les loutres                    |   1 |   1 |     2
+MARIGNANE VB                   |   1 |   1 |     2
+MARSEILLE VOLLEY 3             |   3 |   0 |     3
+MUST1                          |   1 |   2 |     3
+MV4kh                          |   2 |   1 |     3
+MVtapeur                       |   1 |   2 |     3
+Marseille Est 3                |   2 |   1 |     3
+Marseille Volley 1             |   1 |   1 |     2
+Marseille Volley 2             |   1 |   1 |     2
+Massalia                       |   1 |   2 |     3
+Meyrargues                     |   1 |   1 |     2
+Must2                          |   1 |   2 |     3
+NEW TEAM                       |   1 |   2 |     3
+Perier t(r)anche               |   2 |   1 |     3
+Périer original                |   1 |   2 |     3
+Périer tout court !            |   1 |   2 |     3
+ROUSSET KH1                    |   2 |   1 |     3
+Roq'n'Ball                     |   1 |   2 |     3
+SMC MIA                        |   1 |   2 |     3
+ST MARTIN 1M                   |   1 |   2 |     3
+Saint Cannat                   |   1 |   1 |     2
+T-raix                         |   1 |   2 |     3
+Tamalous upgrade               |   1 |   2 |     3
+Team Rocket                    |   1 |   2 |     3
+Trets 1H                       |   1 |   1 |     2
+Trets 2H                       |   1 |   2 |     3
+Trets 3H                       |   1 |   2 |     3
+VELAUXIRAPTOR                  |   2 |   1 |     3
+VELAUXIRAPTOR 2                |   3 |   0 |     3
+Ventabimés                     |   1 |   2 |     3
+Ventapéro                      |   2 |   1 |     3
+Ventartiflette                 |   1 |   2 |     3
+Ventateens                     |   1 |   1 |     2
+aixecuteurs                    |   1 |   2 |     3
+family business                |   1 |   2 |     3
+les Brux d'eyguières           |   3 |   0 |     3
+pelissanne 6x6                 |   1 |   2 |     3
+pelissanne KH1                 |   1 |   2 |     3
+pelissanne KH2                 |   2 |   1 |     3
+pelissanne KH3                 |   1 |   2 |     3
+
+============================================================
+GÉNÉRATION DU FICHIER SQL...
+[SUCCES] Fichier SQL genere: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\insert_matches_c_kh.sql
+[INFO] Ce fichier utilise exactement la même logique que la sauvegarde directe
+[INFO] Vous pouvez maintenant:
+[INFO] 1. Ouvrir phpMyAdmin
+[INFO] 2. Sélectionner votre base de données
+[INFO] 3. Aller dans l'onglet 'SQL'
+[INFO] 4. Copier-coller le contenu de C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\insert_matches_c_kh.sql
+[INFO] 5. Exécuter la requête
+
+[OK] FICHIER SQL GENERE AVEC SUCCES!
+Fichier: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\insert_matches_c_kh.sql
+Vous pouvez maintenant l'utiliser dans phpMyAdmin.

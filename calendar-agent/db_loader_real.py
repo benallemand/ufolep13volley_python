@@ -28,6 +28,8 @@ class GymnaseData:
     nom: str
     adresse: str
     nb_terrains: int
+    lat: float = None
+    lng: float = None
 
 
 @dataclass
@@ -69,17 +71,51 @@ class DivisionVirtuelle:
     equipes: List[str]  # IDs des équipes
 
 
+@dataclass
+class CompetitionDates:
+    """Dates d'une compétition."""
+    code_competition: str
+    start_date: 'date'
+    end_date: 'date'
+
+
 class UfolepDatabaseLoader:
     """Chargeur de données UFOLEP depuis MySQL adapté à la structure réelle."""
     
-    def __init__(self):
+    def __init__(self, competition_codes: List[str] = None):
+        """Initialise le loader.
+        
+        Args:
+            competition_codes: Liste des codes de compétition à charger (ex: ['m', 'f', 'mo', 'c'])
+                              Par défaut: ['m', 'f', 'mo']
+        """
         self.connection = None
+        self.competition_codes = competition_codes or ['m', 'f', 'mo']
         self.clubs = {}
         self.gymnases = {}
         self.creneaux = {}
         self.classements = {}
         self.equipes = {}
         self.divisions_virtuelles = {}
+        self.competition_dates = {}
+        self.historique_deplacements = {}  # {(equipe1_id, equipe2_id): {'equipe1_dom': n, 'equipe2_dom': n}}
+    
+    def _get_competition_filter(self) -> str:
+        """Retourne la clause SQL pour filtrer par code_competition."""
+        codes_str = ", ".join(f"'{c}'" for c in self.competition_codes)
+        return f"({codes_str})"
+    
+    def _parse_gps(self, gps_str: str) -> tuple:
+        """Parse une chaîne GPS 'lat,lng' en tuple (lat, lng)."""
+        if not gps_str:
+            return None, None
+        try:
+            parts = gps_str.split(',')
+            if len(parts) == 2:
+                return float(parts[0].strip()), float(parts[1].strip())
+        except (ValueError, AttributeError):
+            pass
+        return None, None
     
     def connect(self) -> bool:
         """Établit la connexion à la base de données."""
@@ -111,12 +147,16 @@ class UfolepDatabaseLoader:
             self._load_equipes()
             self._load_classements()
             self._load_creneaux()
+            self._load_competition_dates()
             
             # Reconstruire les divisions virtuelles
             self._build_virtual_divisions()
             
             # Associer les données
             self._associate_data()
+            
+            # Charger l'historique des déplacements
+            self._load_historique_deplacements()
             
             print("[OK] Toutes les donnees chargees avec succes")
             return True
@@ -133,7 +173,8 @@ class UfolepDatabaseLoader:
         """Charge les clubs depuis la BDD."""
         cursor = self.connection.cursor(dictionary=True)
         
-        query = """
+        comp_filter = self._get_competition_filter()
+        query = f"""
         SELECT  c.id, 
                 c.nom,
                 c.affiliation_number,
@@ -141,7 +182,7 @@ class UfolepDatabaseLoader:
         FROM clubs c
         JOIN equipes e ON e.id_club = c.id
         JOIN classements cl ON cl.id_equipe = e.id_equipe
-        WHERE cl.code_competition in ('m', 'f', 'mo')
+        WHERE cl.code_competition in {comp_filter}
         """
         
         cursor.execute(query)
@@ -161,32 +202,75 @@ class UfolepDatabaseLoader:
         print(f"[INFO] {len(self.clubs)} clubs charges")
     
     def _load_gymnases(self):
-        """Charge les gymnases depuis la BDD."""
+        """Charge les gymnases depuis la BDD.
+        
+        Pour 'kh': charge aussi depuis register (inscriptions kh)
+        Pour 'c' et autres: charge depuis creneau
+        """
         cursor = self.connection.cursor(dictionary=True)
         
-        query = """
-        SELECT DISTINCT 
-            g.id,
-            g.nom,
-            g.adresse,
-            g.nb_terrain as nb_terrains
-        FROM gymnase g
-        JOIN ufolep_13volley.creneau c on g.id = c.id_gymnase
-        JOIN ufolep_13volley.classements cl on c.id_equipe = cl.id_equipe
-        WHERE cl.code_competition in ('m', 'f', 'mo')
-        """
+        # Charger gymnases depuis table creneau (pour 'm', 'f', 'mo', 'c')
+        classic_codes = [c for c in self.competition_codes if c != 'kh']
+        if classic_codes:
+            comp_filter = "('" + "', '".join(classic_codes) + "')"
+            query = f"""
+            SELECT DISTINCT 
+                g.id,
+                g.nom,
+                g.adresse,
+                g.nb_terrain as nb_terrains,
+                g.gps
+            FROM gymnase g
+            JOIN ufolep_13volley.creneau c on g.id = c.id_gymnase
+            JOIN ufolep_13volley.classements cl on c.id_equipe = cl.id_equipe
+            WHERE cl.code_competition in {comp_filter}
+            """
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            
+            for row in rows:
+                lat, lng = self._parse_gps(row.get('gps'))
+                gymnase = GymnaseData(
+                    id=str(row['id']),
+                    nom=row['nom'],
+                    adresse=row['adresse'] or '',
+                    nb_terrains=int(row['nb_terrains']) if row['nb_terrains'] else 1,
+                    lat=lat,
+                    lng=lng
+                )
+                self.gymnases[gymnase.id] = gymnase
         
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        
-        for row in rows:
-            gymnase = GymnaseData(
-                id=str(row['id']),
-                nom=row['nom'],
-                adresse=row['adresse'] or '',
-                nb_terrains=int(row['nb_terrains']) if row['nb_terrains'] else 1
+        # Charger gymnases depuis table register (pour 'kh')
+        if 'kh' in self.competition_codes:
+            query_kh = """
+            SELECT DISTINCT 
+                g.id,
+                g.nom,
+                g.adresse,
+                g.nb_terrain as nb_terrains,
+                g.gps
+            FROM gymnase g
+            WHERE g.id IN (
+                SELECT DISTINCT r.id_court_1 FROM register r WHERE r.id_competition = 18 AND r.id_court_1 IS NOT NULL
+                UNION
+                SELECT DISTINCT r.id_court_2 FROM register r WHERE r.id_competition = 18 AND r.id_court_2 IS NOT NULL
             )
-            self.gymnases[gymnase.id] = gymnase
+            """
+            cursor.execute(query_kh)
+            rows_kh = cursor.fetchall()
+            
+            for row in rows_kh:
+                if str(row['id']) not in self.gymnases:
+                    lat, lng = self._parse_gps(row.get('gps'))
+                    gymnase = GymnaseData(
+                        id=str(row['id']),
+                        nom=row['nom'],
+                        adresse=row['adresse'] or '',
+                        nb_terrains=int(row['nb_terrains']) if row['nb_terrains'] else 1,
+                        lat=lat,
+                        lng=lng
+                    )
+                    self.gymnases[gymnase.id] = gymnase
         
         cursor.close()
         print(f"[INFO] {len(self.gymnases)} gymnases charges")
@@ -195,14 +279,15 @@ class UfolepDatabaseLoader:
         """Charge les équipes depuis la BDD."""
         cursor = self.connection.cursor(dictionary=True)
         
-        query = """
+        comp_filter = self._get_competition_filter()
+        query = f"""
         SELECT DISTINCT
         e.id_equipe as id,
         e.nom_equipe as nom,
         e.id_club as club_id
         FROM equipes e
         JOIN ufolep_13volley.classements cl on e.id_equipe = cl.id_equipe
-        WHERE cl.code_competition in ('m', 'f', 'mo')  
+        WHERE cl.code_competition in {comp_filter}  
         """
         
         cursor.execute(query)
@@ -225,14 +310,15 @@ class UfolepDatabaseLoader:
         """Charge les classements (liaison équipes-divisions) depuis la BDD."""
         cursor = self.connection.cursor(dictionary=True)
         
-        query = """
+        comp_filter = self._get_competition_filter()
+        query = f"""
         SELECT DISTINCT 
             id,
             code_competition,
             division,
             id_equipe
         FROM classements
-        WHERE code_competition IN ('m', 'f', 'mo')
+        WHERE code_competition IN {comp_filter}
         """
         
         cursor.execute(query)
@@ -255,59 +341,228 @@ class UfolepDatabaseLoader:
         print(f"[INFO] {len(self.classements)} classements charges")
     
     def _load_creneaux(self):
-        """Charge les créneaux depuis la BDD."""
+        """Charge les créneaux depuis la BDD.
+        
+        Logique spéciale par compétition:
+        - 'kh': créneaux depuis table 'register' (inscriptions kh)
+        - 'c': créneaux des équipes 'm' avec is_cup_registered=1 (depuis table 'creneau')
+        - 'm', 'f', 'mo': créneaux depuis table 'creneau'
+        """
+        cursor = self.connection.cursor(dictionary=True)
+        creneau_id = 0
+        
+        # Mapping jour de la semaine (nom -> numéro)
+        jours_mapping = {
+            'Lundi': 1, 'Mardi': 2, 'Mercredi': 3, 'Jeudi': 4, 
+            'Vendredi': 5, 'Samedi': 6, 'Dimanche': 7
+        }
+        
+        # Charger créneaux pour 'kh' depuis table register
+        if 'kh' in self.competition_codes:
+            print("[INFO] Chargement créneaux 'kh' depuis table register...")
+            query_kh = """
+            SELECT 
+                r.new_team_name,
+                e.id_equipe as equipe_id,
+                r.id_court_1 as gymnase_id_1,
+                r.day_court_1 as jour_1,
+                r.hour_court_1 as heure_1,
+                r.id_court_2 as gymnase_id_2,
+                r.day_court_2 as jour_2,
+                r.hour_court_2 as heure_2
+            FROM register r
+            JOIN equipes e ON e.nom_equipe = r.new_team_name
+            WHERE r.id_competition = 18
+            """
+            cursor.execute(query_kh)
+            rows_kh = cursor.fetchall()
+            
+            # Heure par défaut si non spécifiée
+            from datetime import time as dt_time
+            heure_defaut = dt_time(20, 0)  # 20:00 par défaut
+            
+            for row in rows_kh:
+                equipe_id = str(row['equipe_id'])
+                
+                # Créneau 1 (prioritaire)
+                if row['gymnase_id_1'] and row['jour_1']:
+                    heure_1 = self._parse_heure(row['heure_1']) or heure_defaut
+                    jour_1 = jours_mapping.get(row['jour_1'], 1)
+                    creneau_id += 1
+                    creneau = CreneauData(
+                        id=f"reg_kh_{creneau_id}",
+                        equipe_id=equipe_id,
+                        gymnase_id=str(row['gymnase_id_1']),
+                        jour_semaine=jour_1,
+                        heure_debut=heure_1
+                    )
+                    self.creneaux[creneau.id] = creneau
+                
+                # Créneau 2 (secondaire)
+                if row['gymnase_id_2'] and row['jour_2']:
+                    heure_2 = self._parse_heure(row['heure_2']) or heure_defaut
+                    jour_2 = jours_mapping.get(row['jour_2'], 1)
+                    creneau_id += 1
+                    creneau = CreneauData(
+                        id=f"reg_kh_{creneau_id}",
+                        equipe_id=equipe_id,
+                        gymnase_id=str(row['gymnase_id_2']),
+                        jour_semaine=jour_2,
+                        heure_debut=heure_2
+                    )
+                    self.creneaux[creneau.id] = creneau
+            
+            print(f"[INFO] {len([c for c in self.creneaux if c.startswith('reg_kh')])} créneaux 'kh' chargés depuis register")
+        
+        # Charger créneaux pour 'c' depuis table creneau (équipes 'm' avec is_cup_registered=1)
+        if 'c' in self.competition_codes:
+            print("[INFO] Chargement créneaux 'c' depuis équipes 'm' inscrites à la coupe...")
+            query_c = """
+            SELECT DISTINCT
+                c.id as id,
+                c.id_equipe as equipe_id,
+                c.id_gymnase as gymnase_id,
+                c.jour as jour_semaine,
+                c.heure as heure_debut
+            FROM creneau c
+            JOIN classements cl ON cl.id_equipe = c.id_equipe 
+            JOIN equipes e ON e.id_equipe = c.id_equipe
+            WHERE cl.code_competition = 'm'
+            AND e.is_cup_registered = 1
+            """
+            cursor.execute(query_c)
+            rows_c = cursor.fetchall()
+            
+            for row in rows_c:
+                heure_debut = self._parse_heure(row['heure_debut'])
+                jour_raw = row['jour_semaine']
+                if isinstance(jour_raw, str):
+                    jour_semaine = jours_mapping.get(jour_raw, 1)
+                else:
+                    jour_semaine = int(jour_raw) if jour_raw else 1
+                
+                if heure_debut:
+                    creneau = CreneauData(
+                        id=f"cup_c_{row['id']}",
+                        equipe_id=str(row['equipe_id']),
+                        gymnase_id=str(row['gymnase_id']),
+                        jour_semaine=jour_semaine,
+                        heure_debut=heure_debut
+                    )
+                    self.creneaux[creneau.id] = creneau
+            
+            print(f"[INFO] {len([c for c in self.creneaux if c.startswith('cup_c')])} créneaux 'c' chargés")
+        
+        # Charger créneaux pour 'm', 'f', 'mo' depuis table creneau (méthode classique)
+        classic_codes = [c for c in self.competition_codes if c in ('m', 'f', 'mo')]
+        if classic_codes:
+            comp_filter = "('" + "', '".join(classic_codes) + "')"
+            print(f"[INFO] Chargement créneaux classiques pour {classic_codes}...")
+            query_classic = f"""
+            SELECT DISTINCT
+                c.id as id,
+                c.id_equipe as equipe_id,
+                c.id_gymnase as gymnase_id,
+                c.jour as jour_semaine,
+                c.heure as heure_debut
+            FROM creneau c
+            JOIN classements cl ON cl.id_equipe = c.id_equipe 
+            WHERE cl.code_competition IN {comp_filter}
+            """
+            cursor.execute(query_classic)
+            rows_classic = cursor.fetchall()
+            
+            for row in rows_classic:
+                heure_debut = self._parse_heure(row['heure_debut'])
+                jour_raw = row['jour_semaine']
+                if isinstance(jour_raw, str):
+                    jour_semaine = jours_mapping.get(jour_raw, 1)
+                else:
+                    jour_semaine = int(jour_raw) if jour_raw else 1
+                
+                if heure_debut:
+                    creneau = CreneauData(
+                        id=str(row['id']),
+                        equipe_id=str(row['equipe_id']),
+                        gymnase_id=str(row['gymnase_id']),
+                        jour_semaine=jour_semaine,
+                        heure_debut=heure_debut
+                    )
+                    self.creneaux[creneau.id] = creneau
+        
+        cursor.close()
+        print(f"[INFO] {len(self.creneaux)} creneaux charges au total")
+    
+    def _parse_heure(self, heure_raw):
+        """Parse une heure depuis différents formats."""
+        if heure_raw is None:
+            return None
+        if isinstance(heure_raw, str):
+            if not heure_raw:
+                return None
+            # Essayer différents formats
+            for fmt in ('%H:%M:%S', '%H:%M', '%H:%M:%S.%f'):
+                try:
+                    return datetime.strptime(heure_raw, fmt).time()
+                except ValueError:
+                    continue
+            return None
+        elif isinstance(heure_raw, datetime):
+            return heure_raw.time()
+        elif hasattr(heure_raw, 'hour'):  # C'est déjà un time
+            return heure_raw
+        return None
+    
+    def _load_competition_dates(self):
+        """Charge les dates de début et fin pour chaque compétition."""
         cursor = self.connection.cursor(dictionary=True)
         
-        query = """
-        SELECT DISTINCT
-            c.id as id,
-            c.id_equipe as equipe_id,
-            c.id_gymnase as gymnase_id,
-            c.jour as jour_semaine,
-            c.heure as heure_debut
-        FROM creneau c
-        JOIN classements cl ON cl.id_equipe = c.id_equipe 
-        WHERE cl.code_competition IN ('m', 'f', 'mo')
+        comp_filter = self._get_competition_filter()
+        query = f"""
+        SELECT 
+            c.code_competition,
+            c.start_date,
+            dl.date_limite as end_date
+        FROM competitions c
+        LEFT JOIN dates_limite dl ON dl.code_competition = c.code_competition
+        WHERE c.code_competition IN {comp_filter}
         """
         
         cursor.execute(query)
         rows = cursor.fetchall()
         
         for row in rows:
-            # Convertir l'heure si nécessaire
-            heure_debut = row['heure_debut']
-            if isinstance(heure_debut, str):
-                # Essayer d'abord HH:MM:SS, puis HH:MM
-                try:
-                    heure_debut = datetime.strptime(heure_debut, '%H:%M:%S').time()
-                except ValueError:
-                    heure_debut = datetime.strptime(heure_debut, '%H:%M').time()
-            elif isinstance(heure_debut, datetime):
-                heure_debut = heure_debut.time()
+            # Convertir les dates si elles sont des chaînes
+            start_date = row['start_date']
+            end_date = row['end_date']
             
-            # Convertir le jour de la semaine (nom -> numéro)
-            jour_raw = row['jour_semaine']
-            if isinstance(jour_raw, str):
-                # Mapping nom de jour -> numéro (1=Lundi, 7=Dimanche)
-                jours_mapping = {
-                    'Lundi': 1, 'Mardi': 2, 'Mercredi': 3, 'Jeudi': 4, 
-                    'Vendredi': 5, 'Samedi': 6, 'Dimanche': 7
-                }
-                jour_semaine = jours_mapping.get(jour_raw, 1)  # Default à Lundi si inconnu
-            else:
-                jour_semaine = int(jour_raw)
+            if isinstance(start_date, str):
+                # Essayer différents formats
+                for fmt in ('%Y-%m-%d', '%d/%m/%Y', '%d-%m-%Y'):
+                    try:
+                        start_date = datetime.strptime(start_date, fmt).date()
+                        break
+                    except ValueError:
+                        continue
             
-            creneau = CreneauData(
-                id=str(row['id']),
-                equipe_id=str(row['equipe_id']),
-                gymnase_id=str(row['gymnase_id']),
-                jour_semaine=jour_semaine,
-                heure_debut=heure_debut
+            if isinstance(end_date, str):
+                # Essayer différents formats
+                for fmt in ('%Y-%m-%d', '%d/%m/%Y', '%d-%m-%Y'):
+                    try:
+                        end_date = datetime.strptime(end_date, fmt).date()
+                        break
+                    except ValueError:
+                        continue
+            
+            comp_dates = CompetitionDates(
+                code_competition=row['code_competition'],
+                start_date=start_date,
+                end_date=end_date
             )
-            self.creneaux[creneau.id] = creneau
+            self.competition_dates[comp_dates.code_competition] = comp_dates
         
         cursor.close()
-        print(f"[INFO] {len(self.creneaux)} creneaux charges")
+        print(f"[INFO] {len(self.competition_dates)} dates de competition chargees")
     
     def _build_virtual_divisions(self):
         """Reconstruit les divisions à partir des classements."""
@@ -341,11 +596,11 @@ class UfolepDatabaseLoader:
     
     def _associate_data(self):
         """Associe les données entre elles (relations) et filtre les équipes."""
-        # Filtrer les équipes pour ne garder que celles avec classement 'm', 'f', 'mo'
+        # Filtrer les équipes pour ne garder que celles avec classement correspondant
         equipes_valides = {}
         for equipe in self.equipes.values():
             if (equipe.classement and 
-                equipe.classement.code_competition in ['m', 'f', 'mo']):
+                equipe.classement.code_competition in self.competition_codes):
                 equipes_valides[equipe.id] = equipe
         
         # Remplacer la liste des équipes par les équipes filtrées
@@ -406,6 +661,70 @@ class UfolepDatabaseLoader:
             if len(division.equipes) >= min_teams:
                 valid_divisions.append(division)
         return valid_divisions
+    
+    def _load_historique_deplacements(self):
+        """Charge l'historique des matchs passés pour calculer le déséquilibre dom/ext par paire."""
+        cursor = self.connection.cursor(dictionary=True)
+        
+        # Charger tous les matchs CONFIRMED de la saison en cours
+        query = """
+        SELECT 
+            m.id_equipe_dom,
+            m.id_equipe_ext,
+            COUNT(*) as nb_matchs
+        FROM matches m
+        WHERE m.match_status IN ('CONFIRMED', 'ARCHIVED')
+        AND m.date_reception >= '2025-09-01'
+        GROUP BY m.id_equipe_dom, m.id_equipe_ext
+        """
+        
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        
+        # Construire l'historique par paire d'équipes
+        for row in rows:
+            dom_id = str(row['id_equipe_dom'])
+            ext_id = str(row['id_equipe_ext'])
+            nb = row['nb_matchs']
+            
+            # Normaliser la paire (ordre alphabétique des IDs)
+            pair = tuple(sorted([dom_id, ext_id]))
+            
+            if pair not in self.historique_deplacements:
+                self.historique_deplacements[pair] = {pair[0]: 0, pair[1]: 0}
+            
+            # L'équipe dom_id a reçu (donc ext_id s'est déplacé)
+            self.historique_deplacements[pair][dom_id] += nb
+        
+        # Compter les paires avec déséquilibre
+        desequilibres = sum(1 for p, h in self.historique_deplacements.items() 
+                          if abs(h[p[0]] - h[p[1]]) >= 2)
+        
+        cursor.close()
+        print(f"[INFO] Historique: {len(self.historique_deplacements)} paires, {desequilibres} avec déséquilibre")
+    
+    def get_equipe_qui_doit_recevoir(self, equipe1_id: str, equipe2_id: str) -> str:
+        """Retourne l'ID de l'équipe qui devrait recevoir pour équilibrer l'historique.
+        
+        Retourne l'équipe qui s'est le plus déplacée (donc qui devrait recevoir maintenant).
+        Retourne None si pas d'historique ou si équilibré.
+        """
+        pair = tuple(sorted([equipe1_id, equipe2_id]))
+        
+        if pair not in self.historique_deplacements:
+            return None
+        
+        hist = self.historique_deplacements[pair]
+        receptions_e1 = hist.get(equipe1_id, 0)
+        receptions_e2 = hist.get(equipe2_id, 0)
+        
+        # Celui qui a le moins reçu devrait recevoir maintenant
+        if receptions_e1 < receptions_e2:
+            return equipe1_id
+        elif receptions_e2 < receptions_e1:
+            return equipe2_id
+        
+        return None  # Équilibré
 
 
 def test_connection():
