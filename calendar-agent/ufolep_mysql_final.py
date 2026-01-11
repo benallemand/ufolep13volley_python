@@ -365,28 +365,26 @@ class UfolepMySQLScheduler:
             if home_vars and away_vars:
                 model.Add(sum(home_vars) >= sum(away_vars) - 1)
     
-    def _add_long_distance_balance_constraints(self, model: cp_model.CpModel, matches_data: list, 
-                                                distance_threshold: float = 50.0) -> None:
-        """Contrainte : Équilibrer les longs déplacements (>50km) en tenant compte de l'historique.
+    def _add_history_based_home_constraints(self, model: cp_model.CpModel, matches_data: list) -> None:
+        """Contrainte : Alternance domicile/extérieur basée sur l'historique pour TOUTES les paires.
         
-        Pour chaque paire d'équipes distantes de plus de 50km:
-        - Si historique déséquilibré: forcer la réception vers l'équipe qui s'est le plus déplacée
-        - Sinon: le match doit être programmé (une seule fois)
+        Pour chaque paire d'équipes:
+        - Si A a reçu B la dernière fois, alors B doit recevoir A (si B a un créneau)
+        - Sinon: pas de contrainte spécifique sur qui reçoit
         """
-        # Identifier les paires d'équipes avec grande distance
-        long_distance_pairs = []
         teams_by_id = {t.id: t for t in self.teams}
+        teams_with_reception = {team.id for team in self.teams if team.time_slots}
         
+        # Collecter toutes les paires d'équipes de toutes les divisions
+        all_pairs = []
         for division in self.divisions:
             teams = division.teams
             for i in range(len(teams)):
                 for j in range(i + 1, len(teams)):
                     t1, t2 = teams[i], teams[j]
-                    dist = haversine_distance(t1.lat, t1.lng, t2.lat, t2.lng)
-                    if dist >= distance_threshold:
-                        long_distance_pairs.append((t1, t2, dist))
+                    all_pairs.append((t1, t2, division))
         
-        if not long_distance_pairs:
+        if not all_pairs:
             return
         
         # Grouper les variables par paire d'équipes et par qui reçoit
@@ -404,10 +402,10 @@ class UfolepMySQLScheduler:
             pair_home_vars[pair][home_id].append(var)
         
         # Appliquer les contraintes
-        constraints_added = 0
         forced_receptions = 0
+        skipped_no_slot = 0
         
-        for t1, t2, dist in long_distance_pairs:
+        for t1, t2, division in all_pairs:
             pair = tuple(sorted([t1.id, t2.id]))
             if pair not in pair_home_vars:
                 continue
@@ -423,27 +421,82 @@ class UfolepMySQLScheduler:
             
             if equipe_qui_doit_recevoir:
                 # Forcer la réception vers l'équipe désignée par l'historique
-                if equipe_qui_doit_recevoir == t1.id and vars_t1_home:
-                    model.Add(sum(vars_t1_home) == 1)
-                    model.Add(sum(vars_t2_home) == 0)
-                    forced_receptions += 1
-                    t1_name = teams_by_id[t1.id].nom if t1.id in teams_by_id else t1.id
-                    t2_name = teams_by_id[t2.id].nom if t2.id in teams_by_id else t2.id
-                elif equipe_qui_doit_recevoir == t2.id and vars_t2_home:
-                    model.Add(sum(vars_t2_home) == 1)
-                    model.Add(sum(vars_t1_home) == 0)
-                    forced_receptions += 1
-                else:
-                    # Fallback: le match doit être programmé
-                    model.Add(sum(vars_t1_home) + sum(vars_t2_home) == 1)
-            else:
-                # Pas d'historique ou équilibré: le match doit juste être programmé
-                model.Add(sum(vars_t1_home) + sum(vars_t2_home) == 1)
+                if equipe_qui_doit_recevoir == t1.id:
+                    if vars_t1_home and t1.id in teams_with_reception:
+                        model.Add(sum(vars_t1_home) == 1)
+                        if vars_t2_home:
+                            model.Add(sum(vars_t2_home) == 0)
+                        forced_receptions += 1
+                    else:
+                        skipped_no_slot += 1
+                elif equipe_qui_doit_recevoir == t2.id:
+                    if vars_t2_home and t2.id in teams_with_reception:
+                        model.Add(sum(vars_t2_home) == 1)
+                        if vars_t1_home:
+                            model.Add(sum(vars_t1_home) == 0)
+                        forced_receptions += 1
+                    else:
+                        skipped_no_slot += 1
+        
+        print(f"[INFO] Alternance historique: {forced_receptions} réceptions forcées, {skipped_no_slot} ignorées (pas de créneau)")
+    
+    def _add_shared_roster_constraints(self, model: cp_model.CpModel, matches_data: list) -> None:
+        """Contrainte optionnelle : Éviter que 2 équipes avec effectif commun jouent le même soir.
+        
+        Si 2 équipes partagent ≥50% de leur effectif, elles ne doivent pas jouer le même jour.
+        """
+        # Récupérer les paires d'équipes avec effectif commun
+        paires_effectif_commun = self.db_loader.get_equipes_avec_effectif_commun()
+        
+        if not paires_effectif_commun:
+            return
+        
+        # Grouper les matchs par équipe et par date
+        team_date_vars = {}  # {(team_id, date): [vars]}
+        
+        for match_data in matches_data:
+            home_id = match_data['home_team'].id
+            away_id = match_data['away_team'].id
+            date_obj = match_data['date']
+            var = match_data['var']
             
-            constraints_added += 1
+            # Les deux équipes sont occupées par ce match
+            for team_id in [home_id, away_id]:
+                key = (team_id, date_obj)
+                if key not in team_date_vars:
+                    team_date_vars[key] = []
+                team_date_vars[key].append(var)
+        
+        # Appliquer les contraintes pour chaque paire avec effectif commun
+        constraints_added = 0
+        
+        for e1_id, e2_id, nb_communs, ratio in paires_effectif_commun:
+            # Pour chaque date, si e1 joue alors e2 ne doit pas jouer
+            dates_with_both = set()
+            
+            for (team_id, date_obj), vars_list in team_date_vars.items():
+                if team_id == e1_id:
+                    dates_with_both.add(date_obj)
+            
+            for date_obj in dates_with_both:
+                vars_e1 = team_date_vars.get((e1_id, date_obj), [])
+                vars_e2 = team_date_vars.get((e2_id, date_obj), [])
+                
+                if vars_e1 and vars_e2:
+                    # Au plus une des deux équipes peut jouer ce jour
+                    model.Add(sum(vars_e1) + sum(vars_e2) <= 1)
+                    constraints_added += 1
         
         if constraints_added > 0:
-            print(f"[INFO] {constraints_added} paires longue distance (>{distance_threshold}km), {forced_receptions} réceptions forcées par historique")
+            # Récupérer les noms pour le log
+            teams_by_id = {t.id: t for t in self.teams}
+            print(f"[INFO] Effectif commun: {len(paires_effectif_commun)} paires, {constraints_added} contraintes jour ajoutées")
+            for e1_id, e2_id, nb_communs, ratio in paires_effectif_commun[:5]:  # Afficher max 5
+                e1_nom = teams_by_id.get(e1_id, type('', (), {'nom': e1_id})()).nom
+                e2_nom = teams_by_id.get(e2_id, type('', (), {'nom': e2_id})()).nom
+                print(f"       - {e1_nom} / {e2_nom}: {nb_communs} joueurs ({int(ratio*100)}%)")
+            if len(paires_effectif_commun) > 5:
+                print(f"       ... et {len(paires_effectif_commun) - 5} autres paires")
         
     def generate_schedule(self) -> bool:
         """Génère le calendrier complet avec OR-Tools."""
@@ -538,8 +591,11 @@ class UfolepMySQLScheduler:
         # 5. Équilibre dom/ext pour équipes avec créneaux
         self._add_home_balance_constraints(model, matches_data)
         
-        # 6. Équilibrer les longs déplacements (>50km)
-        self._add_long_distance_balance_constraints(model, matches_data)
+        # 6. Alternance dom/ext basée sur l'historique (TOUTES les paires)
+        self._add_history_based_home_constraints(model, matches_data)
+        
+        # 7. Éviter que 2 équipes avec effectif commun jouent le même soir
+        self._add_shared_roster_constraints(model, matches_data)
         
         # Résoudre
         solver = cp_model.CpSolver()
