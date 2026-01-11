@@ -99,6 +99,8 @@ class UfolepDatabaseLoader:
         self.divisions_virtuelles = {}
         self.competition_dates = {}
         self.historique_deplacements = {}  # {(equipe1_id, equipe2_id): {'equipe1_dom': n, 'equipe2_dom': n}}
+        self.equipes_joueurs = {}  # {equipe_id: set(joueur_ids)}
+        self.equipes_effectif_commun = []  # Liste de tuples (equipe1_id, equipe2_id, nb_joueurs_communs, ratio)
     
     def _get_competition_filter(self) -> str:
         """Retourne la clause SQL pour filtrer par code_competition."""
@@ -157,6 +159,10 @@ class UfolepDatabaseLoader:
             
             # Charger l'historique des déplacements
             self._load_historique_deplacements()
+            
+            # Charger les effectifs d'équipes et calculer les chevauchements
+            self._load_equipes_joueurs()
+            self._calculate_effectif_commun()
             
             print("[OK] Toutes les donnees chargees avec succes")
             return True
@@ -702,6 +708,132 @@ class UfolepDatabaseLoader:
         
         cursor.close()
         print(f"[INFO] Historique: {len(self.historique_deplacements)} paires, {desequilibres} avec déséquilibre")
+    
+    def _load_equipes_joueurs(self):
+        """Charge les joueurs par équipe avec leur sexe depuis la table joueur_equipe."""
+        cursor = self.connection.cursor(dictionary=True)
+        
+        # Charger les joueurs avec leur sexe et le code compétition de l'équipe
+        comp_filter = self._get_competition_filter()
+        query = f"""
+        SELECT je.id_equipe, je.id_joueur, j.sexe, cl.code_competition
+        FROM joueur_equipe je
+        JOIN equipes e ON e.id_equipe = je.id_equipe
+        JOIN classements cl ON cl.id_equipe = e.id_equipe
+        JOIN joueurs j ON j.id = je.id_joueur
+        WHERE cl.code_competition IN {comp_filter}
+        """
+        
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        
+        # Stocker les joueurs par équipe avec leur sexe
+        self.equipes_joueurs_details = {}  # {equipe_id: {'joueurs': set(), 'hommes': set(), 'femmes': set(), 'code_comp': str}}
+        
+        for row in rows:
+            equipe_id = str(row['id_equipe'])
+            joueur_id = str(row['id_joueur'])
+            sexe = row['sexe']  # 'H' ou 'F'
+            code_comp = row['code_competition']
+            
+            if equipe_id not in self.equipes_joueurs_details:
+                self.equipes_joueurs_details[equipe_id] = {
+                    'joueurs': set(),
+                    'hommes': set(),
+                    'femmes': set(),
+                    'code_comp': code_comp
+                }
+            
+            self.equipes_joueurs_details[equipe_id]['joueurs'].add(joueur_id)
+            if sexe == 'H':
+                self.equipes_joueurs_details[equipe_id]['hommes'].add(joueur_id)
+            elif sexe == 'F':
+                self.equipes_joueurs_details[equipe_id]['femmes'].add(joueur_id)
+            
+            # Compatibilité avec l'ancien format
+            if equipe_id not in self.equipes_joueurs:
+                self.equipes_joueurs[equipe_id] = set()
+            self.equipes_joueurs[equipe_id].add(joueur_id)
+        
+        # Stats
+        equipes_avec_effectif = sum(1 for e, d in self.equipes_joueurs_details.items() if len(d['joueurs']) > 0)
+        cursor.close()
+        print(f"[INFO] Effectifs: {equipes_avec_effectif} equipes avec joueurs renseignes")
+    
+    def _is_effectif_complet(self, equipe_id: str) -> bool:
+        """Vérifie si une équipe a un effectif complet selon les règles de sa compétition.
+        
+        - KH: minimum 2 filles + 2 garçons
+        - C/M: minimum 6 personnes
+        """
+        if equipe_id not in self.equipes_joueurs_details:
+            return False
+        
+        details = self.equipes_joueurs_details[equipe_id]
+        code_comp = details['code_comp'].lower()
+        nb_hommes = len(details['hommes'])
+        nb_femmes = len(details['femmes'])
+        nb_total = len(details['joueurs'])
+        
+        if code_comp == 'kh':
+            # KH: minimum 2 filles ET 2 garçons
+            return nb_hommes >= 2 and nb_femmes >= 2
+        else:
+            # C, M et autres: minimum 6 personnes
+            return nb_total >= 6
+    
+    def _calculate_effectif_commun(self, seuil_ratio: float = 0.5):
+        """Calcule les paires d'équipes ayant un effectif commun significatif.
+        
+        Args:
+            seuil_ratio: Ratio minimum de joueurs communs (par rapport à la plus petite équipe)
+                        0.5 = au moins 50% de l'effectif de la plus petite équipe en commun
+        
+        Note: Seules les équipes avec effectif complet sont prises en compte.
+              - KH: minimum 2 filles + 2 garçons
+              - C/M: minimum 6 personnes
+        """
+        self.equipes_effectif_commun = []
+        
+        # Ne considérer que les équipes avec effectif complet
+        equipes_valides = {}
+        equipes_exclues = 0
+        
+        for equipe_id, joueurs in self.equipes_joueurs.items():
+            if self._is_effectif_complet(equipe_id):
+                equipes_valides[equipe_id] = joueurs
+            else:
+                equipes_exclues += 1
+        
+        if equipes_exclues > 0:
+            print(f"[INFO] Effectif commun: {equipes_exclues} equipes exclues (effectif incomplet)")
+        
+        equipes_ids = list(equipes_valides.keys())
+        
+        for i in range(len(equipes_ids)):
+            for j in range(i + 1, len(equipes_ids)):
+                e1, e2 = equipes_ids[i], equipes_ids[j]
+                joueurs_e1 = equipes_valides[e1]
+                joueurs_e2 = equipes_valides[e2]
+                
+                # Calculer l'intersection
+                joueurs_communs = joueurs_e1 & joueurs_e2
+                nb_communs = len(joueurs_communs)
+                
+                if nb_communs > 0:
+                    # Ratio par rapport à la plus petite équipe
+                    min_effectif = min(len(joueurs_e1), len(joueurs_e2))
+                    ratio = nb_communs / min_effectif
+                    
+                    if ratio >= seuil_ratio:
+                        self.equipes_effectif_commun.append((e1, e2, nb_communs, ratio))
+        
+        if self.equipes_effectif_commun:
+            print(f"[INFO] Effectif commun: {len(self.equipes_effectif_commun)} paires avec >={int(seuil_ratio*100)}% joueurs communs")
+    
+    def get_equipes_avec_effectif_commun(self) -> list:
+        """Retourne la liste des paires d'équipes avec effectif commun significatif."""
+        return self.equipes_effectif_commun
     
     def get_equipe_qui_doit_recevoir(self, equipe1_id: str, equipe2_id: str) -> str:
         """Retourne l'ID de l'équipe qui devrait recevoir pour équilibrer l'historique.
