@@ -340,8 +340,16 @@ class UfolepDatabaseLoader:
             self.classements[classement.id] = classement
             
             # Associer le classement à l'équipe
+            # Prioriser les divisions non-exclues (6, 7) sur les divisions exclues (7d, 7o)
+            DIVISIONS_EXCLUES = ['7d', '7o']
             if classement.id_equipe in self.equipes:
-                self.equipes[classement.id_equipe].classement = classement
+                existing = self.equipes[classement.id_equipe].classement
+                if existing is None:
+                    self.equipes[classement.id_equipe].classement = classement
+                elif existing.division in DIVISIONS_EXCLUES and classement.division not in DIVISIONS_EXCLUES:
+                    # Remplacer un classement exclu par un non-exclu
+                    self.equipes[classement.id_equipe].classement = classement
+                # Sinon garder l'existant (ne pas écraser un non-exclu par un exclu)
         
         cursor.close()
         print(f"[INFO] {len(self.classements)} classements charges")
@@ -572,9 +580,16 @@ class UfolepDatabaseLoader:
     
     def _build_virtual_divisions(self):
         """Reconstruit les divisions à partir des classements."""
+        # Divisions à exclure (playoff/playdown de la demi-saison précédente)
+        DIVISIONS_EXCLUES = ['7d', '7o']
+        
         divisions_map = {}
         
         for classement in self.classements.values():
+            # Ignorer les divisions de playoff/playdown
+            if classement.division in DIVISIONS_EXCLUES:
+                continue
+            
             # Créer une clé unique pour chaque division
             div_key = f"{classement.code_competition}_{classement.division}"
             

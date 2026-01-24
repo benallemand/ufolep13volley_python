@@ -421,9 +421,11 @@ class UfolepMySQLScheduler:
             
             if equipe_qui_doit_recevoir:
                 # Forcer la réception vers l'équipe désignée par l'historique
+                # MAIS seulement si l'équipe a des dates valides pour recevoir (vars non vide)
                 if equipe_qui_doit_recevoir == t1.id:
                     if vars_t1_home and t1.id in teams_with_reception:
-                        model.Add(sum(vars_t1_home) == 1)
+                        # Ne pas forcer sum==1 car ça force le match à être programmé
+                        # Juste interdire que t2 reçoive si t1 peut recevoir
                         if vars_t2_home:
                             model.Add(sum(vars_t2_home) == 0)
                         forced_receptions += 1
@@ -431,14 +433,15 @@ class UfolepMySQLScheduler:
                         skipped_no_slot += 1
                 elif equipe_qui_doit_recevoir == t2.id:
                     if vars_t2_home and t2.id in teams_with_reception:
-                        model.Add(sum(vars_t2_home) == 1)
+                        # Ne pas forcer sum==1 car ça force le match à être programmé
+                        # Juste interdire que t1 reçoive si t2 peut recevoir
                         if vars_t1_home:
                             model.Add(sum(vars_t1_home) == 0)
                         forced_receptions += 1
                     else:
                         skipped_no_slot += 1
         
-        print(f"[INFO] Alternance historique: {forced_receptions} réceptions forcées, {skipped_no_slot} ignorées (pas de créneau)")
+        print(f"[INFO] Alternance historique: {forced_receptions} réceptions forcées, {skipped_no_slot} ignorées (pas de créneau/date)")
     
     def _add_shared_roster_constraints(self, model: cp_model.CpModel, matches_data: list) -> None:
         """Contrainte optionnelle : Éviter que 2 équipes avec effectif commun jouent le même soir.

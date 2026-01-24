@@ -1,0 +1,553 @@
+GÉNÉRATEUR DE CALENDRIER UFOLEP - VERSION MYSQL FINALE
+Compétitions: ['m']
+Fichier log: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\generation_m.log
+============================================================
+[INFO] Chargement des données MySQL UFOLEP pour ['m']...
+[OK] Connexion reussie a la base ufolep_13volley
+[INFO] Chargement des donnees UFOLEP reelles...
+[INFO] 30 clubs charges
+[INFO] 34 gymnases charges
+[INFO] 53 equipes chargees
+[INFO] 61 classements charges
+[INFO] Chargement créneaux classiques pour ['m']...
+[INFO] 63 creneaux charges au total
+[INFO] 1 dates de competition chargees
+[INFO] 9 divisions virtuelles creees
+[INFO] Historique: 492 paires, 0 avec déséquilibre
+[INFO] Effectifs: 53 equipes avec joueurs renseignes
+[OK] Toutes les donnees chargees avec succes
+[INFO] Connexion MySQL fermee
+[OK] Période compétition: 2026-03-02 au 2026-05-29
+[OK] Données chargées: 53 équipes, 9 divisions, 63 créneaux
+[OK] Conversion terminée: 9 divisions, 53 équipes programmées, 63 créneaux
+
+[INFO] ANALYSE DES CRÉNEAUX:
+   - Équipes avec créneaux de réception: 53
+   - Équipes sans créneaux (joueront toujours à l'extérieur): 0
+[INFO] Division m 1: 7 équipes = 21 matchs
+[INFO] Division m 2: 7 équipes = 21 matchs
+[INFO] Division m 3: 7 équipes = 21 matchs
+[INFO] Division m 4: 8 équipes = 28 matchs
+[INFO] Division m 5: 8 équipes = 28 matchs
+[INFO] Division m 6: 4 équipes = 6 matchs
+[INFO] Division m 7: 4 équipes = 6 matchs
+[INFO] Division m 7o: 4 équipes = 6 matchs
+[INFO] Division m 7d: 4 équipes = 6 matchs
+[OK] 143 matchs programmés
+
+================================================================================
+CALENDRIER
+================================================================================
+
+Lundi 02/03/2026
+--------------------------------------------------
+  19:30 | Division m 1
+    Massalia vs ST MARTIN 1M
+  19:30 | Division m 3
+    MUST1 vs Marseille Volley 2
+  19:30 | Division m 4
+    Asptt Marseille masculin vs AH1, les Panthères
+  19:30 | Division m 5
+    Must2 vs MARSEILLE VOLLEY 3
+  20:00 | Division m 1
+    La Ciotat 1 vs Grans AIL 1
+  20:30 | Division m 1
+    CARIBOU vs BOUC BEL AIR
+  20:45 | Division m 5
+    KARNAGE vs EGUILLES 2
+
+Mardi 03/03/2026
+--------------------------------------------------
+  19:30 | Division m 3
+    AIXTASY vs Grans 2
+  20:00 | Division m 7o
+    MARIGNANE VB vs T-raix
+  20:15 | Division m 6
+    CBVB2 vs Trets 2H
+  20:30 | Division m 2
+    Fuveau 1 vs ASPTT AIX 1
+
+Mercredi 04/03/2026
+--------------------------------------------------
+  20:00 | Division m 4
+    Roq'n'Ball vs Saint Cannat
+  20:00 | Division m 7d
+    LES VETERANS vs VELAUXIRAPTOR 2
+  20:30 | Division m 4
+    Lambestix vs Meyrargues
+
+Jeudi 05/03/2026
+--------------------------------------------------
+  20:45 | Division m 6
+    Fosamax vs Gardanne 1m
+
+Vendredi 06/03/2026
+--------------------------------------------------
+  20:00 | Division m 5
+    Ventapéro vs La Ciotat 2
+  20:00 | Division m 7
+    Ventateens vs MVtapeur
+  20:30 | Division m 2
+    CBVB1 vs Les Moux d'Eyguières
+
+Lundi 09/03/2026
+--------------------------------------------------
+  19:30 | Division m 2
+    Trets 1H vs CBVB1
+  19:30 | Division m 3
+    MUST1 vs Grans 2
+  19:30 | Division m 5
+    Must2 vs KARNAGE
+  20:30 | Division m 1
+    CVFVB1 vs Grans AIL 1
+  20:30 | Division m 4
+    les Brux d'eyguières vs Asptt Marseille masculin
+  20:30 | Division m 5
+    EGUILLES 2 vs MARSEILLE VOLLEY 3
+
+Mardi 10/03/2026
+--------------------------------------------------
+  19:30 | Division m 2
+    ASPTT AIX 1 vs Les Moux d'Eyguières
+  19:30 | Division m 3
+    AIXTASY vs Aix'otic
+  20:00 | Division m 7o
+    MARIGNANE VB vs Les Condors de Périer
+  20:15 | Division m 6
+    CBVB2 vs Fosamax
+
+Mercredi 11/03/2026
+--------------------------------------------------
+  20:00 | Division m 4
+    Roq'n'Ball vs Meyrargues
+  20:30 | Division m 4
+    Lambestix vs Saint Cannat
+
+Jeudi 12/03/2026
+--------------------------------------------------
+  19:30 | Division m 7
+    Trets 3H vs Ventateens
+  20:00 | Division m 6
+    Gardanne 1m vs Trets 2H
+  20:15 | Division m 7o
+    MUST UP vs T-raix
+
+Vendredi 13/03/2026
+--------------------------------------------------
+  20:00 | Division m 5
+    Ventapéro vs Fuveau2
+  20:30 | Division m 3
+    VELAUXIRAPTOR vs Marseille Volley 2
+
+Lundi 16/03/2026
+--------------------------------------------------
+  19:30 | Division m 3
+    MUST1 vs AIXTASY
+  19:30 | Division m 4
+    Asptt Marseille masculin vs Les loutres
+  19:30 | Division m 5
+    Must2 vs EGUILLES 2
+  20:30 | Division m 1
+    CARIBOU vs Massalia
+  20:30 | Division m 1
+    CVFVB1 vs La Ciotat 1
+  20:30 | Division m 2
+    Les Moux d'Eyguières vs Marseille Volley 1
+
+Mardi 17/03/2026
+--------------------------------------------------
+  19:30 | Division m 2
+    ASPTT AIX 1 vs Trets 1H
+  20:30 | Division m 2
+    Fuveau 1 vs CBVB1
+  20:30 | Division m 5
+    Fuveau2 vs La Ciotat 2
+
+Mercredi 18/03/2026
+--------------------------------------------------
+  20:00 | Division m 4
+    Roq'n'Ball vs Lambestix
+  20:30 | Division m 7
+    Aix'plosif vs Ventateens
+
+Jeudi 19/03/2026
+--------------------------------------------------
+  19:30 | Division m 7
+    Trets 3H vs MVtapeur
+  20:30 | Division m 4
+    Saint Cannat vs Meyrargues
+  20:45 | Division m 3
+    Grans 2 vs Aix'otic
+
+Vendredi 20/03/2026
+--------------------------------------------------
+  19:30 | Division m 7d
+    Périer original vs LES VETERANS
+  20:00 | Division m 5
+    Ventapéro vs aixecuteurs
+
+Lundi 23/03/2026
+--------------------------------------------------
+  19:30 | Division m 1
+    Massalia vs La Ciotat 1
+  19:30 | Division m 4
+    Asptt Marseille masculin vs Meyrargues
+  19:30 | Division m 5
+    Must2 vs aixecuteurs
+  20:30 | Division m 1
+    CVFVB1 vs ST MARTIN 1M
+  20:30 | Division m 2
+    Les Moux d'Eyguières vs Trets 1H
+  20:30 | Division m 5
+    EGUILLES 2 vs Ventapéro
+  20:45 | Division m 5
+    KARNAGE vs La Ciotat 2
+
+Mardi 24/03/2026
+--------------------------------------------------
+  20:30 | Division m 5
+    Fuveau2 vs MARSEILLE VOLLEY 3
+
+Mercredi 25/03/2026
+--------------------------------------------------
+  20:00 | Division m 4
+    Roq'n'Ball vs Les loutres
+
+Jeudi 26/03/2026
+--------------------------------------------------
+  20:00 | Division m 4
+    AH1, les Panthères vs les Brux d'eyguières
+  20:45 | Division m 1
+    Grans AIL 1 vs BOUC BEL AIR
+  20:45 | Division m 2
+    pelissanne 6x6 vs Marseille Volley 1
+
+Vendredi 27/03/2026
+--------------------------------------------------
+  20:00 | Division m 3
+    Aix'otic vs Marseille Est 3
+  20:30 | Division m 7d
+    VELAUXIRAPTOR 2 vs AH2, Les Tigres
+
+Lundi 30/03/2026
+--------------------------------------------------
+  19:30 | Division m 4
+    Asptt Marseille masculin vs Roq'n'Ball
+  19:30 | Division m 5
+    Must2 vs Fuveau2
+  20:30 | Division m 1
+    CARIBOU vs CVFVB1
+  20:30 | Division m 5
+    EGUILLES 2 vs La Ciotat 2
+  20:45 | Division m 5
+    KARNAGE vs Ventapéro
+
+Mardi 31/03/2026
+--------------------------------------------------
+  19:30 | Division m 2
+    ASPTT AIX 1 vs pelissanne 6x6
+
+Jeudi 02/04/2026
+--------------------------------------------------
+  20:15 | Division m 4
+    Meyrargues vs Les loutres
+  20:30 | Division m 4
+    Saint Cannat vs AH1, les Panthères
+
+Vendredi 03/04/2026
+--------------------------------------------------
+  19:30 | Division m 2
+    Marseille Volley 1 vs Fuveau 1
+  19:30 | Division m 7
+    MVtapeur vs Aix'plosif
+  19:30 | Division m 7d
+    Périer original vs VELAUXIRAPTOR 2
+  19:45 | Division m 5
+    MARSEILLE VOLLEY 3 vs aixecuteurs
+  20:00 | Division m 3
+    Marseille Est 3 vs AIXTASY
+  20:00 | Division m 3
+    Aix'otic vs MUST1
+
+Mardi 07/04/2026
+--------------------------------------------------
+  20:15 | Division m 6
+    CBVB2 vs Gardanne 1m
+
+Mercredi 08/04/2026
+--------------------------------------------------
+  20:00 | Division m 4
+    Roq'n'Ball vs les Brux d'eyguières
+  20:00 | Division m 5
+    La Ciotat 2 vs Must2
+  20:30 | Division m 4
+    Lambestix vs AH1, les Panthères
+
+Jeudi 09/04/2026
+--------------------------------------------------
+  20:30 | Division m 4
+    Saint Cannat vs Asptt Marseille masculin
+  20:45 | Division m 1
+    Grans AIL 1 vs Massalia
+  20:45 | Division m 2
+    pelissanne 6x6 vs Fuveau 1
+
+Vendredi 10/04/2026
+--------------------------------------------------
+  19:30 | Division m 7o
+    Les Condors de Périer vs MUST UP
+  19:30 | Division m 7d
+    Périer original vs AH2, Les Tigres
+  19:45 | Division m 5
+    MARSEILLE VOLLEY 3 vs Ventapéro
+  20:00 | Division m 5
+    aixecuteurs vs EGUILLES 2
+  20:30 | Division m 3
+    VELAUXIRAPTOR vs Marseille Est 3
+
+Lundi 13/04/2026
+--------------------------------------------------
+  19:30 | Division m 2
+    Trets 1H vs Fuveau 1
+  19:30 | Division m 5
+    Must2 vs Ventapéro
+  20:00 | Division m 1
+    La Ciotat 1 vs ST MARTIN 1M
+  20:30 | Division m 2
+    Les Moux d'Eyguières vs pelissanne 6x6
+  20:30 | Division m 4
+    les Brux d'eyguières vs Lambestix
+
+Mardi 14/04/2026
+--------------------------------------------------
+  20:30 | Division m 5
+    Fuveau2 vs EGUILLES 2
+
+Mercredi 15/04/2026
+--------------------------------------------------
+  20:00 | Division m 5
+    La Ciotat 2 vs MARSEILLE VOLLEY 3
+
+Jeudi 16/04/2026
+--------------------------------------------------
+  20:00 | Division m 4
+    Les loutres vs Saint Cannat
+  20:00 | Division m 4
+    AH1, les Panthères vs Roq'n'Ball
+  20:45 | Division m 1
+    Grans AIL 1 vs CARIBOU
+
+Vendredi 17/04/2026
+--------------------------------------------------
+  19:30 | Division m 3
+    Marseille Volley 2 vs AIXTASY
+  20:00 | Division m 1
+    BOUC BEL AIR vs Massalia
+  20:00 | Division m 3
+    Marseille Est 3 vs Grans 2
+  20:00 | Division m 5
+    aixecuteurs vs KARNAGE
+  20:30 | Division m 2
+    CBVB1 vs ASPTT AIX 1
+
+Mardi 05/05/2026
+--------------------------------------------------
+  19:30 | Division m 3
+    AIXTASY vs VELAUXIRAPTOR
+  20:00 | Division m 7o
+    MARIGNANE VB vs MUST UP
+  20:15 | Division m 1
+    ST MARTIN 1M vs CARIBOU
+  20:30 | Division m 2
+    Fuveau 1 vs Les Moux d'Eyguières
+
+Mercredi 06/05/2026
+--------------------------------------------------
+  20:00 | Division m 5
+    La Ciotat 2 vs aixecuteurs
+  20:30 | Division m 7
+    Aix'plosif vs Trets 3H
+
+Jeudi 07/05/2026
+--------------------------------------------------
+  20:00 | Division m 4
+    Les loutres vs les Brux d'eyguières
+  20:15 | Division m 4
+    Meyrargues vs AH1, les Panthères
+  20:45 | Division m 3
+    Grans 2 vs Marseille Volley 2
+
+Lundi 11/05/2026
+--------------------------------------------------
+  19:30 | Division m 2
+    Trets 1H vs pelissanne 6x6
+  20:30 | Division m 4
+    les Brux d'eyguières vs Saint Cannat
+
+Mardi 12/05/2026
+--------------------------------------------------
+  20:15 | Division m 1
+    ST MARTIN 1M vs Grans AIL 1
+
+Mercredi 13/05/2026
+--------------------------------------------------
+  20:30 | Division m 7o
+    T-raix vs Les Condors de Périer
+
+Vendredi 15/05/2026
+--------------------------------------------------
+  19:30 | Division m 3
+    Marseille Volley 2 vs Marseille Est 3
+  20:00 | Division m 1
+    BOUC BEL AIR vs La Ciotat 1
+  20:00 | Division m 5
+    aixecuteurs vs Fuveau2
+  20:30 | Division m 2
+    CBVB1 vs Marseille Volley 1
+  20:30 | Division m 3
+    VELAUXIRAPTOR vs MUST1
+
+Lundi 18/05/2026
+--------------------------------------------------
+  19:30 | Division m 1
+    Massalia vs CVFVB1
+  19:30 | Division m 4
+    Asptt Marseille masculin vs Lambestix
+  20:00 | Division m 1
+    La Ciotat 1 vs CARIBOU
+
+Mardi 19/05/2026
+--------------------------------------------------
+  20:15 | Division m 1
+    ST MARTIN 1M vs BOUC BEL AIR
+  20:30 | Division m 5
+    Fuveau2 vs KARNAGE
+
+Jeudi 21/05/2026
+--------------------------------------------------
+  20:00 | Division m 4
+    AH1, les Panthères vs Les loutres
+  20:45 | Division m 3
+    Grans 2 vs VELAUXIRAPTOR
+
+Vendredi 22/05/2026
+--------------------------------------------------
+  19:30 | Division m 2
+    Marseille Volley 1 vs Trets 1H
+  19:30 | Division m 3
+    Marseille Volley 2 vs Aix'otic
+
+Jeudi 28/05/2026
+--------------------------------------------------
+  19:30 | Division m 6
+    Trets 2H vs Fosamax
+  20:00 | Division m 4
+    Les loutres vs Lambestix
+  20:00 | Division m 7d
+    AH2, Les Tigres vs LES VETERANS
+  20:15 | Division m 4
+    Meyrargues vs les Brux d'eyguières
+  20:45 | Division m 2
+    pelissanne 6x6 vs CBVB1
+
+Vendredi 29/05/2026
+--------------------------------------------------
+  19:30 | Division m 2
+    Marseille Volley 1 vs ASPTT AIX 1
+  19:45 | Division m 5
+    MARSEILLE VOLLEY 3 vs KARNAGE
+  20:00 | Division m 1
+    BOUC BEL AIR vs CVFVB1
+  20:00 | Division m 3
+    Marseille Est 3 vs MUST1
+  20:00 | Division m 3
+    Aix'otic vs VELAUXIRAPTOR
+
+================================================================================
+MATCHS PAR DIVISION
+================================================================================
+  Division m 1: 21 matchs
+  Division m 2: 21 matchs
+  Division m 3: 21 matchs
+  Division m 4: 28 matchs
+  Division m 5: 28 matchs
+  Division m 6: 6 matchs
+  Division m 7: 6 matchs
+  Division m 7d: 6 matchs
+  Division m 7o: 6 matchs
+
+Total: 143 matchs programmés
+
+================================================================================
+RÉCEPTIONS / DÉPLACEMENTS PAR ÉQUIPE
+================================================================================
+Équipe                         | Dom | Ext | Total
+--------------------------------------------------
+AH1, les Panthères             |   3 |   4 |     7
+AH2, Les Tigres                |   1 |   2 |     3
+AIXTASY                        |   3 |   3 |     6
+ASPTT AIX 1                    |   3 |   3 |     6
+Aix'otic                       |   3 |   3 |     6
+Aix'plosif                     |   2 |   1 |     3
+Asptt Marseille masculin       |   5 |   2 |     7
+BOUC BEL AIR                   |   3 |   3 |     6
+CARIBOU                        |   3 |   3 |     6
+CBVB1                          |   3 |   3 |     6
+CBVB2                          |   3 |   0 |     3
+CVFVB1                         |   3 |   3 |     6
+EGUILLES 2                     |   3 |   4 |     7
+Fosamax                        |   1 |   2 |     3
+Fuveau 1                       |   3 |   3 |     6
+Fuveau2                        |   4 |   3 |     7
+Gardanne 1m                    |   1 |   2 |     3
+Grans 2                        |   3 |   3 |     6
+Grans AIL 1                    |   3 |   3 |     6
+KARNAGE                        |   3 |   4 |     7
+LES VETERANS                   |   1 |   2 |     3
+La Ciotat 1                    |   3 |   3 |     6
+La Ciotat 2                    |   3 |   4 |     7
+Lambestix                      |   3 |   4 |     7
+Les Condors de Périer          |   1 |   2 |     3
+Les Moux d'Eyguières           |   3 |   3 |     6
+Les loutres                    |   3 |   4 |     7
+MARIGNANE VB                   |   3 |   0 |     3
+MARSEILLE VOLLEY 3             |   3 |   4 |     7
+MUST UP                        |   1 |   2 |     3
+MUST1                          |   3 |   3 |     6
+MVtapeur                       |   1 |   2 |     3
+Marseille Est 3                |   3 |   3 |     6
+Marseille Volley 1             |   3 |   3 |     6
+Marseille Volley 2             |   3 |   3 |     6
+Massalia                       |   3 |   3 |     6
+Meyrargues                     |   3 |   4 |     7
+Must2                          |   6 |   1 |     7
+Périer original                |   3 |   0 |     3
+Roq'n'Ball                     |   5 |   2 |     7
+ST MARTIN 1M                   |   3 |   3 |     6
+Saint Cannat                   |   3 |   4 |     7
+T-raix                         |   1 |   2 |     3
+Trets 1H                       |   3 |   3 |     6
+Trets 2H                       |   1 |   2 |     3
+Trets 3H                       |   2 |   1 |     3
+VELAUXIRAPTOR                  |   3 |   3 |     6
+VELAUXIRAPTOR 2                |   1 |   2 |     3
+Ventapéro                      |   3 |   4 |     7
+Ventateens                     |   1 |   2 |     3
+aixecuteurs                    |   3 |   4 |     7
+les Brux d'eyguières           |   3 |   4 |     7
+pelissanne 6x6                 |   3 |   3 |     6
+
+============================================================
+GÉNÉRATION DU FICHIER SQL...
+[SUCCES] Fichier SQL genere: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\insert_matches_m.sql
+[INFO] Ce fichier utilise exactement la même logique que la sauvegarde directe
+[INFO] Vous pouvez maintenant:
+[INFO] 1. Ouvrir phpMyAdmin
+[INFO] 2. Sélectionner votre base de données
+[INFO] 3. Aller dans l'onglet 'SQL'
+[INFO] 4. Copier-coller le contenu de C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\insert_matches_m.sql
+[INFO] 5. Exécuter la requête
+
+[OK] FICHIER SQL GENERE AVEC SUCCES!
+Fichier: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\insert_matches_m.sql
+Vous pouvez maintenant l'utiliser dans phpMyAdmin.
