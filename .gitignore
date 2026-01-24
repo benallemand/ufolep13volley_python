@@ -1,5 +1,43 @@
+# Project specific
 environment.py
 listing volley.csv
 *ufolepvocbufolep*.sql
-venv
-.idea
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Environment
+.env
+.env.local
+*.local
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
