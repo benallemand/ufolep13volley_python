@@ -14,9 +14,10 @@ Fichier log: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent
 [INFO] 3 dates de competition chargees
 [INFO] 18 divisions virtuelles creees
 [INFO] Historique: 492 paires, 0 avec déséquilibre
-[INFO] Effectifs: 129 equipes avec joueurs renseignes
-[INFO] Effectif commun: 1 equipes exclues (effectif incomplet)
+[INFO] Effectifs: 130 equipes avec joueurs renseignes
+[INFO] Effectif commun: 2 equipes exclues (effectif incomplet)
 [INFO] Effectif commun: 18 paires avec >=50% joueurs communs
+[INFO] Blacklist gymnases: 2 gymnases, 5 dates d'indisponibilité
 [OK] Toutes les donnees chargees avec succes
 [INFO] Connexion MySQL fermee
 [OK] Période compétition: 2026-03-02 au 2026-05-29
@@ -45,7 +46,7 @@ Fichier log: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent
 [INFO] Division mo 5: 7 équipes = 21 matchs
 [INFO] Division mo 6: 8 équipes = 28 matchs
 [INFO] Alternance historique: 133 réceptions forcées, 0 ignorées (pas de créneau/date)
-[INFO] Effectif commun: 18 paires, 585 contraintes jour ajoutées
+[INFO] Effectif commun: 18 paires, 549 contraintes jour ajoutées
        - AKOUNATREKEIL / Fosfort: 8 joueurs (66%)
        - KOPINES / KARNAGE: 7 joueurs (70%)
        - Héli'Girls / AH1Mi: 5 joueurs (62%)
@@ -59,967 +60,961 @@ Fichier log: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent
 CALENDRIER
 ================================================================================
 
-Lundi 02/03/2026
+Mardi 03/03/2026
+--------------------------------------------------
+  19:30 | Division m 2
+    ASPTT AIX 1 vs Fuveau 1
+  20:00 | Division f 4
+    MARIGNANE VB 3 vs Héli'Girls
+  20:15 | Division m 1
+    ST MARTIN 1M vs Massalia
+
+Mercredi 04/03/2026
+--------------------------------------------------
+  20:00 | Division f 2
+    Les sardines vs Fuveau F2
+  20:30 | Division m 6
+    T-raix vs CBVB2
+  20:30 | Division mo 4
+    Eyguières Mixte vs Pétokask
+  20:45 | Division mo 5
+    KOLLEGUES vs ACVB
+
+Jeudi 05/03/2026
+--------------------------------------------------
+  19:30 | Division m 7
+    Trets 3H vs MVtapeur
+  20:00 | Division m 4
+    Les loutres vs Saint Cannat
+  20:00 | Division m 7
+    AH2, Les Tigres vs Aix'plosif
+  20:00 | Division mo 1
+    AH1Mi vs GRAND PUIT
+  20:00 | Division mo 3
+    SMC fever vs MV4
+  20:45 | Division f 3
+    Pelissanne F vs Périer Spice
+  20:45 | Division m 1
+    Grans AIL 1 vs CVFVB1
+  20:45 | Division mo 4
+    Fosfort vs ToR Carnoux
+
+Vendredi 06/03/2026
+--------------------------------------------------
+  19:30 | Division f 1
+    Les bulles de Périer vs TE AITO
+  19:30 | Division m 2
+    Marseille Volley 1 vs Trets 1H
+  19:30 | Division m 6
+    Les Condors de Périer vs MARIGNANE VB
+  19:30 | Division mo 3
+    Fox Périer vs BBAVB 4x4 Mixte 1
+  19:45 | Division m 5
+    MARSEILLE VOLLEY 3 vs Ventapéro
+  20:00 | Division f 3
+    Les Boucans vs Les Roussettes
+  20:00 | Division f 4
+    Les novas vs Aixquises 2
+  20:00 | Division f 4
+    Ventastiques vs Eyguières F
+  20:00 | Division m 1
+    BOUC BEL AIR vs CARIBOU
+  20:00 | Division m 5
+    aixecuteurs vs KARNAGE
+  20:00 | Division m 7
+    Ventateens vs Périer original
+  20:00 | Division mo 1
+    Saint Martin Mi A vs La Ciotat 1 Mi
+  20:30 | Division m 2
+    CBVB1 vs pelissanne 6x6
+  20:30 | Division m 3
+    VELAUXIRAPTOR vs Marseille Est 3
+  20:30 | Division m 7
+    VELAUXIRAPTOR 2 vs LES VETERANS
+  20:45 | Division mo 5
+    EGUILLES MI vs Les Tamalous
+
+Lundi 09/03/2026
+--------------------------------------------------
+  19:30 | Division m 4
+    Asptt Marseille masculin vs Roq'n'Ball
+  19:30 | Division mo 1
+    Les 4 Fantastiques vs Les aigles de la ciotat
+  19:30 | Division mo 2
+    Les conno’s vs Koalamités
+  20:00 | Division f 2
+    Les Beach'EZ vs Les Hippocampes
+  20:00 | Division m 1
+    La Ciotat 1 vs Massalia
+  20:00 | Division mo 3
+    SMC fever vs BBAVB 4x4 Mixte 1
+  20:15 | Division mo 5
+    ACVB vs EGUILLES MI
+  20:30 | Division m 1
+    CARIBOU vs Grans AIL 1
+  20:30 | Division m 4
+    les Brux d'eyguières vs Saint Cannat
+  20:30 | Division mo 6
+    Smash Rocket vs Les Fadas
+  20:45 | Division f 1
+    KOPINES vs AixAéRebelles
+  20:45 | Division mo 2
+    Pelissanne MI3 vs pelissanne Mi1
+  21:30 | Division mo 6
+    CBVB 5 vs Les Xvins de Lambesc
+
+Mardi 10/03/2026
+--------------------------------------------------
+  19:30 | Division mo 2
+    Aixplosifs vs Les Crains Deguns
+  20:00 | Division m 6
+    MARIGNANE VB vs Trets 2H
+  20:30 | Division f 2
+    Fuveau F2 vs Les Tigresses
+
+Mercredi 11/03/2026
+--------------------------------------------------
+  19:30 | Division m 6
+    MUST UP vs Fosamax
+  20:00 | Division f 2
+    Les sardines vs Les Jeannettes
+  20:00 | Division m 5
+    La Ciotat 2 vs Must2
+  20:00 | Division mo 5
+    Les Tamalous vs Apé'Roq
+  20:30 | Division f 4
+    Eyguières F vs Les novas
+  20:30 | Division m 7
+    Aix'plosif vs Ventateens
+  20:45 | Division mo 1
+    KOKINOUS vs Saint Martin Mi A
+  20:45 | Division mo 5
+    KOLLEGUES vs MARSUPIAUX
+
+Jeudi 12/03/2026
+--------------------------------------------------
+  19:30 | Division f 5
+    Trets F vs Marignane VB 2
+  19:30 | Division m 7
+    Trets 3H vs AH2, Les Tigres
+  20:00 | Division m 6
+    Gardanne 1m vs CBVB2
+  20:15 | Division m 4
+    Meyrargues vs Les loutres
+  20:45 | Division m 3
+    Grans 2 vs MUST1
+
+Vendredi 13/03/2026
+--------------------------------------------------
+  19:00 | Division f 3
+    Les Roussettes vs EGUILLETTES
+  19:00 | Division f 4
+    Aixquises 2 vs MARIGNANE VB 3
+  19:30 | Division m 2
+    Marseille Volley 1 vs CBVB1
+  19:30 | Division m 7
+    Périer original vs VELAUXIRAPTOR 2
+  19:30 | Division mo 3
+    Fox Périer vs Les FuMistes
+  19:30 | Division mo 3
+    MV4 vs AH2Mi
+  19:30 | Division mo 4
+    Périer Ces Fous vs ToR Carnoux
+  19:45 | Division m 5
+    MARSEILLE VOLLEY 3 vs EGUILLES 2
+  20:00 | Division f 3
+    Les Boucans vs Périer Spice
+  20:00 | Division f 4
+    Ventastiques vs Marignane VB 1
+  20:00 | Division m 3
+    Aix'otic vs AIXTASY
+  20:00 | Division mo 4
+    BBAVB MIXTE 2 vs Pelissanne MI2
+  20:00 | Division mo 6
+    Les Revenants vs FUMIGÈNE
+  20:00 | Division mo 6
+    MARIGNANE VB MIXTE 2 vs TEAM ROCKET - Rousset
+  20:30 | Division f 1
+    ACVB-F vs TE AITO
+
+Lundi 16/03/2026
 --------------------------------------------------
   19:15 | Division f 1
     AixAéRebelles vs AKOUNATREKEIL
   19:30 | Division f 2
-    Les Hippocampes vs Les Tigresses
-  19:30 | Division m 1
-    Massalia vs CARIBOU
-  19:30 | Division m 3
-    MUST1 vs AIXTASY
-  19:30 | Division m 5
-    Must2 vs KARNAGE
-  19:30 | Division mo 2
-    Les Crains Deguns vs pelissanne Mi1
-  20:00 | Division f 2
-    Les Beach'EZ vs Fuveau F2
-  20:00 | Division m 6
-    CBVB2 vs MUST UP
-  20:30 | Division m 1
-    CVFVB1 vs BOUC BEL AIR
-  20:30 | Division m 2
-    Les Moux d'Eyguières vs Marseille Volley 1
-  20:30 | Division m 5
-    EGUILLES 2 vs La Ciotat 2
-  20:45 | Division mo 4
-    Pelissanne MI2 vs BBAVB MIXTE 2
-  21:30 | Division mo 6
-    CBVB 5 vs Les Xvins de Lambesc
-
-Mardi 03/03/2026
---------------------------------------------------
-  20:00 | Division f 2
-    Chateaumeuf vs Les Jeannettes
-  20:00 | Division f 4
-    MARIGNANE VB 3 vs Marignane VB 1
-  20:00 | Division m 7
-    Ventateens vs Aix'plosif
-  20:30 | Division m 2
-    Fuveau 1 vs Trets 1H
-  20:30 | Division mo 3
-    Les FuMistes vs AH2Mi
-
-Mercredi 04/03/2026
---------------------------------------------------
-  20:00 | Division m 7
-    LES VETERANS vs AH2, Les Tigres
-  20:00 | Division mo 1
-    La Ciotat 1 Mi vs Les 4 Fantastiques
-  20:00 | Division mo 6
-    Smash Rocket vs Les Fadas
-  20:30 | Division m 6
-    T-raix vs MARIGNANE VB
-  20:30 | Division mo 4
-    Eyguières Mixte vs Périer Ces Fous
-
-Jeudi 05/03/2026
---------------------------------------------------
-  19:30 | Division f 5
-    Trets F vs Fées No Men de Velaux
-  20:00 | Division f 5
-    Les Pink Ladies vs CBVB4
-  20:15 | Division m 4
-    Meyrargues vs AH1, les Panthères
-  20:45 | Division m 2
-    pelissanne 6x6 vs CBVB1
-  20:45 | Division m 6
-    Fosamax vs Trets 2H
-
-Vendredi 06/03/2026
---------------------------------------------------
-  19:30 | Division f 3
-    Périer Spice vs Aixquises 1
-  19:30 | Division m 3
-    Marseille Volley 2 vs Aix'otic
-  19:30 | Division m 7
-    Périer original vs Trets 3H
-  19:30 | Division mo 3
-    Fox Périer vs MV4
-  20:00 | Division f 3
-    les côtelettes vs EGUILLETTES
-  20:00 | Division f 3
-    Les Boucans vs Les Roussettes
-  20:00 | Division f 4
-    Les novas vs Héli'Girls
-  20:00 | Division f 5
-    Les Jeu’nettes vs Marignane VB 2
-  20:00 | Division m 5
-    Ventapéro vs aixecuteurs
-  20:00 | Division mo 2
-    Marignane VB MIXTE 1 vs Les conno’s
-  20:30 | Division f 1
-    ACVB-F vs KOPINES
-  20:45 | Division mo 5
-    EGUILLES MI vs Apé'Roq
-
-Lundi 09/03/2026
---------------------------------------------------
-  19:15 | Division f 1
-    AixAéRebelles vs KOPINES
+    Les Hippocampes vs Les Jeannettes
   19:30 | Division m 2
-    Trets 1H vs CBVB1
+    Trets 1H vs pelissanne 6x6
+  19:30 | Division m 4
+    Asptt Marseille masculin vs les Brux d'eyguières
   19:30 | Division m 5
     Must2 vs Fuveau2
-  19:30 | Division mo 1
-    Les 4 Fantastiques vs GRAND PUIT
-  20:00 | Division m 5
-    La Ciotat 2 vs aixecuteurs
-  20:30 | Division m 4
-    les Brux d'eyguières vs Asptt Marseille masculin
-  20:30 | Division mo 4
-    Fosfort vs Pelissanne MI2
-  20:30 | Division mo 6
-    Smash Rocket vs TEAM ROCKET - Rousset
-  20:45 | Division mo 2
-    Pelissanne MI3 vs Marignane VB MIXTE 1
-  20:45 | Division mo 2
-    pelissanne Mi1 vs Koalamités
-
-Mardi 10/03/2026
---------------------------------------------------
-  20:15 | Division m 6
-    CBVB2 vs Trets 2H
-  20:30 | Division f 1
-    FUVEAU F1 vs Les bulles de Périer
-  20:30 | Division m 2
-    Fuveau 1 vs Marseille Volley 1
-  20:30 | Division mo 6
-    FUMIGÈNE vs Les Xvins de Lambesc
-
-Mercredi 11/03/2026
---------------------------------------------------
+  19:30 | Division mo 2
+    Les conno’s vs Marignane VB MIXTE 1
   20:00 | Division f 2
-    Les Tigresses vs Les Jeannettes
-  20:00 | Division m 4
-    Roq'n'Ball vs AH1, les Panthères
-  20:00 | Division m 7
-    LES VETERANS vs Trets 3H
-  20:00 | Division mo 1
-    Les aigles de la ciotat vs La Ciotat 1 Mi
-  20:30 | Division f 4
-    Eyguières F vs Marignane VB 1
-  20:45 | Division mo 1
-    KOKINOUS vs AH1Mi
-
-Jeudi 12/03/2026
---------------------------------------------------
-  20:00 | Division f 1
-    TE AITO vs ACVB-F
-  20:00 | Division f 4
-    Héli'Girls vs Ventastiques
-  20:00 | Division m 6
-    Gardanne 1m vs MUST UP
-  20:00 | Division m 7
-    AH2, Les Tigres vs Aix'plosif
-  20:30 | Division m 4
-    Saint Cannat vs Meyrargues
-  20:45 | Division m 1
-    Grans AIL 1 vs CVFVB1
-  20:45 | Division m 6
-    Fosamax vs Les Condors de Périer
-
-Vendredi 13/03/2026
---------------------------------------------------
-  19:00 | Division mo 2
-    Aixplosifs vs Les Crains Deguns
-  19:30 | Division m 3
-    Marseille Volley 2 vs MUST1
-  19:30 | Division m 7
-    Périer original vs VELAUXIRAPTOR 2
-  19:45 | Division m 5
-    MARSEILLE VOLLEY 3 vs EGUILLES 2
-  20:00 | Division mo 4
-    ToR Carnoux vs Eyguières Mixte
-  20:00 | Division mo 6
-    Les Revenants vs CBVB 5
-  20:30 | Division m 3
-    VELAUXIRAPTOR vs Marseille Est 3
-
-Lundi 16/03/2026
---------------------------------------------------
-  19:30 | Division f 2
-    Les Hippocampes vs Les Jeannettes
-  19:30 | Division m 4
-    Asptt Marseille masculin vs Lambestix
-  20:15 | Division mo 5
-    ACVB vs MARSUPIAUX
-  20:30 | Division m 1
-    CVFVB1 vs La Ciotat 1
-  20:30 | Division m 4
-    Roq'n'Ball vs Saint Cannat
-  20:45 | Division f 1
-    KOPINES vs FUVEAU F1
-  20:45 | Division mo 2
-    Pelissanne MI3 vs Koalamités
-  20:45 | Division mo 4
-    Pelissanne MI2 vs Pétokask
+    Les Beach'EZ vs Les Tigresses
+  20:00 | Division m 1
+    La Ciotat 1 vs ST MARTIN 1M
+  20:30 | Division m 5
+    EGUILLES 2 vs La Ciotat 2
+  20:30 | Division m 6
+    Fosamax vs CBVB2
+  20:30 | Division mo 5
+    Apé'Roq vs Les Loups du VBC
+  20:45 | Division m 5
+    KARNAGE vs Ventapéro
 
 Mardi 17/03/2026
 --------------------------------------------------
-  19:30 | Division m 2
-    ASPTT AIX 1 vs Les Moux d'Eyguières
-  20:00 | Division f 2
-    Chateaumeuf vs Fuveau F2
-  20:00 | Division m 6
-    MARIGNANE VB vs Gardanne 1m
-  20:15 | Division m 1
-    ST MARTIN 1M vs Grans AIL 1
-  20:30 | Division m 5
-    Fuveau2 vs Ventapéro
+  20:00 | Division f 4
+    MARIGNANE VB 3 vs Marignane VB 1
+  20:00 | Division mo 4
+    Pétokask vs Périer Ces Fous
+  20:00 | Division mo 6
+    Les Fadas vs MARIGNANE VB MIXTE 2
+  20:30 | Division f 2
+    Fuveau F2 vs Chateaumeuf
   20:30 | Division mo 6
-    FUMIGÈNE vs Les Revenants
+    FUMIGÈNE vs Les Xvins de Lambesc
 
 Mercredi 18/03/2026
 --------------------------------------------------
-  20:00 | Division f 2
-    Les sardines vs Les Beach'EZ
-  20:00 | Division m 5
-    La Ciotat 2 vs Must2
-  20:00 | Division mo 3
-    La Family Business vs Les FuMistes
-  20:00 | Division mo 5
-    Les Tamalous vs Les Loups du VBC
-  20:45 | Division mo 1
-    KOKINOUS vs Les 4 Fantastiques
+  20:00 | Division mo 1
+    La Ciotat 1 Mi vs KOKINOUS
+  20:30 | Division m 6
+    T-raix vs MUST UP
+  20:45 | Division mo 2
+    Koalamités vs Les Crains Deguns
 
 Jeudi 19/03/2026
 --------------------------------------------------
+  19:30 | Division m 6
+    Trets 2H vs Gardanne 1m
   20:00 | Division f 1
-    TE AITO vs AixAéRebelles
+    TE AITO vs FUVEAU F1
   20:00 | Division f 4
-    Héli'Girls vs Eyguières F
-  20:00 | Division m 4
-    Les loutres vs AH1, les Panthères
-  20:00 | Division mo 3
-    AH2Mi vs MV4
-  20:45 | Division m 2
-    pelissanne 6x6 vs Marseille Volley 1
+    Héli'Girls vs Ventastiques
+  20:45 | Division m 3
+    Grans 2 vs Aix'otic
 
 Vendredi 20/03/2026
 --------------------------------------------------
+  19:00 | Division f 3
+    Aixquises 1 vs les côtelettes
   19:00 | Division mo 6
-    TEAM ROCKET - Rousset vs Les Xvins de Lambesc
+    TEAM ROCKET - Rousset vs Les Revenants
+  19:30 | Division f 3
+    Périer Spice vs Les Roussettes
   19:30 | Division m 3
-    Marseille Volley 2 vs AIXTASY
-  19:45 | Division m 5
-    MARSEILLE VOLLEY 3 vs KARNAGE
-  20:00 | Division f 4
-    Ventastiques vs Les novas
-  20:00 | Division m 1
-    BOUC BEL AIR vs Massalia
-  20:00 | Division m 3
-    Aix'otic vs MUST1
-  20:00 | Division m 7
-    Ventateens vs Périer original
-  20:00 | Division mo 2
-    Marignane VB MIXTE 1 vs Les Crains Deguns
+    Marseille Volley 2 vs MUST1
+  19:30 | Division m 7
+    MVtapeur vs LES VETERANS
+  19:30 | Division m 7
+    Périer original vs Trets 3H
+  20:00 | Division m 5
+    aixecuteurs vs MARSEILLE VOLLEY 3
+  20:00 | Division mo 1
+    Saint Martin Mi A vs Les aigles de la ciotat
   20:00 | Division mo 3
-    BBAVB 4x4 Mixte 1 vs Fox Périer
+    BBAVB 4x4 Mixte 1 vs AH2Mi
+  20:00 | Division mo 4
+    BBAVB MIXTE 2 vs Fosfort
+  20:00 | Division mo 4
+    ToR Carnoux vs Eyguières Mixte
+  20:30 | Division m 2
+    CBVB1 vs ASPTT AIX 1
+  20:30 | Division m 7
+    VELAUXIRAPTOR 2 vs AH2, Les Tigres
   20:45 | Division f 3
     EGUILLETTES vs Les Boucans
 
 Lundi 23/03/2026
 --------------------------------------------------
-  19:30 | Division f 2
-    Les Hippocampes vs Les Beach'EZ
   19:30 | Division m 3
-    MUST1 vs VELAUXIRAPTOR
+    MUST1 vs AIXTASY
   19:30 | Division m 4
-    Asptt Marseille masculin vs Les loutres
+    Asptt Marseille masculin vs AH1, les Panthères
+  19:30 | Division m 5
+    Must2 vs KARNAGE
   19:30 | Division mo 2
     Les conno’s vs Pelissanne MI3
+  20:00 | Division f 5
+    CBVB4 vs Trets F
   20:30 | Division m 1
-    CARIBOU vs CVFVB1
-  20:30 | Division m 4
-    les Brux d'eyguières vs Lambestix
-  20:30 | Division mo 5
-    Apé'Roq vs ACVB
-  20:45 | Division f 1
-    KOPINES vs TE AITO
-  20:45 | Division mo 2
-    pelissanne Mi1 vs Aixplosifs
+    CVFVB1 vs La Ciotat 1
+  20:30 | Division m 2
+    Les Moux d'Eyguières vs pelissanne 6x6
 
 Mardi 24/03/2026
 --------------------------------------------------
-  19:30 | Division m 3
-    AIXTASY vs Aix'otic
   20:00 | Division f 4
     MARIGNANE VB 3 vs Eyguières F
-  20:00 | Division m 5
-    Ventapéro vs EGUILLES 2
-  20:00 | Division mo 6
-    Les Fadas vs Les Revenants
   20:15 | Division m 6
-    CBVB2 vs Les Condors de Périer
+    CBVB2 vs MUST UP
+  20:30 | Division f 2
+    Fuveau F2 vs Les Hippocampes
+  20:30 | Division m 5
+    Fuveau2 vs aixecuteurs
   20:30 | Division mo 3
-    Les FuMistes vs SMC fever
+    Les FuMistes vs La Family Business
 
 Mercredi 25/03/2026
 --------------------------------------------------
   20:00 | Division f 2
-    Les Tigresses vs Chateaumeuf
-  20:00 | Division f 5
-    Marignane VB 2 vs CBVB4
+    Les Tigresses vs Les Jeannettes
+  20:00 | Division f 4
+    Marignane VB 1 vs Les novas
+  20:00 | Division m 5
+    La Ciotat 2 vs Ventapéro
   20:00 | Division mo 1
-    Les aigles de la ciotat vs GRAND PUIT
-  20:00 | Division mo 5
-    Les Loups du VBC vs KOLLEGUES
-  20:00 | Division mo 6
-    Smash Rocket vs FUMIGÈNE
-  20:30 | Division m 7
-    Aix'plosif vs Périer original
+    La Ciotat 1 Mi vs AH1Mi
+  20:30 | Division mo 6
+    Les Xvins de Lambesc vs Smash Rocket
+  20:45 | Division mo 1
+    KOKINOUS vs Les 4 Fantastiques
   20:45 | Division mo 2
     Koalamités vs Marignane VB MIXTE 1
 
 Jeudi 26/03/2026
 --------------------------------------------------
-  19:30 | Division m 7
-    Trets 3H vs MVtapeur
-  20:00 | Division m 4
-    AH1, les Panthères vs Saint Cannat
-  20:00 | Division m 7
-    AH2, Les Tigres vs Ventateens
-  20:00 | Division mo 1
-    AH1Mi vs Saint Martin Mi A
-  20:45 | Division f 1
-    AKOUNATREKEIL vs Les bulles de Périer
+  20:45 | Division m 6
+    Fosamax vs MARIGNANE VB
 
 Vendredi 27/03/2026
 --------------------------------------------------
   19:00 | Division f 3
-    Les Roussettes vs Aixquises 1
-  19:00 | Division f 4
-    Aixquises 2 vs Ventastiques
-  19:30 | Division f 3
-    Périer Spice vs les côtelettes
-  19:30 | Division mo 4
-    Périer Ces Fous vs Fosfort
-  19:45 | Division m 5
-    MARSEILLE VOLLEY 3 vs La Ciotat 2
-  20:00 | Division f 5
-    Les Jeu’nettes vs Trets F
+    Aixquises 1 vs Les Boucans
+  19:30 | Division m 6
+    Les Condors de Périer vs Trets 2H
+  19:30 | Division m 7
+    Périer original vs LES VETERANS
+  19:30 | Division m 7
+    MVtapeur vs VELAUXIRAPTOR 2
+  20:00 | Division f 3
+    les côtelettes vs Les Roussettes
+  20:00 | Division m 1
+    BOUC BEL AIR vs Massalia
   20:00 | Division m 3
-    Marseille Est 3 vs Marseille Volley 2
-  20:00 | Division m 5
-    aixecuteurs vs KARNAGE
+    Marseille Est 3 vs Grans 2
+  20:00 | Division m 3
+    Aix'otic vs VELAUXIRAPTOR
+  20:00 | Division mo 4
+    ToR Carnoux vs Pétokask
   20:00 | Division mo 6
-    MARIGNANE VB MIXTE 2 vs TEAM ROCKET - Rousset
-  20:30 | Division m 2
-    CBVB1 vs Fuveau 1
+    Les Revenants vs Les Fadas
+  20:00 | Division mo 6
+    MARIGNANE VB MIXTE 2 vs CBVB 5
+  20:30 | Division f 5
+    Fées No Men de Velaux vs Les Pink Ladies
+  20:45 | Division mo 5
+    EGUILLES MI vs MARSUPIAUX
 
 Lundi 30/03/2026
 --------------------------------------------------
-  19:15 | Division f 1
-    AixAéRebelles vs Les bulles de Périer
+  19:30 | Division f 2
+    Les Hippocampes vs Les sardines
   19:30 | Division m 1
     Massalia vs Grans AIL 1
-  19:30 | Division mo 1
-    Les 4 Fantastiques vs Les aigles de la ciotat
+  19:30 | Division m 5
+    Must2 vs Ventapéro
   19:30 | Division mo 2
-    Les conno’s vs Les Crains Deguns
-  20:00 | Division f 2
-    Les Beach'EZ vs Les Tigresses
+    Les Crains Deguns vs Pelissanne MI3
   20:00 | Division m 1
-    La Ciotat 1 vs BOUC BEL AIR
-  20:00 | Division mo 3
-    SMC fever vs AH2Mi
-  20:30 | Division f 1
-    AKOUNATREKEIL vs TE AITO
+    La Ciotat 1 vs CARIBOU
+  20:00 | Division m 5
+    La Ciotat 2 vs aixecuteurs
+  20:15 | Division mo 5
+    ACVB vs Les Loups du VBC
   20:30 | Division m 1
-    CARIBOU vs ST MARTIN 1M
-  20:30 | Division m 2
-    Les Moux d'Eyguières vs pelissanne 6x6
+    CVFVB1 vs BOUC BEL AIR
   20:30 | Division m 3
-    VELAUXIRAPTOR vs AIXTASY
+    VELAUXIRAPTOR vs Marseille Volley 2
   20:30 | Division m 4
-    les Brux d'eyguières vs Meyrargues
+    Roq'n'Ball vs Les loutres
+  20:30 | Division m 4
+    les Brux d'eyguières vs Lambestix
   20:30 | Division m 6
-    Fosamax vs T-raix
-  20:30 | Division mo 5
-    Apé'Roq vs MARSUPIAUX
+    Gardanne 1m vs Fosamax
   20:45 | Division m 5
     KARNAGE vs EGUILLES 2
+  20:45 | Division mo 2
+    pelissanne Mi1 vs Les conno’s
+  20:45 | Division mo 4
+    Pelissanne MI2 vs Eyguières Mixte
   21:30 | Division mo 6
-    CBVB 5 vs Les Fadas
+    CBVB 5 vs TEAM ROCKET - Rousset
 
 Mardi 31/03/2026
 --------------------------------------------------
   20:00 | Division m 6
-    MARIGNANE VB vs CBVB2
+    MARIGNANE VB vs T-raix
+  20:00 | Division mo 4
+    Pétokask vs Fosfort
+  20:30 | Division m 2
+    Fuveau 1 vs Les Moux d'Eyguières
 
 Mercredi 01/04/2026
 --------------------------------------------------
-  20:00 | Division f 4
-    Marignane VB 1 vs Aixquises 2
+  20:00 | Division f 2
+    Les Tigresses vs Chateaumeuf
+  20:00 | Division m 7
+    LES VETERANS vs AH2, Les Tigres
   20:00 | Division mo 1
-    La Ciotat 1 Mi vs AH1Mi
-  20:00 | Division mo 5
-    Les Tamalous vs EGUILLES MI
+    Les aigles de la ciotat vs La Ciotat 1 Mi
+  20:00 | Division mo 3
+    La Family Business vs AH2Mi
   20:30 | Division f 4
-    Eyguières F vs Les novas
-  20:30 | Division m 7
-    Aix'plosif vs LES VETERANS
-  20:30 | Division mo 6
-    Les Xvins de Lambesc vs MARIGNANE VB MIXTE 2
+    Eyguières F vs Héli'Girls
+  20:45 | Division mo 5
+    KOLLEGUES vs Apé'Roq
 
 Jeudi 02/04/2026
 --------------------------------------------------
-  19:30 | Division m 6
-    Trets 2H vs Les Condors de Périer
-  20:00 | Division m 4
-    Les loutres vs Roq'n'Ball
-  20:00 | Division m 4
-    AH1, les Panthères vs Lambestix
-  20:00 | Division m 7
-    AH2, Les Tigres vs Périer original
-  20:45 | Division m 3
-    Grans 2 vs Aix'otic
-  20:45 | Division mo 4
-    Fosfort vs Eyguières Mixte
+  19:30 | Division f 5
+    Trets F vs Fées No Men de Velaux
+  19:30 | Division m 7
+    Trets 3H vs Ventateens
+  20:00 | Division f 1
+    TE AITO vs AixAéRebelles
+  20:30 | Division m 4
+    Saint Cannat vs Meyrargues
 
 Vendredi 03/04/2026
 --------------------------------------------------
   19:00 | Division f 3
-    Les Roussettes vs Pelissanne F
+    Aixquises 1 vs Périer Spice
   19:30 | Division m 7
-    MVtapeur vs VELAUXIRAPTOR 2
-  19:30 | Division mo 3
-    Fox Périer vs La Family Business
+    Périer original vs MVtapeur
   19:30 | Division mo 3
     MV4 vs BBAVB 4x4 Mixte 1
+  19:30 | Division mo 4
+    Périer Ces Fous vs BBAVB MIXTE 2
+  19:45 | Division m 5
+    MARSEILLE VOLLEY 3 vs Fuveau2
   20:00 | Division f 2
-    Les Jeannettes vs Fuveau F2
-  20:00 | Division m 3
-    Marseille Est 3 vs MUST1
-  20:00 | Division m 5
-    aixecuteurs vs Must2
-  20:00 | Division m 5
-    Ventapéro vs MARSEILLE VOLLEY 3
+    Les Jeannettes vs Les Beach'EZ
+  20:00 | Division mo 1
+    Saint Martin Mi A vs Les 4 Fantastiques
   20:00 | Division mo 2
-    Marignane VB MIXTE 1 vs pelissanne Mi1
-  20:00 | Division mo 4
-    BBAVB MIXTE 2 vs ToR Carnoux
-  20:00 | Division mo 6
-    Les Revenants vs TEAM ROCKET - Rousset
-  20:30 | Division f 1
-    ACVB-F vs FUVEAU F1
-  20:30 | Division f 5
-    Fées No Men de Velaux vs Les Pink Ladies
-  20:30 | Division m 2
-    CBVB1 vs ASPTT AIX 1
+    Marignane VB MIXTE 1 vs Aixplosifs
   20:45 | Division f 3
-    EGUILLETTES vs Aixquises 1
-  20:45 | Division mo 1
-    GRAND PUIT vs Saint Martin Mi A
+    EGUILLETTES vs les côtelettes
 
 Mardi 07/04/2026
 --------------------------------------------------
-  19:30 | Division mo 2
-    Aixplosifs vs Marignane VB MIXTE 1
-  20:00 | Division f 4
-    MARIGNANE VB 3 vs Héli'Girls
-  20:00 | Division f 5
-    CBVB4 vs Les Jeu’nettes
-  20:00 | Division m 5
-    Ventapéro vs Must2
+  19:30 | Division m 3
+    AIXTASY vs Grans 2
   20:00 | Division mo 6
     Les Fadas vs Les Xvins de Lambesc
+  20:30 | Division m 2
+    Fuveau 1 vs Trets 1H
   20:30 | Division m 5
     Fuveau2 vs La Ciotat 2
-  20:30 | Division mo 6
-    FUMIGÈNE vs MARIGNANE VB MIXTE 2
 
 Mercredi 08/04/2026
 --------------------------------------------------
   20:00 | Division f 2
-    Les sardines vs Chateaumeuf
+    Les sardines vs Les Beach'EZ
   20:00 | Division f 5
-    Marignane VB 2 vs Les Pink Ladies
-  20:00 | Division mo 3
-    La Family Business vs AH2Mi
+    Marignane VB 2 vs CBVB4
+  20:00 | Division m 7
+    LES VETERANS vs Trets 3H
+  20:00 | Division mo 5
+    Les Loups du VBC vs EGUILLES MI
+  20:30 | Division f 4
+    Eyguières F vs Marignane VB 1
   20:30 | Division m 4
-    Lambestix vs Les loutres
-  20:30 | Division m 6
-    T-raix vs CBVB2
-  20:30 | Division mo 4
-    Eyguières Mixte vs Pelissanne MI2
-  20:45 | Division mo 2
-    Koalamités vs Les conno’s
+    Lambestix vs Roq'n'Ball
+  20:30 | Division m 7
+    Aix'plosif vs Périer original
 
 Jeudi 09/04/2026
 --------------------------------------------------
-  19:30 | Division m 6
-    Trets 2H vs MUST UP
-  20:00 | Division m 6
-    Gardanne 1m vs Fosamax
-  20:00 | Division mo 1
-    AH1Mi vs GRAND PUIT
+  20:00 | Division f 5
+    Les Pink Ladies vs Trets F
+  20:00 | Division m 4
+    Les loutres vs les Brux d'eyguières
+  20:00 | Division m 7
+    AH2, Les Tigres vs Ventateens
   20:00 | Division mo 3
-    SMC fever vs BBAVB 4x4 Mixte 1
+    AH2Mi vs Les FuMistes
   20:15 | Division m 4
     Meyrargues vs Asptt Marseille masculin
-  20:45 | Division m 2
-    pelissanne 6x6 vs ASPTT AIX 1
-  20:45 | Division m 3
-    Grans 2 vs Marseille Volley 2
+  20:30 | Division m 4
+    Saint Cannat vs AH1, les Panthères
+  20:45 | Division f 1
+    AKOUNATREKEIL vs Les bulles de Périer
+  20:45 | Division f 3
+    Pelissanne F vs EGUILLETTES
+  20:45 | Division m 1
+    Grans AIL 1 vs La Ciotat 1
+  20:45 | Division m 6
+    Fosamax vs T-raix
 
 Vendredi 10/04/2026
 --------------------------------------------------
-  19:00 | Division f 3
-    Aixquises 1 vs les côtelettes
-  19:00 | Division f 3
-    Les Roussettes vs EGUILLETTES
-  19:30 | Division f 1
-    Les bulles de Périer vs ACVB-F
   19:30 | Division m 2
-    Marseille Volley 1 vs Trets 1H
-  19:30 | Division m 6
-    Les Condors de Périer vs MARIGNANE VB
-  19:30 | Division m 7
-    Périer original vs MVtapeur
+    Marseille Volley 1 vs ASPTT AIX 1
+  19:30 | Division mo 3
+    Fox Périer vs MV4
   20:00 | Division f 2
-    Les Jeannettes vs Les Beach'EZ
-  20:00 | Division f 3
-    Les Boucans vs Pelissanne F
+    Les Jeannettes vs Chateaumeuf
   20:00 | Division f 4
-    Les novas vs Aixquises 2
-  20:00 | Division mo 1
-    Saint Martin Mi A vs Les aigles de la ciotat
-  20:00 | Division mo 4
-    BBAVB MIXTE 2 vs Périer Ces Fous
-  20:00 | Division mo 4
-    ToR Carnoux vs Pétokask
-  20:30 | Division m 7
-    VELAUXIRAPTOR 2 vs Trets 3H
-  20:45 | Division mo 5
-    EGUILLES MI vs KOLLEGUES
-  20:45 | Division mo 5
-    MARSUPIAUX vs Les Loups du VBC
+    Les novas vs Ventastiques
+  20:00 | Division m 3
+    Marseille Est 3 vs Marseille Volley 2
+  20:00 | Division m 5
+    Ventapéro vs aixecuteurs
+  20:00 | Division mo 2
+    Marignane VB MIXTE 1 vs Les Crains Deguns
+  20:00 | Division mo 3
+    BBAVB 4x4 Mixte 1 vs La Family Business
+  20:30 | Division f 1
+    ACVB-F vs KOPINES
+  20:30 | Division f 5
+    Fées No Men de Velaux vs Les Jeu’nettes
+  20:45 | Division mo 1
+    GRAND PUIT vs La Ciotat 1 Mi
 
-Lundi 13/04/2026
+Mardi 28/04/2026
 --------------------------------------------------
+  19:30 | Division f 4
+    Aixquises 2 vs Ventastiques
   19:30 | Division m 2
-    Trets 1H vs pelissanne 6x6
+    ASPTT AIX 1 vs Trets 1H
+  20:00 | Division f 2
+    Chateaumeuf vs Les Beach'EZ
+  20:00 | Division m 7
+    Ventateens vs VELAUXIRAPTOR 2
+  20:00 | Division mo 6
+    Les Fadas vs FUMIGÈNE
+  20:15 | Division m 1
+    ST MARTIN 1M vs CVFVB1
+  20:15 | Division m 6
+    CBVB2 vs MARIGNANE VB
+  20:30 | Division f 1
+    FUVEAU F1 vs AKOUNATREKEIL
+  20:30 | Division m 5
+    Fuveau2 vs EGUILLES 2
+  20:30 | Division mo 3
+    Les FuMistes vs SMC fever
+
+Mercredi 29/04/2026
+--------------------------------------------------
+  20:00 | Division f 5
+    Marignane VB 2 vs Fées No Men de Velaux
+  20:00 | Division mo 1
+    Les aigles de la ciotat vs GRAND PUIT
+  20:00 | Division mo 5
+    Les Loups du VBC vs Les Tamalous
+  20:00 | Division mo 6
+    Smash Rocket vs CBVB 5
+  20:30 | Division m 4
+    Lambestix vs Asptt Marseille masculin
+  20:30 | Division m 7
+    Aix'plosif vs MVtapeur
+  20:30 | Division mo 4
+    Eyguières Mixte vs BBAVB MIXTE 2
+  20:45 | Division mo 1
+    KOKINOUS vs AH1Mi
+
+Jeudi 30/04/2026
+--------------------------------------------------
+  19:30 | Division m 6
+    Trets 2H vs T-raix
+  20:00 | Division f 4
+    Héli'Girls vs Les novas
+  20:00 | Division m 4
+    AH1, les Panthères vs les Brux d'eyguières
+  20:00 | Division m 6
+    Gardanne 1m vs Les Condors de Périer
+  20:00 | Division m 7
+    AH2, Les Tigres vs Périer original
+  20:15 | Division m 4
+    Meyrargues vs Roq'n'Ball
+  20:45 | Division f 3
+    Pelissanne F vs Aixquises 1
+  20:45 | Division m 3
+    Grans 2 vs Marseille Volley 2
+  20:45 | Division mo 4
+    Fosfort vs Pelissanne MI2
+
+Lundi 04/05/2026
+--------------------------------------------------
+  19:15 | Division f 1
+    AixAéRebelles vs ACVB-F
+  19:30 | Division m 2
+    Trets 1H vs CBVB1
+  19:30 | Division m 3
+    MUST1 vs Aix'otic
   19:30 | Division m 5
     Must2 vs MARSEILLE VOLLEY 3
   19:30 | Division mo 1
-    Les 4 Fantastiques vs AH1Mi
+    Les 4 Fantastiques vs GRAND PUIT
   19:30 | Division mo 2
-    Les Crains Deguns vs Pelissanne MI3
-  20:00 | Division m 1
-    La Ciotat 1 vs Massalia
-  20:30 | Division m 4
-    Roq'n'Ball vs les Brux d'eyguières
+    Les Crains Deguns vs pelissanne Mi1
+  20:00 | Division f 2
+    Les Beach'EZ vs Fuveau F2
+  20:00 | Division f 3
+    les côtelettes vs Pelissanne F
+  20:15 | Division mo 5
+    ACVB vs MARSUPIAUX
+  20:30 | Division m 2
+    Les Moux d'Eyguières vs Marseille Volley 1
   20:30 | Division m 5
     EGUILLES 2 vs aixecuteurs
+  20:30 | Division mo 6
+    Smash Rocket vs Les Revenants
   20:45 | Division m 5
     KARNAGE vs Fuveau2
-
-Mardi 14/04/2026
---------------------------------------------------
-  20:00 | Division f 5
-    CBVB4 vs Trets F
-  20:00 | Division mo 4
-    Pétokask vs Périer Ces Fous
-  20:30 | Division f 2
-    Fuveau F2 vs Les sardines
-
-Mercredi 15/04/2026
---------------------------------------------------
-  20:00 | Division m 5
-    La Ciotat 2 vs Ventapéro
-  20:00 | Division mo 1
-    Les aigles de la ciotat vs KOKINOUS
-  20:00 | Division mo 5
-    Les Tamalous vs Apé'Roq
-  20:00 | Division mo 6
-    Smash Rocket vs CBVB 5
-  20:45 | Division mo 5
-    KOLLEGUES vs MARSUPIAUX
-
-Jeudi 16/04/2026
---------------------------------------------------
-  19:30 | Division m 6
-    Trets 2H vs MARIGNANE VB
-  19:30 | Division m 7
-    Trets 3H vs Ventateens
-  20:00 | Division m 6
-    Gardanne 1m vs CBVB2
-  20:15 | Division m 4
-    Meyrargues vs Les loutres
-  20:30 | Division m 4
-    Saint Cannat vs Asptt Marseille masculin
-  20:45 | Division f 3
-    Pelissanne F vs Périer Spice
-  20:45 | Division m 3
-    Grans 2 vs VELAUXIRAPTOR
-
-Vendredi 17/04/2026
---------------------------------------------------
-  19:00 | Division mo 6
-    TEAM ROCKET - Rousset vs FUMIGÈNE
-  19:30 | Division f 1
-    Les bulles de Périer vs KOPINES
-  19:30 | Division m 6
-    Les Condors de Périer vs T-raix
-  19:30 | Division m 7
-    MVtapeur vs LES VETERANS
-  19:30 | Division mo 3
-    Fox Périer vs Les FuMistes
-  20:00 | Division f 4
-    Ventastiques vs Marignane VB 1
-  20:00 | Division f 4
-    Les novas vs MARIGNANE VB 3
-  20:00 | Division m 1
-    BOUC BEL AIR vs CARIBOU
-  20:00 | Division mo 4
-    ToR Carnoux vs Fosfort
-  20:00 | Division mo 6
-    MARIGNANE VB MIXTE 2 vs Les Fadas
-  20:30 | Division m 2
-    CBVB1 vs Les Moux d'Eyguières
-  20:30 | Division m 7
-    VELAUXIRAPTOR 2 vs AH2, Les Tigres
+  20:45 | Division mo 2
+    Pelissanne MI3 vs Marignane VB MIXTE 1
+  20:45 | Division mo 4
+    Pelissanne MI2 vs Pétokask
+  21:30 | Division mo 6
+    CBVB 5 vs Les Fadas
 
 Mardi 05/05/2026
 --------------------------------------------------
-  19:30 | Division m 2
-    ASPTT AIX 1 vs Trets 1H
   19:30 | Division m 3
     AIXTASY vs Marseille Est 3
-  20:00 | Division f 2
-    Chateaumeuf vs Les Hippocampes
-  20:00 | Division f 4
-    Ventastiques vs MARIGNANE VB 3
-  20:00 | Division m 7
-    Ventateens vs VELAUXIRAPTOR 2
-  20:00 | Division mo 4
-    Pétokask vs Eyguières Mixte
-  20:15 | Division m 1
-    ST MARTIN 1M vs BOUC BEL AIR
   20:15 | Division m 6
-    CBVB2 vs Fosamax
-  20:30 | Division m 5
-    Fuveau2 vs aixecuteurs
+    CBVB2 vs Les Condors de Périer
+  20:30 | Division f 1
+    FUVEAU F1 vs Les bulles de Périer
   20:30 | Division mo 6
-    FUMIGÈNE vs CBVB 5
+    FUMIGÈNE vs TEAM ROCKET - Rousset
 
 Mercredi 06/05/2026
 --------------------------------------------------
-  20:00 | Division f 2
-    Les Tigresses vs Les sardines
-  20:00 | Division f 5
-    Marignane VB 2 vs Fées No Men de Velaux
-  20:00 | Division m 4
-    Roq'n'Ball vs Asptt Marseille masculin
   20:00 | Division mo 1
-    La Ciotat 1 Mi vs KOKINOUS
+    Les aigles de la ciotat vs KOKINOUS
   20:00 | Division mo 3
-    La Family Business vs SMC fever
+    La Family Business vs Fox Périer
   20:00 | Division mo 5
-    Les Loups du VBC vs Apé'Roq
-  20:30 | Division m 6
-    T-raix vs MUST UP
+    Les Tamalous vs KOLLEGUES
+  20:00 | Division mo 5
+    Apé'Roq vs EGUILLES MI
+  20:30 | Division m 7
+    Aix'plosif vs LES VETERANS
   20:30 | Division mo 6
-    Les Xvins de Lambesc vs Les Revenants
-  20:45 | Division mo 5
-    KOLLEGUES vs ACVB
+    Les Xvins de Lambesc vs MARIGNANE VB MIXTE 2
+  20:45 | Division mo 2
+    Koalamités vs Aixplosifs
 
 Jeudi 07/05/2026
 --------------------------------------------------
-  19:30 | Division m 7
-    Trets 3H vs AH2, Les Tigres
+  19:30 | Division f 5
+    Trets F vs Les Jeu’nettes
   20:00 | Division f 1
-    TE AITO vs FUVEAU F1
-  20:00 | Division f 4
-    Héli'Girls vs Aixquises 2
+    TE AITO vs KOPINES
+  20:00 | Division f 5
+    Les Pink Ladies vs Marignane VB 2
   20:00 | Division m 4
-    Les loutres vs Saint Cannat
-  20:00 | Division m 6
-    Gardanne 1m vs Trets 2H
+    AH1, les Panthères vs Lambestix
+  20:00 | Division mo 1
+    AH1Mi vs Saint Martin Mi A
   20:00 | Division mo 3
-    AH2Mi vs Fox Périer
-  20:15 | Division m 4
-    Meyrargues vs Lambestix
-  20:45 | Division f 3
-    Pelissanne F vs les côtelettes
+    AH2Mi vs SMC fever
+  20:15 | Division m 6
+    MUST UP vs Gardanne 1m
   20:45 | Division m 1
-    Grans AIL 1 vs La Ciotat 1
+    Grans AIL 1 vs BOUC BEL AIR
+  20:45 | Division m 2
+    pelissanne 6x6 vs Fuveau 1
   20:45 | Division mo 4
-    Fosfort vs BBAVB MIXTE 2
+    Fosfort vs Eyguières Mixte
 
 Lundi 11/05/2026
 --------------------------------------------------
+  19:15 | Division f 1
+    AixAéRebelles vs Les bulles de Périer
   19:30 | Division m 1
     Massalia vs CVFVB1
   19:30 | Division m 3
-    MUST1 vs Grans 2
-  19:30 | Division mo 2
-    Les Crains Deguns vs Koalamités
-  20:00 | Division m 1
-    La Ciotat 1 vs ST MARTIN 1M
-  20:15 | Division mo 5
-    ACVB vs Les Tamalous
+    MUST1 vs VELAUXIRAPTOR
+  19:30 | Division m 4
+    Asptt Marseille masculin vs Les loutres
+  19:30 | Division mo 1
+    Les 4 Fantastiques vs AH1Mi
+  20:30 | Division f 1
+    AKOUNATREKEIL vs ACVB-F
+  20:30 | Division m 1
+    CARIBOU vs ST MARTIN 1M
   20:30 | Division m 2
-    Les Moux d'Eyguières vs Fuveau 1
+    Les Moux d'Eyguières vs CBVB1
   20:30 | Division m 4
-    les Brux d'eyguières vs Les loutres
-  20:30 | Division m 5
-    EGUILLES 2 vs Must2
-  20:30 | Division mo 5
-    Apé'Roq vs KOLLEGUES
+    les Brux d'eyguières vs Meyrargues
+  20:30 | Division m 6
+    Fosamax vs Trets 2H
+  20:30 | Division mo 6
+    Smash Rocket vs MARIGNANE VB MIXTE 2
   20:45 | Division f 1
-    KOPINES vs AKOUNATREKEIL
+    KOPINES vs FUVEAU F1
   20:45 | Division mo 2
-    pelissanne Mi1 vs Les conno’s
+    Pelissanne MI3 vs Koalamités
+  20:45 | Division mo 2
+    pelissanne Mi1 vs Aixplosifs
 
 Mardi 12/05/2026
 --------------------------------------------------
-  20:30 | Division f 1
-    FUVEAU F1 vs AixAéRebelles
-  20:30 | Division m 5
-    Fuveau2 vs MARSEILLE VOLLEY 3
+  20:00 | Division f 5
+    CBVB4 vs Fées No Men de Velaux
+  20:00 | Division mo 4
+    Pétokask vs BBAVB MIXTE 2
+  20:30 | Division m 2
+    Fuveau 1 vs Marseille Volley 1
+  20:30 | Division mo 6
+    FUMIGÈNE vs CBVB 5
 
 Mercredi 13/05/2026
 --------------------------------------------------
   19:30 | Division m 6
-    MUST UP vs Fosamax
+    MUST UP vs MARIGNANE VB
   20:00 | Division f 4
-    Marignane VB 1 vs Les novas
+    Marignane VB 1 vs Héli'Girls
+  20:00 | Division m 4
+    Roq'n'Ball vs AH1, les Panthères
   20:00 | Division m 7
     LES VETERANS vs Ventateens
-  20:00 | Division mo 5
-    Les Loups du VBC vs EGUILLES MI
+  20:00 | Division mo 3
+    La Family Business vs SMC fever
   20:30 | Division m 4
     Lambestix vs Saint Cannat
-  20:30 | Division m 6
-    T-raix vs Gardanne 1m
-  20:45 | Division mo 1
-    KOKINOUS vs Saint Martin Mi A
+  20:30 | Division m 7
+    Aix'plosif vs Trets 3H
 
 Vendredi 15/05/2026
 --------------------------------------------------
   19:00 | Division f 3
-    Aixquises 1 vs Pelissanne F
+    Les Roussettes vs Pelissanne F
   19:00 | Division f 4
-    Aixquises 2 vs MARIGNANE VB 3
-  19:00 | Division mo 2
-    Aixplosifs vs Pelissanne MI3
+    Aixquises 2 vs Eyguières F
   19:00 | Division mo 6
     TEAM ROCKET - Rousset vs Les Fadas
-  19:30 | Division m 2
-    Marseille Volley 1 vs ASPTT AIX 1
+  19:30 | Division m 6
+    Les Condors de Périer vs T-raix
   19:30 | Division m 7
-    MVtapeur vs Aix'plosif
-  19:30 | Division mo 3
-    MV4 vs SMC fever
+    MVtapeur vs AH2, Les Tigres
   19:30 | Division mo 4
-    Périer Ces Fous vs Pelissanne MI2
+    Périer Ces Fous vs Fosfort
+  19:45 | Division m 5
+    MARSEILLE VOLLEY 3 vs KARNAGE
   20:00 | Division f 3
     les côtelettes vs Les Boucans
   20:00 | Division f 5
     Les Jeu’nettes vs Les Pink Ladies
   20:00 | Division m 3
     Aix'otic vs Marseille Est 3
-  20:00 | Division mo 3
-    BBAVB 4x4 Mixte 1 vs La Family Business
+  20:00 | Division m 5
+    Ventapéro vs EGUILLES 2
   20:00 | Division mo 4
-    BBAVB MIXTE 2 vs Pétokask
+    ToR Carnoux vs Pelissanne MI2
   20:00 | Division mo 6
-    MARIGNANE VB MIXTE 2 vs CBVB 5
-  20:00 | Division mo 6
-    Les Revenants vs Smash Rocket
-  20:30 | Division m 3
-    VELAUXIRAPTOR vs Marseille Volley 2
+    Les Revenants vs Les Xvins de Lambesc
   20:45 | Division f 3
-    EGUILLETTES vs Périer Spice
+    EGUILLETTES vs Aixquises 1
+  20:45 | Division mo 1
+    GRAND PUIT vs Saint Martin Mi A
+  20:45 | Division mo 5
+    MARSUPIAUX vs Les Loups du VBC
 
 Lundi 18/05/2026
 --------------------------------------------------
+  19:30 | Division f 2
+    Les Hippocampes vs Les Tigresses
+  19:30 | Division m 1
+    Massalia vs CARIBOU
   19:30 | Division m 2
     Trets 1H vs Les Moux d'Eyguières
-  19:30 | Division m 4
-    Asptt Marseille masculin vs AH1, les Panthères
   19:30 | Division mo 2
-    Les conno’s vs Aixplosifs
-  20:00 | Division f 2
-    Les Beach'EZ vs Chateaumeuf
-  20:00 | Division mo 3
-    SMC fever vs Fox Périer
-  20:15 | Division mo 5
-    ACVB vs Les Loups du VBC
-  20:30 | Division m 1
-    CARIBOU vs La Ciotat 1
+    Les Crains Deguns vs Les conno’s
+  20:30 | Division m 3
+    VELAUXIRAPTOR vs Grans 2
   20:30 | Division m 5
-    EGUILLES 2 vs Fuveau2
-  20:30 | Division m 7
-    VELAUXIRAPTOR 2 vs Aix'plosif
-  20:45 | Division m 5
-    KARNAGE vs La Ciotat 2
+    EGUILLES 2 vs Must2
+  20:30 | Division mo 5
+    Apé'Roq vs ACVB
+  20:45 | Division f 1
+    KOPINES vs AKOUNATREKEIL
   20:45 | Division mo 2
-    Pelissanne MI3 vs pelissanne Mi1
+    pelissanne Mi1 vs Koalamités
   20:45 | Division mo 4
-    Pelissanne MI2 vs ToR Carnoux
+    Pelissanne MI2 vs Périer Ces Fous
   21:30 | Division mo 6
-    CBVB 5 vs TEAM ROCKET - Rousset
+    CBVB 5 vs Les Revenants
 
 Mardi 19/05/2026
 --------------------------------------------------
-  20:00 | Division mo 4
-    Pétokask vs Fosfort
-  20:30 | Division f 2
-    Fuveau F2 vs Les Tigresses
-  20:30 | Division m 2
-    Fuveau 1 vs pelissanne 6x6
+  19:30 | Division mo 2
+    Aixplosifs vs Pelissanne MI3
+  20:00 | Division f 2
+    Chateaumeuf vs Les sardines
+  20:00 | Division f 5
+    CBVB4 vs Les Jeu’nettes
+  20:15 | Division m 1
+    ST MARTIN 1M vs Grans AIL 1
+  20:30 | Division f 1
+    FUVEAU F1 vs AixAéRebelles
   20:30 | Division mo 3
     Les FuMistes vs MV4
 
 Mercredi 20/05/2026
 --------------------------------------------------
-  20:00 | Division f 2
-    Les sardines vs Les Hippocampes
-  20:30 | Division f 4
-    Eyguières F vs Ventastiques
-  20:30 | Division mo 6
-    Les Xvins de Lambesc vs Smash Rocket
-  20:45 | Division mo 5
-    KOLLEGUES vs Les Tamalous
+  20:00 | Division mo 1
+    La Ciotat 1 Mi vs Les 4 Fantastiques
+  20:00 | Division mo 5
+    Les Loups du VBC vs KOLLEGUES
+  20:30 | Division m 6
+    T-raix vs Gardanne 1m
 
 Jeudi 21/05/2026
 --------------------------------------------------
   19:30 | Division m 6
-    Trets 2H vs T-raix
-  20:00 | Division f 5
-    Les Pink Ladies vs Trets F
-  20:00 | Division mo 1
-    AH1Mi vs Les aigles de la ciotat
+    Trets 2H vs MUST UP
+  20:00 | Division f 4
+    Héli'Girls vs Aixquises 2
+  20:00 | Division m 4
+    Les loutres vs Lambestix
   20:00 | Division mo 3
-    AH2Mi vs BBAVB 4x4 Mixte 1
+    AH2Mi vs Fox Périer
   20:15 | Division m 4
-    Meyrargues vs Roq'n'Ball
-  20:15 | Division m 6
-    MUST UP vs MARIGNANE VB
+    Meyrargues vs AH1, les Panthères
   20:30 | Division m 4
-    Saint Cannat vs les Brux d'eyguières
-  20:45 | Division f 1
-    AKOUNATREKEIL vs ACVB-F
-  20:45 | Division f 3
-    Pelissanne F vs EGUILLETTES
+    Saint Cannat vs Roq'n'Ball
+  20:45 | Division m 2
+    pelissanne 6x6 vs ASPTT AIX 1
 
 Vendredi 22/05/2026
 --------------------------------------------------
   19:00 | Division f 3
-    Aixquises 1 vs Les Boucans
-  19:30 | Division f 3
-    Périer Spice vs Les Roussettes
-  19:30 | Division m 2
-    Marseille Volley 1 vs CBVB1
-  19:30 | Division m 6
-    Les Condors de Périer vs Gardanne 1m
-  19:30 | Division m 7
-    Périer original vs LES VETERANS
-  20:00 | Division m 1
-    BOUC BEL AIR vs Grans AIL 1
-  20:00 | Division m 3
-    Marseille Est 3 vs Grans 2
-  20:00 | Division m 3
-    Aix'otic vs VELAUXIRAPTOR
-  20:00 | Division m 7
-    Ventateens vs MVtapeur
-  20:00 | Division mo 1
-    Saint Martin Mi A vs Les 4 Fantastiques
-  20:00 | Division mo 6
-    Les Revenants vs MARIGNANE VB MIXTE 2
-  20:30 | Division f 5
-    Fées No Men de Velaux vs Les Jeu’nettes
-  20:45 | Division mo 1
-    GRAND PUIT vs La Ciotat 1 Mi
-  20:45 | Division mo 5
-    MARSUPIAUX vs EGUILLES MI
-
-Mardi 26/05/2026
---------------------------------------------------
-  19:30 | Division m 2
-    ASPTT AIX 1 vs Fuveau 1
-  19:30 | Division m 3
-    AIXTASY vs Grans 2
-  20:00 | Division m 5
-    Ventapéro vs KARNAGE
-  20:00 | Division m 6
-    MARIGNANE VB vs Fosamax
-  20:00 | Division mo 6
-    Les Fadas vs FUMIGÈNE
-  20:15 | Division m 1
-    ST MARTIN 1M vs Massalia
-  20:30 | Division f 1
-    FUVEAU F1 vs AKOUNATREKEIL
-  20:30 | Division f 2
-    Fuveau F2 vs Les Hippocampes
-
-Mercredi 27/05/2026
---------------------------------------------------
-  20:00 | Division f 4
-    Marignane VB 1 vs Héli'Girls
-  20:00 | Division mo 6
-    Smash Rocket vs MARIGNANE VB MIXTE 2
-  20:30 | Division m 4
-    Lambestix vs Roq'n'Ball
-  20:30 | Division m 7
-    Aix'plosif vs Trets 3H
-  20:30 | Division mo 4
-    Eyguières Mixte vs BBAVB MIXTE 2
-  20:45 | Division mo 2
-    Koalamités vs Aixplosifs
-
-Jeudi 28/05/2026
---------------------------------------------------
-  19:30 | Division f 5
-    Trets F vs Marignane VB 2
-  20:00 | Division m 4
-    AH1, les Panthères vs les Brux d'eyguières
-  20:15 | Division m 6
-    MUST UP vs Les Condors de Périer
-  20:45 | Division m 1
-    Grans AIL 1 vs CARIBOU
-
-Vendredi 29/05/2026
---------------------------------------------------
-  19:00 | Division f 4
-    Aixquises 2 vs Eyguières F
+    Les Roussettes vs Aixquises 1
+  19:00 | Division mo 6
+    TEAM ROCKET - Rousset vs Smash Rocket
   19:30 | Division f 1
-    Les bulles de Périer vs TE AITO
-  19:30 | Division m 7
-    MVtapeur vs AH2, Les Tigres
-  19:30 | Division mo 3
-    MV4 vs La Family Business
-  19:30 | Division mo 4
-    Périer Ces Fous vs ToR Carnoux
+    Les bulles de Périer vs ACVB-F
+  19:30 | Division f 3
+    Périer Spice vs les côtelettes
+  19:30 | Division m 3
+    Marseille Volley 2 vs AIXTASY
+  19:30 | Division m 6
+    Les Condors de Périer vs Fosamax
+  19:45 | Division m 5
+    MARSEILLE VOLLEY 3 vs La Ciotat 2
   20:00 | Division f 2
-    Les Jeannettes vs Les sardines
+    Les Jeannettes vs Fuveau F2
   20:00 | Division f 3
-    Les Boucans vs Périer Spice
-  20:00 | Division f 3
-    les côtelettes vs Les Roussettes
+    Les Boucans vs Pelissanne F
+  20:00 | Division f 4
+    Ventastiques vs MARIGNANE VB 3
+  20:00 | Division m 1
+    BOUC BEL AIR vs La Ciotat 1
   20:00 | Division m 5
-    aixecuteurs vs MARSEILLE VOLLEY 3
-  20:00 | Division mo 1
-    Saint Martin Mi A vs La Ciotat 1 Mi
-  20:00 | Division mo 3
-    BBAVB 4x4 Mixte 1 vs Les FuMistes
-  20:30 | Division f 1
-    ACVB-F vs AixAéRebelles
-  20:30 | Division f 5
-    Fées No Men de Velaux vs CBVB4
+    Ventapéro vs Fuveau2
+  20:00 | Division mo 6
+    MARIGNANE VB MIXTE 2 vs FUMIGÈNE
   20:30 | Division m 7
-    VELAUXIRAPTOR 2 vs LES VETERANS
+    VELAUXIRAPTOR 2 vs Trets 3H
   20:45 | Division mo 1
     GRAND PUIT vs KOKINOUS
   20:45 | Division mo 5
     MARSUPIAUX vs Les Tamalous
+
+Mardi 26/05/2026
+--------------------------------------------------
+  19:30 | Division m 2
+    ASPTT AIX 1 vs Les Moux d'Eyguières
+  19:30 | Division m 3
+    AIXTASY vs VELAUXIRAPTOR
+  20:00 | Division f 2
+    Chateaumeuf vs Les Hippocampes
+  20:00 | Division m 6
+    MARIGNANE VB vs Gardanne 1m
+  20:00 | Division m 7
+    Ventateens vs MVtapeur
+  20:15 | Division m 1
+    ST MARTIN 1M vs BOUC BEL AIR
+  20:30 | Division mo 6
+    FUMIGÈNE vs Smash Rocket
+
+Mercredi 27/05/2026
+--------------------------------------------------
+  20:00 | Division f 2
+    Les Tigresses vs Les sardines
+  20:00 | Division f 4
+    Marignane VB 1 vs Aixquises 2
+  20:00 | Division m 4
+    Roq'n'Ball vs les Brux d'eyguières
+  20:00 | Division m 5
+    La Ciotat 2 vs KARNAGE
+  20:00 | Division mo 5
+    Les Tamalous vs ACVB
+  20:30 | Division mo 4
+    Eyguières Mixte vs Périer Ces Fous
+  20:30 | Division mo 6
+    Les Xvins de Lambesc vs TEAM ROCKET - Rousset
+
+Jeudi 28/05/2026
+--------------------------------------------------
+  19:30 | Division m 6
+    Trets 2H vs CBVB2
+  20:00 | Division f 5
+    Les Pink Ladies vs CBVB4
+  20:00 | Division m 4
+    AH1, les Panthères vs Les loutres
+  20:00 | Division mo 1
+    AH1Mi vs Les aigles de la ciotat
+  20:00 | Division mo 3
+    SMC fever vs Fox Périer
+  20:15 | Division m 4
+    Meyrargues vs Lambestix
+  20:30 | Division m 4
+    Saint Cannat vs Asptt Marseille masculin
+  20:45 | Division f 1
+    AKOUNATREKEIL vs TE AITO
+  20:45 | Division m 2
+    pelissanne 6x6 vs Marseille Volley 1
+
+Vendredi 29/05/2026
+--------------------------------------------------
+  19:00 | Division mo 2
+    Aixplosifs vs Les conno’s
+  19:30 | Division f 1
+    Les bulles de Périer vs KOPINES
+  19:30 | Division f 3
+    Périer Spice vs EGUILLETTES
+  19:30 | Division m 3
+    Marseille Volley 2 vs Aix'otic
+  19:30 | Division m 6
+    Les Condors de Périer vs MUST UP
+  19:30 | Division mo 3
+    MV4 vs La Family Business
+  20:00 | Division f 4
+    Les novas vs MARIGNANE VB 3
+  20:00 | Division f 5
+    Les Jeu’nettes vs Marignane VB 2
+  20:00 | Division m 3
+    Marseille Est 3 vs MUST1
+  20:00 | Division m 5
+    aixecuteurs vs Must2
+  20:00 | Division mo 2
+    Marignane VB MIXTE 1 vs pelissanne Mi1
+  20:00 | Division mo 3
+    BBAVB 4x4 Mixte 1 vs Les FuMistes
+  20:00 | Division mo 4
+    BBAVB MIXTE 2 vs ToR Carnoux
+  20:00 | Division mo 6
+    Les Revenants vs MARIGNANE VB MIXTE 2
+  20:30 | Division f 1
+    ACVB-F vs FUVEAU F1
+  20:30 | Division m 2
+    CBVB1 vs Fuveau 1
+  20:30 | Division m 7
+    VELAUXIRAPTOR 2 vs Aix'plosif
   20:45 | Division mo 5
-    EGUILLES MI vs ACVB
+    MARSUPIAUX vs Apé'Roq
+  20:45 | Division mo 5
+    EGUILLES MI vs KOLLEGUES
 
 ================================================================================
 MATCHS PAR DIVISION
@@ -1060,39 +1055,39 @@ AIXTASY                        |   3 |   3 |     6
 AKOUNATREKEIL                  |   3 |   3 |     6
 ASPTT AIX 1                    |   3 |   3 |     6
 Aix'otic                       |   3 |   3 |     6
-Aix'plosif                     |   3 |   4 |     7
+Aix'plosif                     |   5 |   2 |     7
 AixAéRebelles                  |   3 |   3 |     6
 Aixplosifs                     |   3 |   3 |     6
 Aixquises 1                    |   3 |   3 |     6
 Aixquises 2                    |   3 |   3 |     6
 Apé'Roq                        |   3 |   3 |     6
-Asptt Marseille masculin       |   3 |   4 |     7
+Asptt Marseille masculin       |   4 |   3 |     7
 BBAVB 4x4 Mixte 1              |   3 |   3 |     6
 BBAVB MIXTE 2                  |   3 |   3 |     6
 BOUC BEL AIR                   |   3 |   3 |     6
-CARIBOU                        |   3 |   3 |     6
-CBVB 5                         |   3 |   4 |     7
+CARIBOU                        |   2 |   3 |     5
+CBVB 5                         |   4 |   3 |     7
 CBVB1                          |   3 |   3 |     6
-CBVB2                          |   4 |   3 |     7
-CBVB4                          |   2 |   3 |     5
+CBVB2                          |   3 |   4 |     7
+CBVB4                          |   3 |   2 |     5
 CVFVB1                         |   2 |   3 |     5
 Chateaumeuf                    |   3 |   3 |     6
-EGUILLES 2                     |   4 |   3 |     7
+EGUILLES 2                     |   3 |   4 |     7
 EGUILLES MI                    |   3 |   3 |     6
 EGUILLETTES                    |   3 |   3 |     6
 Eyguières F                    |   3 |   3 |     6
 Eyguières Mixte                |   3 |   3 |     6
 FUMIGÈNE                       |   4 |   3 |     7
 FUVEAU F1                      |   3 |   3 |     6
-Fosamax                        |   3 |   4 |     7
+Fosamax                        |   4 |   3 |     7
 Fosfort                        |   3 |   3 |     6
 Fox Périer                     |   3 |   3 |     6
 Fuveau 1                       |   3 |   3 |     6
 Fuveau F2                      |   3 |   3 |     6
-Fuveau2                        |   4 |   3 |     7
-Fées No Men de Velaux          |   3 |   2 |     5
+Fuveau2                        |   3 |   4 |     7
+Fées No Men de Velaux          |   2 |   3 |     5
 GRAND PUIT                     |   3 |   3 |     6
-Gardanne 1m                    |   4 |   3 |     7
+Gardanne 1m                    |   3 |   4 |     7
 Grans 2                        |   3 |   3 |     6
 Grans AIL 1                    |   3 |   3 |     6
 Héli'Girls                     |   3 |   3 |     6
@@ -1104,22 +1099,22 @@ Koalamités                     |   3 |   3 |     6
 LES VETERANS                   |   3 |   4 |     7
 La Ciotat 1                    |   3 |   3 |     6
 La Ciotat 1 Mi                 |   3 |   3 |     6
-La Ciotat 2                    |   3 |   4 |     7
+La Ciotat 2                    |   4 |   3 |     7
 La Family Business             |   3 |   3 |     6
 Lambestix                      |   3 |   4 |     7
 Les 4 Fantastiques             |   3 |   3 |     6
 Les Beach'EZ                   |   3 |   3 |     6
 Les Boucans                    |   3 |   3 |     6
-Les Condors de Périer          |   3 |   4 |     7
+Les Condors de Périer          |   5 |   2 |     7
 Les Crains Deguns              |   3 |   3 |     6
 Les Fadas                      |   3 |   4 |     7
 Les FuMistes                   |   3 |   3 |     6
 Les Hippocampes                |   3 |   3 |     6
 Les Jeannettes                 |   3 |   3 |     6
-Les Jeu’nettes                 |   3 |   2 |     5
+Les Jeu’nettes                 |   2 |   3 |     5
 Les Loups du VBC               |   3 |   3 |     6
 Les Moux d'Eyguières           |   3 |   3 |     6
-Les Pink Ladies                |   2 |   3 |     5
+Les Pink Ladies                |   3 |   2 |     5
 Les Revenants                  |   4 |   3 |     7
 Les Roussettes                 |   3 |   3 |     6
 Les Tamalous                   |   3 |   3 |     6
@@ -1134,21 +1129,21 @@ Les sardines                   |   3 |   3 |     6
 MARIGNANE VB                   |   3 |   4 |     7
 MARIGNANE VB 3                 |   3 |   3 |     6
 MARIGNANE VB MIXTE 2           |   3 |   4 |     7
-MARSEILLE VOLLEY 3             |   3 |   4 |     7
+MARSEILLE VOLLEY 3             |   5 |   2 |     7
 MARSUPIAUX                     |   3 |   3 |     6
 MUST UP                        |   3 |   4 |     7
 MUST1                          |   3 |   3 |     6
 MV4                            |   3 |   3 |     6
-MVtapeur                       |   4 |   3 |     7
+MVtapeur                       |   3 |   4 |     7
 Marignane VB 1                 |   3 |   3 |     6
-Marignane VB 2                 |   3 |   2 |     5
+Marignane VB 2                 |   2 |   3 |     5
 Marignane VB MIXTE 1           |   3 |   3 |     6
 Marseille Est 3                |   3 |   3 |     6
 Marseille Volley 1             |   3 |   3 |     6
 Marseille Volley 2             |   3 |   3 |     6
 Massalia                       |   3 |   3 |     6
 Meyrargues                     |   5 |   2 |     7
-Must2                          |   3 |   4 |     7
+Must2                          |   4 |   3 |     7
 Pelissanne F                   |   3 |   3 |     6
 Pelissanne MI2                 |   3 |   3 |     6
 Pelissanne MI3                 |   3 |   3 |     6
@@ -1156,27 +1151,27 @@ Périer Ces Fous                |   3 |   3 |     6
 Périer Spice                   |   3 |   3 |     6
 Périer original                |   4 |   3 |     7
 Pétokask                       |   3 |   3 |     6
-Roq'n'Ball                     |   4 |   3 |     7
+Roq'n'Ball                     |   3 |   4 |     7
 SMC fever                      |   3 |   3 |     6
-ST MARTIN 1M                   |   3 |   2 |     5
-Saint Cannat                   |   3 |   4 |     7
+ST MARTIN 1M                   |   4 |   2 |     6
+Saint Cannat                   |   4 |   3 |     7
 Saint Martin Mi A              |   3 |   3 |     6
-Smash Rocket                   |   5 |   2 |     7
-T-raix                         |   4 |   3 |     7
+Smash Rocket                   |   4 |   3 |     7
+T-raix                         |   3 |   4 |     7
 TE AITO                        |   3 |   3 |     6
 TEAM ROCKET - Rousset          |   3 |   4 |     7
 ToR Carnoux                    |   3 |   3 |     6
 Trets 1H                       |   3 |   3 |     6
 Trets 2H                       |   4 |   3 |     7
 Trets 3H                       |   3 |   4 |     7
-Trets F                        |   2 |   3 |     5
+Trets F                        |   3 |   2 |     5
 VELAUXIRAPTOR                  |   3 |   3 |     6
 VELAUXIRAPTOR 2                |   4 |   3 |     7
-Ventapéro                      |   5 |   2 |     7
+Ventapéro                      |   3 |   4 |     7
 Ventastiques                   |   3 |   3 |     6
-Ventateens                     |   4 |   3 |     7
+Ventateens                     |   3 |   4 |     7
 aixecuteurs                    |   3 |   4 |     7
-les Brux d'eyguières           |   4 |   3 |     7
+les Brux d'eyguières           |   3 |   4 |     7
 les côtelettes                 |   3 |   3 |     6
 pelissanne 6x6                 |   3 |   3 |     6
 pelissanne Mi1                 |   3 |   3 |     6
