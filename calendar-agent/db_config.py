@@ -23,7 +23,8 @@ TABLE_NAMES = {
     'gymnases': 'gymnase',
     'creneaux': 'creneau',
     'classements': 'classements',  # Table de liaison équipes ↔ divisions
-    'matchs': 'matches'  # Table où seront insérés les matchs générés
+    'matchs': 'matches',  # Table où seront insérés les matchs générés
+    'blacklist_gymnase': 'blacklist_gymnase'  # Dates d'indisponibilité des gymnases
 }
 
 # Mapping des colonnes (adaptez selon votre structure)
@@ -69,5 +70,10 @@ COLUMN_MAPPING = {
         'date_reception': 'date_reception',
         'match_status': 'match_status',
         'id_gymnasium': 'id_gymnasium'
+    },
+    'blacklist_gymnase': {
+        'id': 'id',
+        'id_gymnase': 'id_gymnase',
+        'closed_date': 'closed_date'
     }
 }

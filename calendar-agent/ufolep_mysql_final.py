@@ -48,13 +48,13 @@ JOURS_FERIES = [
 # Vacances scolaires Zone B année scolaire 2025-2026
 VACANCES_ZONE_B = [
     # Vacances de la Toussaint 2025
-    (date(2025, 10, 19), date(2025, 11, 3)),
+    (date(2025, 10, 18), date(2025, 11, 3)),
     # Vacances de Noël 2025-2026
-    (date(2025, 12, 21), date(2026, 1, 5)),
+    (date(2025, 12, 20), date(2026, 1, 5)),
     # Vacances d'hiver 2026
-    (date(2026, 2, 14), date(2026, 2, 27)),
-    # Vacances de printemps 2026
-    (date(2026, 4, 18), date(2026, 5, 4)),
+    (date(2026, 2, 14), date(2026, 3, 2)),
+    # Vacances de printemps 2026 (Zone B)
+    (date(2026, 4, 11), date(2026, 4, 27)),
 ]
 
 @dataclass
@@ -530,6 +530,9 @@ class UfolepMySQLScheduler:
                         # Match à domicile : créneaux de l'équipe à domicile
                         for time_slot in team_home.time_slots:
                             if date_obj.weekday() + 1 == time_slot.jour_semaine:
+                                # Vérifier que le gymnase est disponible à cette date
+                                if not self.db_loader.is_gymnase_available(time_slot.gymnase_id, date_obj):
+                                    continue
                                 var_name = f"match_{match_id}_home_{date_obj}_{time_slot.id}"
                                 match_var = model.NewBoolVar(var_name)
                                 match_vars[var_name] = match_var
@@ -547,6 +550,9 @@ class UfolepMySQLScheduler:
                         # Match à l'extérieur : créneaux de l'équipe à l'extérieur
                         for time_slot in team_away.time_slots:
                             if date_obj.weekday() + 1 == time_slot.jour_semaine:
+                                # Vérifier que le gymnase est disponible à cette date
+                                if not self.db_loader.is_gymnase_available(time_slot.gymnase_id, date_obj):
+                                    continue
                                 var_name = f"match_{match_id}_away_{date_obj}_{time_slot.id}"
                                 match_var = model.NewBoolVar(var_name)
                                 match_vars[var_name] = match_var

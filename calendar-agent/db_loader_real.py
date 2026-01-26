@@ -79,6 +79,14 @@ class CompetitionDates:
     end_date: 'date'
 
 
+@dataclass
+class BlacklistGymnaseData:
+    """Date d'indisponibilité d'un gymnase."""
+    id: str
+    gymnase_id: str
+    closed_date: 'date'
+
+
 class UfolepDatabaseLoader:
     """Chargeur de données UFOLEP depuis MySQL adapté à la structure réelle."""
     
@@ -101,6 +109,7 @@ class UfolepDatabaseLoader:
         self.historique_deplacements = {}  # {(equipe1_id, equipe2_id): {'equipe1_dom': n, 'equipe2_dom': n}}
         self.equipes_joueurs = {}  # {equipe_id: set(joueur_ids)}
         self.equipes_effectif_commun = []  # Liste de tuples (equipe1_id, equipe2_id, nb_joueurs_communs, ratio)
+        self.blacklist_gymnases = {}  # {gymnase_id: set(dates)}
     
     def _get_competition_filter(self) -> str:
         """Retourne la clause SQL pour filtrer par code_competition."""
@@ -163,6 +172,9 @@ class UfolepDatabaseLoader:
             # Charger les effectifs d'équipes et calculer les chevauchements
             self._load_equipes_joueurs()
             self._calculate_effectif_commun()
+            
+            # Charger les indisponibilités de gymnases
+            self._load_blacklist_gymnases()
             
             print("[OK] Toutes les donnees chargees avec succes")
             return True
@@ -849,6 +861,49 @@ class UfolepDatabaseLoader:
     def get_equipes_avec_effectif_commun(self) -> list:
         """Retourne la liste des paires d'équipes avec effectif commun significatif."""
         return self.equipes_effectif_commun
+    
+    def _load_blacklist_gymnases(self):
+        """Charge les dates d'indisponibilité des gymnases depuis la table blacklist_gymnase."""
+        cursor = self.connection.cursor(dictionary=True)
+        
+        query = """
+        SELECT id, id_gymnase, closed_date
+        FROM blacklist_gymnase
+        """
+        
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        
+        for row in rows:
+            gymnase_id = str(row['id_gymnase'])
+            closed_date = row['closed_date']
+            
+            # Convertir en date si c'est un datetime
+            if isinstance(closed_date, datetime):
+                closed_date = closed_date.date()
+            elif isinstance(closed_date, str):
+                for fmt in ('%Y-%m-%d', '%Y-%m-%d %H:%M:%S'):
+                    try:
+                        closed_date = datetime.strptime(closed_date, fmt).date()
+                        break
+                    except ValueError:
+                        continue
+            
+            if gymnase_id not in self.blacklist_gymnases:
+                self.blacklist_gymnases[gymnase_id] = set()
+            
+            self.blacklist_gymnases[gymnase_id].add(closed_date)
+        
+        # Stats
+        total_dates = sum(len(dates) for dates in self.blacklist_gymnases.values())
+        cursor.close()
+        print(f"[INFO] Blacklist gymnases: {len(self.blacklist_gymnases)} gymnases, {total_dates} dates d'indisponibilité")
+    
+    def is_gymnase_available(self, gymnase_id: str, date_obj) -> bool:
+        """Vérifie si un gymnase est disponible à une date donnée."""
+        if gymnase_id not in self.blacklist_gymnases:
+            return True
+        return date_obj not in self.blacklist_gymnases[gymnase_id]
     
     def get_equipe_qui_doit_recevoir(self, equipe1_id: str, equipe2_id: str) -> str:
         """Retourne l'ID de l'équipe qui devrait recevoir pour équilibrer l'historique.
