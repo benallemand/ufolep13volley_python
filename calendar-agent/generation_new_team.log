@@ -1,0 +1,71 @@
+============================================================
+GÉNÉRATION INCRÉMENTALE - NOUVELLE ÉQUIPE
+Compétition: f | Division: 5
+============================================================
+
+--- ÉTAPE 1: Chargement des données ---
+[INFO] Chargement des données MySQL UFOLEP pour ['f']...
+[OK] Connexion reussie a la base ufolep_13volley
+[INFO] Chargement des donnees UFOLEP reelles...
+[INFO] 24 clubs charges
+[INFO] 29 gymnases charges
+[INFO] 35 equipes chargees
+[INFO] 35 classements charges
+[INFO] Chargement créneaux classiques pour ['f']...
+[INFO] 42 creneaux charges au total
+[INFO] 1 dates de competition chargees
+[INFO] 5 divisions virtuelles creees
+[INFO] Historique: 765 paires, 0 avec déséquilibre
+[INFO] Effectifs: 35 equipes avec joueurs renseignes
+[INFO] Effectif commun: 2 equipes exclues (effectif incomplet)
+[INFO] Blacklist gymnases: 5 gymnases, 22 dates d'indisponibilité
+[OK] Toutes les donnees chargees avec succes
+[INFO] Connexion MySQL fermee
+[OK] Période compétition: 2026-03-02 au 2026-05-29
+[OK] Données chargées: 35 équipes, 5 divisions, 42 créneaux
+[OK] Conversion terminée: 5 divisions, 35 équipes programmées, 42 créneaux
+
+--- ÉTAPE 2: Chargement des matchs confirmés (TOUTES compétitions) ---
+[OK] 902 matchs confirmés chargés (toutes compétitions)
+  - c: 63 matchs confirmés
+  - f: 198 matchs confirmés
+  - kh: 54 matchs confirmés
+  - m: 334 matchs confirmés
+  - mo: 253 matchs confirmés
+
+--- ÉTAPE 3: Identification de la nouvelle équipe dans f_5 ---
+[OK] Nouvelle équipe identifiée: new aubagne filles (ID: 721)
+     Créneaux: 2
+       - Lundi 20:15:00 @ Gymnase Ignace Heinrich
+       - Vendredi 20:15:00 @ Gymnase Ignace Heinrich
+
+--- ÉTAPE 4: Génération des matchs ---
+[INFO] 48 dates valides dans la période
+[INFO] 6 adversaires à planifier:
+  - Trets F (11 dates déjà bloquées)
+  - Fées No Men de Velaux (11 dates déjà bloquées)
+  - CBVB4 (10 dates déjà bloquées)
+  - Les Jeu’nettes (10 dates déjà bloquées)
+  - Marignane VB 2 (10 dates déjà bloquées)
+  - Les Pink Ladies (5 dates déjà bloquées)
+[INFO] 66 combinaisons possibles pour 6 matchs
+[INFO] Équilibre dom/ext: minimum 2 matchs à domicile imposé
+
+[INFO] Résolution en cours...
+
+[OK] 6/6 matchs programmés
+
+============================================================
+CALENDRIER DE LA NOUVELLE ÉQUIPE
+============================================================
+  Lundi 16/03/2026 20:15 | new aubagne filles vs CBVB4 [DOM] @ Gymnase Ignace Heinrich
+  Vendredi 03/04/2026 20:15 | new aubagne filles vs Les Jeu’nettes [DOM] @ Gymnase Ignace Heinrich
+  Jeudi 30/04/2026 20:00 | Les Pink Ladies vs new aubagne filles [EXT] @ COSEC du college les Amandierets
+  Lundi 04/05/2026 20:30 | Fées No Men de Velaux vs new aubagne filles [EXT] @ Gymnase Albert Camus
+  Lundi 18/05/2026 20:15 | new aubagne filles vs Marignane VB 2 [DOM] @ Gymnase Ignace Heinrich
+  Jeudi 28/05/2026 19:30 | Trets F vs new aubagne filles [EXT] @ Gymnase du College
+
+  Domicile: 3 | Extérieur: 3
+
+--- ÉTAPE 5: Génération du fichier SQL ---
+[OK] Fichier SQL généré: c:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\insert_matches_new_team_f_5.sql
