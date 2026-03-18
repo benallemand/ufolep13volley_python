@@ -109,15 +109,26 @@ class Match:
     time_slot: TimeSlot
     division: Division
 
+@dataclass
+class PredefinedMatch:
+    """Match prédéfini (pour les phases finales)."""
+    match_id: str
+    home_team_id: str
+    away_team_id: str
+    division: Division
+
+
 class UfolepMySQLScheduler:
     """Générateur de calendrier UFOLEP utilisant les données MySQL réelles."""
     
-    def __init__(self, competition_codes: List[str] = None):
+    def __init__(self, competition_codes: List[str] = None, predefined_matches: List[PredefinedMatch] = None):
         """Initialise le scheduler.
         
         Args:
             competition_codes: Liste des codes de compétition à traiter (ex: ['m'], ['c'], ['m', 'f', 'mo'])
                               Par défaut: ['m', 'f', 'mo']
+            predefined_matches: Liste de matchs prédéfinis (pour les phases finales).
+                               Si fourni, ces matchs sont utilisés au lieu de générer un round-robin.
         """
         self.competition_codes = competition_codes or ['m', 'f', 'mo']
         self.db_loader = UfolepDatabaseLoader(self.competition_codes)
@@ -125,6 +136,7 @@ class UfolepMySQLScheduler:
         self.teams: List[Team] = []
         self.time_slots: List[TimeSlot] = []
         self.matches: List[Match] = []
+        self.predefined_matches = predefined_matches or []
         
         # Période de championnat (sera chargée depuis la BDD)
         self.start_date = None
@@ -270,6 +282,10 @@ class UfolepMySQLScheduler:
     
     def _calculate_matches_needed(self) -> int:
         """Calcule le nombre total de matchs nécessaires."""
+        # En mode matchs prédéfinis, on ne calcule pas les matchs des divisions
+        if self.predefined_matches:
+            return len(self.predefined_matches)
+        
         total_matches = 0
         for division in self.divisions:
             n_teams = len(division.teams)
@@ -277,7 +293,7 @@ class UfolepMySQLScheduler:
                 # Championnat aller uniquement
                 matches_in_division = n_teams * (n_teams - 1) // 2
                 total_matches += matches_in_division
-                print(f"[INFO] {division.nom}: {n_teams} équipes = {matches_in_division} matchs")
+                print(f"[INFO] Division {division.code_competition} {division.division_num}: {n_teams} équipes = {matches_in_division} matchs")
         
         return total_matches
     
@@ -513,76 +529,125 @@ class UfolepMySQLScheduler:
         match_vars = {}
         matches_data = []
         
+        # Index des équipes par ID pour les matchs prédéfinis
+        teams_by_id = {team.id: team for team in self.teams}
+        
         # Créer toutes les combinaisons possibles
         match_id = 0
-        for division in self.divisions:
-            teams = division.teams
-            n_teams = len(teams)
-            if n_teams < 3:
-                continue
-            # Générer tous les matchs de la division (aller uniquement)
-            for i in range(n_teams):
-                for j in range(i + 1, n_teams):
-                    team_home = teams[i]
-                    team_away = teams[j]
-                    # Créer les variables pour chaque date et créneau possible
-                    for date_obj in valid_dates:
-                        # Match à domicile : créneaux de l'équipe à domicile
-                        for time_slot in team_home.time_slots:
-                            if date_obj.weekday() + 1 == time_slot.jour_semaine:
-                                # Vérifier que le gymnase est disponible à cette date
-                                if not self.db_loader.is_gymnase_available(time_slot.gymnase_id, date_obj):
-                                    continue
-                                var_name = f"match_{match_id}_home_{date_obj}_{time_slot.id}"
-                                match_var = model.NewBoolVar(var_name)
-                                match_vars[var_name] = match_var
-                                
-                                matches_data.append({
-                                    'var': match_var,
-                                    'match_id': match_id,
-                                    'home_team': team_home,
-                                    'away_team': team_away,
-                                    'date': date_obj,
-                                    'time_slot': time_slot,
-                                    'division': division
-                                })
+        
+        if self.predefined_matches:
+            # Mode matchs prédéfinis (phases finales)
+            print(f"[INFO] Mode matchs prédéfinis: {len(self.predefined_matches)} matchs")
+            # Inverser l'ordre des dates pour privilégier les dates les plus proches
+            sorted_dates = sorted(valid_dates, reverse=True)
+            for predef in self.predefined_matches:
+                team_home = teams_by_id.get(predef.home_team_id)
+                team_away = teams_by_id.get(predef.away_team_id)
+                
+                if not team_home or not team_away:
+                    print(f"[ATTENTION] Match {predef.match_id}: équipe non trouvée (home={predef.home_team_id}, away={predef.away_team_id})")
+                    continue
+                
+                # Seul l'équipe à domicile peut recevoir
+                for date_obj in sorted_dates:
+                    for time_slot in team_home.time_slots:
+                        if date_obj.weekday() + 1 == time_slot.jour_semaine:
+                            if not self.db_loader.is_gymnase_available(time_slot.gymnase_id, date_obj):
+                                continue
+                            var_name = f"match_{predef.match_id}_{date_obj}_{time_slot.id}"
+                            match_var = model.NewBoolVar(var_name)
+                            match_vars[var_name] = match_var
+                            
+                            matches_data.append({
+                                'var': match_var,
+                                'match_id': predef.match_id,
+                                'home_team': team_home,
+                                'away_team': team_away,
+                                'date': date_obj,
+                                'time_slot': time_slot,
+                                'division': predef.division
+                            })
+        else:
+            # Mode round-robin (championnats/coupes)
+            for division in self.divisions:
+                teams = division.teams
+                n_teams = len(teams)
+                if n_teams < 3:
+                    continue
+                # Générer tous les matchs de la division (aller uniquement)
+                for i in range(n_teams):
+                    for j in range(i + 1, n_teams):
+                        team_home = teams[i]
+                        team_away = teams[j]
+                        # Créer les variables pour chaque date et créneau possible
+                        for date_obj in valid_dates:
+                            # Match à domicile : créneaux de l'équipe à domicile
+                            for time_slot in team_home.time_slots:
+                                if date_obj.weekday() + 1 == time_slot.jour_semaine:
+                                    # Vérifier que le gymnase est disponible à cette date
+                                    if not self.db_loader.is_gymnase_available(time_slot.gymnase_id, date_obj):
+                                        continue
+                                    var_name = f"match_{match_id}_home_{date_obj}_{time_slot.id}"
+                                    match_var = model.NewBoolVar(var_name)
+                                    match_vars[var_name] = match_var
+                                    
+                                    matches_data.append({
+                                        'var': match_var,
+                                        'match_id': match_id,
+                                        'home_team': team_home,
+                                        'away_team': team_away,
+                                        'date': date_obj,
+                                        'time_slot': time_slot,
+                                        'division': division
+                                    })
+                            
+                            # Match à l'extérieur : créneaux de l'équipe à l'extérieur
+                            for time_slot in team_away.time_slots:
+                                if date_obj.weekday() + 1 == time_slot.jour_semaine:
+                                    # Vérifier que le gymnase est disponible à cette date
+                                    if not self.db_loader.is_gymnase_available(time_slot.gymnase_id, date_obj):
+                                        continue
+                                    var_name = f"match_{match_id}_away_{date_obj}_{time_slot.id}"
+                                    match_var = model.NewBoolVar(var_name)
+                                    match_vars[var_name] = match_var
+                                    
+                                    matches_data.append({
+                                        'var': match_var,
+                                        'match_id': match_id,
+                                        'home_team': team_away,  # Inversion !
+                                        'away_team': team_home,  # Inversion !
+                                        'date': date_obj,
+                                        'time_slot': time_slot,
+                                        'division': division
+                                    })
                         
-                        # Match à l'extérieur : créneaux de l'équipe à l'extérieur
-                        for time_slot in team_away.time_slots:
-                            if date_obj.weekday() + 1 == time_slot.jour_semaine:
-                                # Vérifier que le gymnase est disponible à cette date
-                                if not self.db_loader.is_gymnase_available(time_slot.gymnase_id, date_obj):
-                                    continue
-                                var_name = f"match_{match_id}_away_{date_obj}_{time_slot.id}"
-                                match_var = model.NewBoolVar(var_name)
-                                match_vars[var_name] = match_var
-                                
-                                matches_data.append({
-                                    'var': match_var,
-                                    'match_id': match_id,
-                                    'home_team': team_away,  # Inversion !
-                                    'away_team': team_home,  # Inversion !
-                                    'date': date_obj,
-                                    'time_slot': time_slot,
-                                    'division': division
-                                })
-                    
-                    match_id += 1
+                        match_id += 1
         
         # Stocker les infos des matchs pour gérer les non-programmables
         self._all_matches_info = []
-        for division in self.divisions:
-            teams = division.teams
-            n_teams = len(teams)
-            if n_teams < 3:
-                continue
-            for i in range(n_teams):
-                for j in range(i + 1, n_teams):
+        if self.predefined_matches:
+            for predef in self.predefined_matches:
+                team_home = teams_by_id.get(predef.home_team_id)
+                team_away = teams_by_id.get(predef.away_team_id)
+                if team_home and team_away:
                     self._all_matches_info.append({
-                        'team1': teams[i],
-                        'team2': teams[j],
-                        'division': division
+                        'team1': team_home,
+                        'team2': team_away,
+                        'division': predef.division
                     })
+        else:
+            for division in self.divisions:
+                teams = division.teams
+                n_teams = len(teams)
+                if n_teams < 3:
+                    continue
+                for i in range(n_teams):
+                    for j in range(i + 1, len(teams)):
+                        self._all_matches_info.append({
+                            'team1': teams[i],
+                            'team2': teams[j],
+                            'division': division
+                        })
         
         # Application des contraintes SIMPLIFIÉES
         # 1. Chaque match programmé exactement une fois (si possible)
@@ -594,22 +659,33 @@ class UfolepMySQLScheduler:
         # 3. Capacité gymnases
         self._add_gymnasium_capacity_constraints(model, matches_data)
         
-        # 4. Max 1 match par équipe par semaine
-        self._add_weekly_match_limit_constraints(model, matches_data)
+        # 4. Max 1 match par équipe par semaine (sauf pour matchs prédéfinis où chaque équipe ne joue qu'un match)
+        if not self.predefined_matches:
+            self._add_weekly_match_limit_constraints(model, matches_data)
         
-        # 5. Équilibre dom/ext pour équipes avec créneaux
-        self._add_home_balance_constraints(model, matches_data)
+        # 5. Équilibre dom/ext pour équipes avec créneaux (sauf pour matchs prédéfinis)
+        if not self.predefined_matches:
+            self._add_home_balance_constraints(model, matches_data)
         
-        # 6. Alternance dom/ext basée sur l'historique (TOUTES les paires)
-        self._add_history_based_home_constraints(model, matches_data)
+        # 6. Alternance dom/ext basée sur l'historique (sauf pour matchs prédéfinis où dom/ext est déjà fixé)
+        if not self.predefined_matches:
+            self._add_history_based_home_constraints(model, matches_data)
         
-        # 7. Éviter que 2 équipes avec effectif commun jouent le même soir
-        self._add_shared_roster_constraints(model, matches_data)
+        # 7. Éviter que 2 équipes avec effectif commun jouent le même soir (sauf pour matchs prédéfinis)
+        if not self.predefined_matches:
+            self._add_shared_roster_constraints(model, matches_data)
         
         # Résoudre
         solver = cp_model.CpSolver()
         solver.parameters.max_time_in_seconds = 300.0
         solver.parameters.log_search_progress = False
+        
+        # Pour les matchs prédéfinis, utiliser une stratégie de recherche qui privilégie les dates proches
+        if self.predefined_matches:
+            # Trier les variables par date croissante pour que le solver les essaie en premier
+            sorted_vars = sorted(matches_data, key=lambda x: x['date'])
+            decision_vars = [d['var'] for d in sorted_vars]
+            model.AddDecisionStrategy(decision_vars, cp_model.CHOOSE_FIRST, cp_model.SELECT_MAX_VALUE)
         
         status = solver.Solve(model)
         
@@ -988,10 +1064,22 @@ class UfolepMySQLScheduler:
         print("[SUCCÈS] Calendrier sauvegardé avec succès dans la base MySQL!")
         return True
     
-    def generate_sql_file(self, filename: str = "insert_matches.sql") -> bool:
+    def generate_sql_file(self, filename: str = "insert_matches.sql", filter_competition: str = None) -> bool:
         """Génère un fichier SQL pour insérer les matchs via phpMyAdmin.
-        Utilise exactement la même logique que save_matches_to_database()."""
-        if not self.matches:
+        
+        Args:
+            filename: Nom du fichier SQL à générer
+            filter_competition: Si spécifié, ne génère que les matchs de cette compétition
+        """
+        # Filtrer les matchs si nécessaire
+        if filter_competition:
+            matches_to_export = [m for m in self.matches if m.division.code_competition == filter_competition]
+            competition_codes_for_delete = [filter_competition]
+        else:
+            matches_to_export = self.matches
+            competition_codes_for_delete = self.competition_codes
+        
+        if not matches_to_export:
             print("[ERREUR] Aucun match à exporter")
             return False
         
@@ -1000,11 +1088,13 @@ class UfolepMySQLScheduler:
                 # En-tête du fichier
                 f.write("-- Fichier SQL généré automatiquement par le générateur UFOLEP\n")
                 f.write(f"-- Date de génération: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                f.write(f"-- Nombre de matchs: {len(self.matches)}\n")
+                if filter_competition:
+                    f.write(f"-- Compétition: {filter_competition}\n")
+                f.write(f"-- Nombre de matchs: {len(matches_to_export)}\n")
                 f.write("-- À exécuter dans phpMyAdmin\n\n")
                 
                 # Suppression des matchs existants (même logique que clear_existing_matches)
-                codes_str = ", ".join(f"'{c}'" for c in self.competition_codes)
+                codes_str = ", ".join(f"'{c}'" for c in competition_codes_for_delete)
                 f.write("-- Suppression uniquement des matchs NOT_CONFIRMED\n")
                 f.write(f"DELETE FROM {TABLE_NAMES['matchs']} \n")
                 f.write(f"WHERE {COLUMN_MAPPING['matches']['code_competition']} IN ({codes_str})\n")
@@ -1023,10 +1113,10 @@ class UfolepMySQLScheduler:
                 f.write(f"    {COLUMN_MAPPING['matches']['id_gymnasium']}\n")
                 f.write(") VALUES\n")
                 
-                # Préparer les données exactement comme dans save_matches_to_database
+                # Préparer les données - numérotation spécifique à chaque compétition
                 match_values = []
-                for i, match in enumerate(self.matches, 1):
-                    # Utiliser la même méthode de génération de code
+                for i, match in enumerate(matches_to_export, 1):
+                    # Utiliser la même méthode de génération de code avec numéro spécifique
                     match_code = self.generate_match_code(match, i)
                     
                     # Utiliser seulement la date (pas l'heure)
@@ -1066,14 +1156,10 @@ class UfolepMySQLScheduler:
                 
                 # Statistiques finales
                 f.write("-- Statistiques\n")
-                total_matches = len(self.matches) + (len(self.unscheduled_matches) if hasattr(self, 'unscheduled_matches') else 0)
-                f.write(f"-- Total matchs: {total_matches}\n")
-                f.write(f"-- Matchs programmés: {len(self.matches)}\n")
-                if hasattr(self, 'unscheduled_matches') and self.unscheduled_matches:
-                    f.write(f"-- Matchs non programmés: {len(self.unscheduled_matches)}\n")
+                f.write(f"-- Total matchs: {len(matches_to_export)}\n")
                 
                 divisions_count = {}
-                for match in self.matches:
+                for match in matches_to_export:
                     div_key = f"{match.division.code_competition}{match.division.division_num}"
                     divisions_count[div_key] = divisions_count.get(div_key, 0) + 1
                 

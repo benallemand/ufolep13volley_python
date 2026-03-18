@@ -1,0 +1,153 @@
+GÉNÉRATEUR DE HUITIÈMES DE FINALE UFOLEP
+Compétitions: ['cf', 'kf']
+Fichier log: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\generation_huitiemes_cf_kf.log
+============================================================
+[OK] Connexion réussie à la base ufolep_13volley
+[OK] Tirage récupéré: 8 matchs pour cf
+[OK] Classements récupérés: 14 poules pour c
+[OK] 8 matchs de huitièmes chargés pour cf
+[OK] Tirage récupéré: 8 matchs pour kf
+[OK] Classements récupérés: 9 poules pour kh
+[OK] 8 matchs de huitièmes chargés pour kf
+
+[INFO] 16 matchs prédéfinis à planifier
+[INFO] Chargement des données MySQL UFOLEP pour ['c', 'kh']...
+[OK] Connexion reussie a la base ufolep_13volley
+[INFO] Chargement des donnees UFOLEP reelles...
+[INFO] 34 clubs charges
+[INFO] 39 gymnases charges
+[INFO] 85 equipes chargees
+[INFO] 85 classements charges
+[INFO] Chargement créneaux 'kh' depuis table register...
+[INFO] 43 créneaux 'kh' chargés depuis register
+[INFO] Chargement créneaux 'c' depuis équipes 'm' inscrites à la coupe...
+[INFO] 57 créneaux 'c' chargés
+[INFO] 100 creneaux charges au total
+[INFO] 2 dates de competition chargees
+[INFO] 23 divisions virtuelles creees
+[INFO] Historique: 771 paires, 0 avec déséquilibre
+[INFO] Effectifs: 85 equipes avec joueurs renseignes
+[INFO] Effectif commun: 36 equipes exclues (effectif incomplet)
+[INFO] Blacklist gymnases: 5 gymnases, 22 dates d'indisponibilité
+[OK] Toutes les donnees chargees avec succes
+[INFO] Connexion MySQL fermee
+[OK] Période compétition: 2026-01-19 au 2026-02-13
+[OK] Données chargées: 85 équipes, 23 divisions, 100 créneaux
+[OK] Conversion terminée: 23 divisions, 85 équipes programmées, 100 créneaux
+[OK] Dates forcées pour les finales: 2026-06-01 au 2026-06-15
+[INFO] Mode matchs prédéfinis: 16 matchs
+[OK] 16 matchs programmés
+
+================================================================================
+CALENDRIER
+================================================================================
+
+Lundi 01/06/2026
+--------------------------------------------------
+  19:30 | Huitièmes CF
+    Massalia vs Meyrargues
+  20:30 | Huitièmes CF
+    VELAUXIRAPTOR 2 vs Fuveau 1
+  20:30 | Huitièmes KF
+    BLOCK LIGNE vs Les branquignoles
+  20:45 | Huitièmes KF
+    pelissanne KH1 vs MV4kh
+
+Mardi 02/06/2026
+--------------------------------------------------
+  20:15 | Huitièmes CF
+    ST MARTIN 1M vs CARIBOU
+  20:30 | Huitièmes CF
+    Fuveau2 vs MARSEILLE VOLLEY 3
+  20:30 | Huitièmes KF
+    Furie Bond vs AHpero
+
+Mercredi 03/06/2026
+--------------------------------------------------
+  20:30 | Huitièmes CF
+    Lambestix vs BOUC BEL AIR
+  20:30 | Huitièmes CF
+    T-raix vs pelissanne 6x6
+
+Jeudi 04/06/2026
+--------------------------------------------------
+  19:30 | Huitièmes CF
+    Trets 2H vs CVFVB1
+
+Vendredi 05/06/2026
+--------------------------------------------------
+  19:00 | Huitièmes KF
+    Foxperier vs 2 gars 2 filles
+  19:30 | Huitièmes CF
+    Marseille Volley 1 vs MARIGNANE VB
+  19:30 | Huitièmes KF
+    Perier t(r)anche vs Les crains degun
+  20:00 | Huitièmes KF
+    Carnoux vs Fuveau KH
+  20:00 | Huitièmes KF
+    SMC MIA vs AHpero2
+  20:00 | Huitièmes KF
+    family business vs Familly and Co
+
+================================================================================
+MATCHS PAR DIVISION
+================================================================================
+  Huitièmes CF: 8 matchs
+  Huitièmes KF: 8 matchs
+
+Total: 16 matchs programmés
+
+================================================================================
+RÉCEPTIONS / DÉPLACEMENTS PAR ÉQUIPE
+================================================================================
+Équipe                         | Dom | Ext | Total
+--------------------------------------------------
+2 gars 2 filles                |   0 |   1 |     1
+AHpero                         |   0 |   1 |     1
+AHpero2                        |   0 |   1 |     1
+BLOCK LIGNE                    |   1 |   0 |     1
+BOUC BEL AIR                   |   0 |   1 |     1
+CARIBOU                        |   0 |   1 |     1
+CVFVB1                         |   0 |   1 |     1
+Carnoux                        |   1 |   0 |     1
+Familly and Co                 |   0 |   1 |     1
+Foxperier                      |   1 |   0 |     1
+Furie Bond                     |   1 |   0 |     1
+Fuveau 1                       |   0 |   1 |     1
+Fuveau KH                      |   0 |   1 |     1
+Fuveau2                        |   1 |   0 |     1
+Lambestix                      |   1 |   0 |     1
+Les branquignoles              |   0 |   1 |     1
+Les crains degun               |   0 |   1 |     1
+MARIGNANE VB                   |   0 |   1 |     1
+MARSEILLE VOLLEY 3             |   0 |   1 |     1
+MV4kh                          |   0 |   1 |     1
+Marseille Volley 1             |   1 |   0 |     1
+Massalia                       |   1 |   0 |     1
+Meyrargues                     |   0 |   1 |     1
+Perier t(r)anche               |   1 |   0 |     1
+SMC MIA                        |   1 |   0 |     1
+ST MARTIN 1M                   |   1 |   0 |     1
+T-raix                         |   1 |   0 |     1
+Trets 2H                       |   1 |   0 |     1
+VELAUXIRAPTOR 2                |   1 |   0 |     1
+family business                |   1 |   0 |     1
+pelissanne 6x6                 |   0 |   1 |     1
+pelissanne KH1                 |   1 |   0 |     1
+[SUCCES] Fichier SQL genere: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\insert_huitiemes_cf.sql
+[INFO] Ce fichier utilise exactement la même logique que la sauvegarde directe
+[INFO] Vous pouvez maintenant:
+[INFO] 1. Ouvrir phpMyAdmin
+[INFO] 2. Sélectionner votre base de données
+[INFO] 3. Aller dans l'onglet 'SQL'
+[INFO] 4. Copier-coller le contenu de C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\insert_huitiemes_cf.sql
+[INFO] 5. Exécuter la requête
+[SUCCES] Fichier SQL genere: C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\insert_huitiemes_kf.sql
+[INFO] Ce fichier utilise exactement la même logique que la sauvegarde directe
+[INFO] Vous pouvez maintenant:
+[INFO] 1. Ouvrir phpMyAdmin
+[INFO] 2. Sélectionner votre base de données
+[INFO] 3. Aller dans l'onglet 'SQL'
+[INFO] 4. Copier-coller le contenu de C:\Users\benal\PycharmProjects\ufolep13volley_python\calendar-agent\insert_huitiemes_kf.sql
+[INFO] 5. Exécuter la requête
+[INFO] Connexion MySQL fermée
