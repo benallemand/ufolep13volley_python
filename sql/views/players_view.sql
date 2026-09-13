@@ -1,5 +1,5 @@
 -- DEV: reDONE 260913
--- PROD: reDONE 251018
+-- PROD: reDONE 260913
 CREATE OR REPLACE VIEW players_view AS
 SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')        AS full_name,
        j.prenom,
