@@ -1,5 +1,5 @@
 -- DEV: reDONE 260913
--- PROD: reDONE 260913
+-- PROD: TODO (la prod porte la version de l'issue #325, du 260913)
 CREATE OR REPLACE VIEW players_view AS
 SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')        AS full_name,
        j.prenom,
@@ -76,7 +76,7 @@ SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')
        c.nom                                                                            AS club,
        j.telephone2,
        j.email2,
-       j.est_responsable_club + 0                                                       AS est_responsable_club,
+       j.id_compte,
        IF(j.id IN (SELECT id_joueur FROM joueur_equipe WHERE is_captain = 1), 1, 0)     AS is_captain,
        IF(j.id IN (SELECT id_joueur FROM joueur_equipe WHERE is_vice_leader = 1), 1, 0) AS is_vice_leader,
        IF(j.id IN (SELECT id_joueur FROM joueur_equipe WHERE is_leader = 1), 1, 0)      AS is_leader,
