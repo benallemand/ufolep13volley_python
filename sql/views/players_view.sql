@@ -1,4 +1,4 @@
--- DEV: reDONE 251018
+-- DEV: reDONE 260913
 -- PROD: reDONE 251018
 CREATE OR REPLACE VIEW players_view AS
 SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')        AS full_name,
@@ -95,6 +95,16 @@ SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')
        GROUP_CONCAT(DISTINCT concat(e.nom_equipe, ' (', comp.libelle, ')')
                     SEPARATOR
                     '<br/>')                                                            AS teams_list,
+       -- issue #325 : les équipes où la personne figure sans y jouer
+       -- (responsable d'une équipe féminine alors qu'elle joue en masculin,
+       -- par exemple). Ces équipes restent dans les trois listes ci-dessus —
+       -- une appartenance reste une appartenance, et le filtre « engagé » de
+       -- l'écran des joueurs comme le %teams_list% des emails gardent leur
+       -- sens. Cette colonne dit lesquelles ne comptent pas dans un effectif.
+       GROUP_CONCAT(DISTINCT
+                    CASE WHEN je.est_jouant + 0 = 0 THEN concat(e.nom_equipe, ' (', comp.libelle, ')') END
+                    SEPARATOR '<br/>'
+       )                                                                                AS non_playing_teams_list,
        GROUP_CONCAT(DISTINCT e_l.nom_equipe SEPARATOR '<br/>')                          AS team_leader_list,
        DATE_FORMAT(j.date_homologation, '%d/%m/%Y')                                     AS date_homologation
 FROM joueurs j
