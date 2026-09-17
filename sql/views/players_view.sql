@@ -1,4 +1,6 @@
--- DEV: reDONE 260913
+-- DEV: reDONE 260917 (issue #334 : a rejouer APRES la conversion en utf8mb4,
+--      pour purger les convert(... using utf8mb3) que MySQL avait injectes
+--      dans les CONCAT melangeant latin1 et utf8mb3)
 -- PROD: TODO (la prod porte la version de l'issue #325, du 260913)
 CREATE OR REPLACE VIEW players_view AS
 SELECT CONCAT(UPPER(j.nom), ' ', j.prenom, ' (', IFNULL(j.num_licence, ''), ')')        AS full_name,

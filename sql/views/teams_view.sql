@@ -1,5 +1,7 @@
--- DEV: DONE 251004
--- PROD: DONE 251004
+-- DEV: reDONE 260917 (issue #334 : a rejouer APRES la conversion en utf8mb4,
+--      pour purger les convert(... using utf8mb3) que MySQL avait injectes
+--      dans les CONCAT melangeant latin1 et utf8mb3)
+-- PROD: TODO (issue #334)
 CREATE OR REPLACE VIEW teams_view AS
 SELECT e.code_competition,
        comp.libelle                                    AS libelle_competition,
