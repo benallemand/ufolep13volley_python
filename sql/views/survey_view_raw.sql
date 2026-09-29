@@ -1,5 +1,6 @@
 -- DEV: reDONE 250721
 -- PROD: reDONE 250727
+-- issue #350 : filtre sur scale_version (migration 2026/018)
 CREATE OR REPLACE view survey_view_raw AS
 SELECT s.id,
        e_sondeuse.id_equipe    AS id_team_sondeuse,
@@ -41,5 +42,7 @@ FROM survey s
                   AND e_sondee.id_equipe != e_sondeuse.id_equipe)
          JOIN clubs c_sondee ON e_sondee.id_club = c_sondee.id
          JOIN classements c ON e_sondee.id_equipe = c.id_equipe AND c.code_competition = m.code_competition
-WHERE s.on_time + s.spirit + s.referee + s.catering + s.global > 0
+-- Issue #350 : seule l'échelle courante (-- - = + ++, en -2..+2) compte. Un
+-- sondage tout à `=` vaut 0 : l'ancien filtre « somme > 0 » l'aurait écarté.
+WHERE s.scale_version = 2
 ORDER BY id;
