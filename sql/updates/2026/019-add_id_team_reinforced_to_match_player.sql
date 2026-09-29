@@ -20,10 +20,9 @@ ALTER TABLE match_player
 
 -- 2. rejouer sql/views/match_players_count_view.sql (renforts comptés par
 --    équipe, et par sexe pour la mixité du championnat mixte).
---    NE PAS rejouer sql/views/matchs_view.sql : ce fichier est périmé (il lit
---    encore la table `journees`, supprimée par #279), et c'est inutile —
---    matchs_view lit match_players_count_view par son nom, et les colonnes
---    qu'elle en utilise (id_match, count_status) sont inchangées.
+--    Inutile de rejouer sql/views/matchs_view.sql : matchs_view lit
+--    match_players_count_view par son nom, et les colonnes qu'elle en utilise
+--    (id_match, count_status) sont inchangées.
 
 -- 3. côté dépôt applicatif, regénérer le schéma de CI :
 --    pwsh .github/ci/dump-schema.ps1

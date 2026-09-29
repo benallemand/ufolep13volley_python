@@ -1,5 +1,8 @@
 -- DEV: reDONE 260118
 -- PROD: reDONE 260118
+-- issue #279 : colonnes numero_journee, id_journee et journee retirees
+--   (table journees supprimee par la migration 2026/013, qui avait recree la
+--   vue sans mettre ce fichier a jour). Aligne sur la definition de prod.
 CREATE OR REPLACE VIEW matchs_view AS
 WITH computed_forfait AS (SELECT m.id_match,
                                  IF(m.set_1_dom = 25 AND m.set_1_ext = 0
@@ -58,14 +61,6 @@ SELECT m.id_match,
        c.id_compet_maitre                                                        AS parent_code_competition,
        c.libelle                                                                 AS libelle_competition,
        m.division,
-       j.numero                                                                  AS numero_journee,
-       j.id                                                                      AS id_journee,
-       CONCAT(j.nommage,
-              ' : ',
-              'Semaine du ',
-              DATE_FORMAT(j.start_date, '%W %d %M'),
-              ' au ',
-              DATE_FORMAT(ADDDATE(j.start_date, INTERVAL 4 DAY), '%W %d %M %Y')) AS journee,
        m.id_equipe_dom,
        e1.nom_equipe                                                             AS equipe_dom,
        m.id_equipe_ext,
@@ -127,7 +122,6 @@ FROM matches m
          JOIN equipes e2 ON e2.id_equipe = m.id_equipe_ext
          LEFT JOIN joueur_equipe jeresp_ext on jeresp_ext.id_equipe = e2.id_equipe AND jeresp_ext.is_leader = 1
          LEFT JOIN joueurs jresp_ext ON jeresp_ext.id_joueur = jresp_ext.id
-         LEFT JOIN journees j ON m.id_journee = j.id
          LEFT JOIN creneau cr ON cr.id_equipe = m.id_equipe_dom
     AND cr.jour = ELT(WEEKDAY(m.date_reception) + 2,
                       'Dimanche',
@@ -151,5 +145,5 @@ FROM matches m
          LEFT JOIN commission_division cd ON cd.division = CONCAT(m.code_competition,'/', m.division)
          LEFT JOIN commission com ON cd.id_commission = com.id_commission
 WHERE 1 = 1
-GROUP BY m.id_match, code_competition, division, numero_journee, code_match
-ORDER BY code_competition, division, numero_journee, code_match;
+GROUP BY m.id_match, code_competition, division, code_match
+ORDER BY code_competition, division, code_match;
