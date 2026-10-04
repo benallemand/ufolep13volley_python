@@ -32,7 +32,6 @@ from db_loader_real import UfolepDatabaseLoader
 # Import des structures et constantes depuis le module principal
 from ufolep_mysql_final import (
     TimeSlot, Team, Division, Match,
-    JOURS_FERIES, VACANCES_ZONE_B,
     UfolepMySQLScheduler,
 )
 

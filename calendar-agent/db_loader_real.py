@@ -107,9 +107,13 @@ class UfolepDatabaseLoader:
         self.divisions_virtuelles = {}
         self.competition_dates = {}
         self.historique_deplacements = {}  # {(equipe1_id, equipe2_id): {'equipe1_dom': n, 'equipe2_dom': n}}
+        self.dernier_receveur = {}  # {(equipe1_id, equipe2_id): id de l'équipe qui a reçu la dernière rencontre}
         self.equipes_joueurs = {}  # {equipe_id: set(joueur_ids)}
         self.equipes_effectif_commun = []  # Liste de tuples (equipe1_id, equipe2_id, nb_joueurs_communs, ratio)
         self.blacklist_gymnases = {}  # {gymnase_id: set(dates)}
+        # Agenda de la commission (table calendar_events) : périodes de jeu,
+        # vacances et jours fériés de la saison. [{label, date_start, date_end}]
+        self.calendar_events = []
     
     def _get_competition_filter(self) -> str:
         """Retourne la clause SQL pour filtrer par code_competition."""
@@ -159,6 +163,7 @@ class UfolepDatabaseLoader:
             self._load_classements()
             self._load_creneaux()
             self._load_competition_dates()
+            self._load_calendar_events()
             
             # Reconstruire les divisions virtuelles
             self._build_virtual_divisions()
@@ -196,8 +201,12 @@ class UfolepDatabaseLoader:
         SELECT  c.id, 
                 c.nom,
                 c.affiliation_number,
-                c.email_responsable 
+                -- Les colonnes clubs.*_responsable ont été supprimées
+                -- (ufolep13volley #327) : le contact d'un club vient de la
+                -- vue club_contacts_view (#395, migration 023).
+                cc.contact AS email_responsable
         FROM clubs c
+        LEFT JOIN club_contacts_view cc ON cc.id_club = c.id
         JOIN equipes e ON e.id_club = c.id
         JOIN classements cl ON cl.id_equipe = e.id_equipe
         WHERE cl.code_competition in {comp_filter}
@@ -590,6 +599,43 @@ class UfolepDatabaseLoader:
         cursor.close()
         print(f"[INFO] {len(self.competition_dates)} dates de competition chargees")
     
+    def _load_calendar_events(self):
+        """Charge l'agenda de la commission pour la ou les saisons concernées.
+
+        C'est l'agenda affiché sur la page d'accueil du site, saisi dans
+        l'administration (« Calendrier de la home ») : plages « Championnats »
+        et « Coupes », « Vacances », jours « Férié / pont ». Il remplace les
+        jours fériés et vacances scolaires codés en dur, qui n'étaient valables
+        que pour 2025-2026.
+
+        La saison d'une compétition se déduit de sa date de début : elle
+        s'ouvre le 1er juillet (même règle que CalendarEvents::getCurrentSeason).
+        """
+        seasons = set()
+        for comp_dates in self.competition_dates.values():
+            start = comp_dates.start_date
+            if start:
+                year = start.year if start.month >= 7 else start.year - 1
+                seasons.add(f"{year}-{year + 1}")
+        if not seasons:
+            print("[ATTENTION] Aucune saison déduite des dates de compétition : agenda non chargé")
+            return
+        cursor = self.connection.cursor(dictionary=True)
+        placeholders = ", ".join(["%s"] * len(seasons))
+        cursor.execute(
+            f"SELECT label, date_start, date_end FROM calendar_events WHERE season IN ({placeholders}) ORDER BY date_start",
+            tuple(sorted(seasons)))
+        for row in cursor.fetchall():
+            start = row['date_start']
+            end = row['date_end'] or start
+            self.calendar_events.append({
+                'label': row['label'],
+                'date_start': start.date() if isinstance(start, datetime) else start,
+                'date_end': end.date() if isinstance(end, datetime) else end,
+            })
+        cursor.close()
+        print(f"[INFO] Agenda de la commission ({', '.join(sorted(seasons))}) : {len(self.calendar_events)} événements")
+
     def _build_virtual_divisions(self):
         """Reconstruit les divisions à partir des classements."""
         # Divisions à exclure (playoff/playdown de la demi-saison précédente)
@@ -699,26 +745,38 @@ class UfolepDatabaseLoader:
         """Charge l'historique des matchs passés pour calculer le déséquilibre dom/ext par paire."""
         cursor = self.connection.cursor(dictionary=True)
         
-        # Charger tous les matchs CONFIRMED de la saison en cours
-        query = """
+        # Rencontres jouées depuis le début de la saison PRÉCÉDENTE (1er juillet),
+        # dans les compétitions générées : c'est sur elles que porte l'alerte
+        # « Même réception que la fois précédente » du site. La borne était
+        # écrite en dur ('2025-09-01').
+        starts = [d.start_date for d in self.competition_dates.values() if d.start_date]
+        if starts:
+            first = min(starts)
+            season_year = first.year if first.month >= 7 else first.year - 1
+            since = f"{season_year - 1}-07-01"
+        else:
+            since = '1900-01-01'
+        comp_filter = self._get_competition_filter()
+        query = f"""
         SELECT 
             m.id_equipe_dom,
             m.id_equipe_ext,
-            COUNT(*) as nb_matchs
+            m.date_reception
         FROM matches m
         WHERE m.match_status IN ('CONFIRMED', 'ARCHIVED')
-        AND m.date_reception >= '2025-09-01'
-        GROUP BY m.id_equipe_dom, m.id_equipe_ext
+        AND m.date_reception >= '{since}'
+        AND m.code_competition IN {comp_filter}
+        ORDER BY m.date_reception, m.id_match
         """
         
         cursor.execute(query)
         rows = cursor.fetchall()
         
-        # Construire l'historique par paire d'équipes
+        # Construire l'historique par paire d'équipes, dans l'ordre des dates :
+        # la dernière ligne d'une paire donne qui a reçu la dernière fois.
         for row in rows:
             dom_id = str(row['id_equipe_dom'])
             ext_id = str(row['id_equipe_ext'])
-            nb = row['nb_matchs']
             
             # Normaliser la paire (ordre alphabétique des IDs)
             pair = tuple(sorted([dom_id, ext_id]))
@@ -727,7 +785,8 @@ class UfolepDatabaseLoader:
                 self.historique_deplacements[pair] = {pair[0]: 0, pair[1]: 0}
             
             # L'équipe dom_id a reçu (donc ext_id s'est déplacé)
-            self.historique_deplacements[pair][dom_id] += nb
+            self.historique_deplacements[pair][dom_id] += 1
+            self.dernier_receveur[pair] = dom_id
         
         # Compter les paires avec déséquilibre
         desequilibres = sum(1 for p, h in self.historique_deplacements.items() 
@@ -908,8 +967,12 @@ class UfolepDatabaseLoader:
     def get_equipe_qui_doit_recevoir(self, equipe1_id: str, equipe2_id: str) -> str:
         """Retourne l'ID de l'équipe qui devrait recevoir pour équilibrer l'historique.
         
-        Retourne l'équipe qui s'est le plus déplacée (donc qui devrait recevoir maintenant).
-        Retourne None si pas d'historique ou si équilibré.
+        Retourne l'équipe qui s'est le plus déplacée (donc qui devrait recevoir
+        maintenant). À égalité (un aller et un retour, par exemple), celle qui
+        s'est déplacée lors de la DERNIÈRE rencontre : sans cela, rien n'était
+        imposé, et 30 paires recevaient chez la même équipe qu'à la rencontre
+        précédente (essai d'octobre 2026).
+        Retourne None s'il n'y a pas d'historique.
         """
         pair = tuple(sorted([equipe1_id, equipe2_id]))
         
@@ -925,8 +988,14 @@ class UfolepDatabaseLoader:
             return equipe1_id
         elif receptions_e2 < receptions_e1:
             return equipe2_id
-        
-        return None  # Équilibré
+
+        # Équilibré : on alterne avec la dernière rencontre
+        dernier = self.dernier_receveur.get(pair)
+        if dernier == equipe1_id:
+            return equipe2_id
+        if dernier == equipe2_id:
+            return equipe1_id
+        return None
 
 
 def test_connection():

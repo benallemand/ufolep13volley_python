@@ -18,6 +18,7 @@ Exemples d'utilisation:
 
 import calendar
 import math
+import unicodedata
 from dataclasses import dataclass
 from datetime import datetime, date, timedelta, time
 from typing import List
@@ -31,31 +32,21 @@ from db_loader_real import UfolepDatabaseLoader
 # Jours fériés année scolaire 2025-2026
 # Coupes: 19 janvier - 13 février 2026
 # Championnats: 2 mars - 22 mai 2026
-JOURS_FERIES = [
-    # 2025
-    date(2025, 11, 1),   # Toussaint
-    date(2025, 11, 11),  # Armistice
-    date(2025, 12, 25),  # Noël
-    # 2026
-    date(2026, 1, 1),    # Jour de l'An
-    date(2026, 4, 6),    # Lundi de Pâques
-    date(2026, 5, 1),    # Fête du Travail
-    date(2026, 5, 8),    # Victoire 1945
-    date(2026, 5, 14),   # Ascension
-    date(2026, 5, 25),   # Lundi de Pentecôte
-]
+# Jours fériés et vacances : lus dans l'agenda de la commission (table
+# calendar_events, voir UfolepDatabaseLoader._load_calendar_events), et plus
+# codés en dur. Les listes JOURS_FERIES / VACANCES_ZONE_B ne valaient que pour
+# 2025-2026 : en 2026-2027, des matchs tombaient le 11/11, pendant les
+# vacances de Noël et pendant la semaine des reports.
 
-# Vacances scolaires Zone B année scolaire 2025-2026
-VACANCES_ZONE_B = [
-    # Vacances de la Toussaint 2025
-    (date(2025, 10, 18), date(2025, 11, 3)),
-    # Vacances de Noël 2025-2026
-    (date(2025, 12, 20), date(2026, 1, 5)),
-    # Vacances d'hiver 2026
-    (date(2026, 2, 14), date(2026, 3, 2)),
-    # Vacances de printemps 2026 (Zone B)
-    (date(2026, 4, 11), date(2026, 4, 27)),
-]
+# Libellés de l'agenda (comparés sans accents ni casse).
+EVENT_PERIOD_CHAMPIONSHIPS = 'championnats'
+EVENT_PERIOD_CUPS = 'coupes'
+EVENT_EXCLUDED_PREFIXES = ('vacances', 'ferie')
+
+
+def normalize_label(label: str) -> str:
+    """Libellé d'agenda sans accents ni casse : « Férié / pont » → « ferie / pont »."""
+    return unicodedata.normalize('NFKD', label or '').encode('ascii', 'ignore').decode().lower().strip()
 
 @dataclass
 class TimeSlot:
@@ -144,6 +135,11 @@ class UfolepMySQLScheduler:
         
         # Jours de la semaine autorisés (1=Lundi, 5=Vendredi)
         self.allowed_weekdays = [1, 2, 3, 4, 5]
+
+        # Agenda de la commission (voir _apply_calendar_events) : plages de jeu
+        # autorisées, et dates exclues (vacances, fériés).
+        self.allowed_windows = []
+        self.excluded_dates = set()
         
     def load_data(self) -> bool:
         """Charge les données depuis MySQL."""
@@ -164,6 +160,8 @@ class UfolepMySQLScheduler:
         else:
             print(f"[ERREUR] Dates non trouvées pour la compétition '{main_code}'")
             return False
+
+        self._apply_calendar_events()
             
         print(f"[OK] Données chargées: {len(self.db_loader.equipes)} équipes, "
               f"{len(self.db_loader.divisions_virtuelles)} divisions, "
@@ -251,21 +249,62 @@ class UfolepMySQLScheduler:
             print(f"[ERREUR] Erreur lors de la conversion des données: {e}")
             return False
     
+    def _apply_calendar_events(self) -> None:
+        """Applique l'agenda de la commission à la période de génération.
+
+        - Dates exclues : toute plage « Vacances » et tout jour « Férié / pont »
+          de la saison.
+        - Plages autorisées : les plages « Championnats » (championnats) ou
+          « Coupes » (coupes c, kh) qui recoupent la période de la compétition.
+          La période se resserre sur elles : la fin de la plage « Championnats »
+          et non la date limite, qui couvre aussi la semaine des reports.
+          Pas pour les matchs prédéfinis (huitièmes) : leur script impose ses
+          dates après le chargement.
+        """
+        events = self.db_loader.calendar_events
+        if not events:
+            print("[ATTENTION] Agenda de la commission vide : aucune date de vacances ni de férié exclue")
+            return
+        cup_codes = ('c', 'kh')
+        period = EVENT_PERIOD_CUPS if all(c in cup_codes for c in self.competition_codes) else EVENT_PERIOD_CHAMPIONSHIPS
+        for event in events:
+            label = normalize_label(event['label'])
+            start, end = event['date_start'], event['date_end']
+            if label.startswith(EVENT_EXCLUDED_PREFIXES):
+                day = start
+                while day <= end:
+                    self.excluded_dates.add(day)
+                    day += timedelta(days=1)
+            elif label == period and not self.predefined_matches:
+                if end >= self.start_date and start <= self.end_date:
+                    self.allowed_windows.append((start, end))
+        if self.allowed_windows:
+            self.start_date = max(self.start_date, min(s for s, _ in self.allowed_windows))
+            self.end_date = min(self.end_date, max(e for _, e in self.allowed_windows))
+            windows = ', '.join(f"{s:%d/%m/%Y} → {e:%d/%m/%Y}" for s, e in self.allowed_windows)
+            print(f"[OK] Plages « {period} » de l'agenda : {windows}")
+            print(f"[OK] Période de génération resserrée : {self.start_date} au {self.end_date}")
+        elif not self.predefined_matches:
+            print(f"[ATTENTION] Aucune plage « {period} » dans l'agenda pour cette période : dates de la compétition utilisées")
+        in_period = sorted(d for d in self.excluded_dates if self.start_date <= d <= self.end_date)
+        print(f"[OK] Dates exclues (vacances, fériés) dans la période : "
+              f"{', '.join(f'{d:%d/%m}' for d in in_period) or 'aucune'}")
+
     def _is_valid_date(self, date_obj: date) -> bool:
-        """Vérifie si une date est valide (pas férié, pas vacances, bon jour semaine)."""
+        """Vérifie si une date est valide : bon jour de semaine, dans une plage
+        autorisée de l'agenda, ni vacances ni férié."""
         # Vérifier jour de la semaine (1=Lundi, 7=Dimanche)
         if date_obj.weekday() + 1 not in self.allowed_weekdays:
             return False
-            
-        # Vérifier jours fériés
-        if date_obj in JOURS_FERIES:
+
+        # Vacances et jours fériés de l'agenda de la commission
+        if date_obj in self.excluded_dates:
             return False
-            
-        # Vérifier vacances scolaires
-        for debut_vacances, fin_vacances in VACANCES_ZONE_B:
-            if debut_vacances <= date_obj <= fin_vacances:
-                return False
-                
+
+        # Plages de jeu de l'agenda (« Championnats » / « Coupes »)
+        if self.allowed_windows and not any(s <= date_obj <= e for s, e in self.allowed_windows):
+            return False
+
         return True
     
     def _generate_valid_dates(self) -> List[date]:
@@ -379,7 +418,11 @@ class UfolepMySQLScheduler:
             home_vars = team_home_vars.get(team_id, [])
             away_vars = team_away_vars.get(team_id, [])
             if home_vars and away_vars:
+                # Dans les deux sens : la version précédente ne bornait que
+                # les déplacements, et laissait passer 6 réceptions pour 1
+                # déplacement (LES ANCIENNES, essai d'octobre 2026).
                 model.Add(sum(home_vars) >= sum(away_vars) - 1)
+                model.Add(sum(home_vars) <= sum(away_vars) + 1)
     
     def _add_history_based_home_constraints(self, model: cp_model.CpModel, matches_data: list) -> None:
         """Contrainte : Alternance domicile/extérieur basée sur l'historique pour TOUTES les paires.
