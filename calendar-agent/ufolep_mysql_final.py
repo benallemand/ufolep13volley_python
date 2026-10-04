@@ -43,6 +43,10 @@ EVENT_PERIOD_CHAMPIONSHIPS = 'championnats'
 EVENT_PERIOD_CUPS = 'coupes'
 EVENT_EXCLUDED_PREFIXES = ('vacances', 'ferie')
 
+# Essais du calendrier avec réceptions choisies d'avance, avant de laisser
+# l'alternance en simple préférence pour tout le monde (generate_schedule).
+MAX_PLAN_ATTEMPTS = 3
+
 
 def normalize_label(label: str) -> str:
     """Libellé d'agenda sans accents ni casse : « Férié / pont » → « ferie / pont »."""
@@ -140,7 +144,10 @@ class UfolepMySQLScheduler:
         # autorisées, et dates exclues (vacances, fériés).
         self.allowed_windows = []
         self.excluded_dates = set()
-        
+
+        # Réceptions choisies d'avance (_plan_home_teams), calculées une fois.
+        self._home_plan = None
+
     def load_data(self) -> bool:
         """Charge les données depuis MySQL."""
         print(f"[INFO] Chargement des données MySQL UFOLEP pour {self.competition_codes}...")
@@ -424,13 +431,19 @@ class UfolepMySQLScheduler:
                 model.Add(sum(home_vars) >= sum(away_vars) - 1)
                 model.Add(sum(home_vars) <= sum(away_vars) + 1)
     
-    def _add_history_based_home_constraints(self, model: cp_model.CpModel, matches_data: list) -> None:
-        """Contrainte : Alternance domicile/extérieur basée sur l'historique pour TOUTES les paires.
-        
+    def _add_history_based_home_constraints(self, model: cp_model.CpModel, matches_data: list) -> list:
+        """Préférence : Alternance domicile/extérieur basée sur l'historique pour TOUTES les paires.
+
         Pour chaque paire d'équipes:
-        - Si A a reçu B la dernière fois, alors B doit recevoir A (si B a un créneau)
-        - Sinon: pas de contrainte spécifique sur qui reçoit
+        - Si A a reçu B la dernière fois, alors B devrait recevoir A (si B a un créneau)
+        - Sinon: pas de préférence sur qui reçoit
+
+        Pénalité et non interdiction : imposée, l'alternance se heurtait à
+        l'équilibre ±1 (L ehpad : 5 déplacements imposés pour 6 matchs) et
+        laissait 8 matchs sans date (essai d'octobre 2026). Retourne les
+        variables « mauvaise équipe reçoit », que l'objectif pénalise.
         """
+        penalty_vars = []
         teams_by_id = {t.id: t for t in self.teams}
         teams_with_reception = {team.id for team in self.teams if team.time_slots}
         
@@ -444,8 +457,8 @@ class UfolepMySQLScheduler:
                     all_pairs.append((t1, t2, division))
         
         if not all_pairs:
-            return
-        
+            return penalty_vars
+
         # Grouper les variables par paire d'équipes et par qui reçoit
         pair_home_vars = {}
         
@@ -463,6 +476,7 @@ class UfolepMySQLScheduler:
         # Appliquer les contraintes
         forced_receptions = 0
         skipped_no_slot = 0
+        same_club = 0
         
         for t1, t2, division in all_pairs:
             pair = tuple(sorted([t1.id, t2.id]))
@@ -474,33 +488,37 @@ class UfolepMySQLScheduler:
             
             if not vars_t1_home and not vars_t2_home:
                 continue
-            
+
+            # Deux équipes d'un même club : peu importe qui reçoit, pas
+            # d'alternance à respecter (Les Tigresses / Les Jeannettes).
+            if t1.club_id == t2.club_id:
+                same_club += 1
+                continue
+
             # Vérifier l'historique pour cette paire
             equipe_qui_doit_recevoir = self.db_loader.get_equipe_qui_doit_recevoir(t1.id, t2.id)
             
             if equipe_qui_doit_recevoir:
-                # Forcer la réception vers l'équipe désignée par l'historique
+                # Orienter la réception vers l'équipe désignée par l'historique
                 # MAIS seulement si l'équipe a des dates valides pour recevoir (vars non vide)
                 if equipe_qui_doit_recevoir == t1.id:
                     if vars_t1_home and t1.id in teams_with_reception:
-                        # Ne pas forcer sum==1 car ça force le match à être programmé
-                        # Juste interdire que t2 reçoive si t1 peut recevoir
-                        if vars_t2_home:
-                            model.Add(sum(vars_t2_home) == 0)
+                        # Pénaliser la réception par t2 si t1 peut recevoir
+                        penalty_vars.extend(vars_t2_home)
                         forced_receptions += 1
                     else:
                         skipped_no_slot += 1
                 elif equipe_qui_doit_recevoir == t2.id:
                     if vars_t2_home and t2.id in teams_with_reception:
-                        # Ne pas forcer sum==1 car ça force le match à être programmé
-                        # Juste interdire que t1 reçoive si t2 peut recevoir
-                        if vars_t1_home:
-                            model.Add(sum(vars_t1_home) == 0)
+                        # Pénaliser la réception par t1 si t2 peut recevoir
+                        penalty_vars.extend(vars_t1_home)
                         forced_receptions += 1
                     else:
                         skipped_no_slot += 1
-        
-        print(f"[INFO] Alternance historique: {forced_receptions} réceptions forcées, {skipped_no_slot} ignorées (pas de créneau/date)")
+
+        print(f"[INFO] Alternance historique: {forced_receptions} réceptions orientées, {skipped_no_slot} ignorées (pas de créneau/date), "
+              f"{same_club} entre équipes d'un même club")
+        return penalty_vars
     
     def _add_shared_roster_constraints(self, model: cp_model.CpModel, matches_data: list) -> None:
         """Contrainte optionnelle : Éviter que 2 équipes avec effectif commun jouent le même soir.
@@ -560,8 +578,91 @@ class UfolepMySQLScheduler:
             if len(paires_effectif_commun) > 5:
                 print(f"       ... et {len(paires_effectif_commun) - 5} autres paires")
         
-    def generate_schedule(self) -> bool:
-        """Génère le calendrier complet avec OR-Tools."""
+    def _count_history_breaks(self) -> int:
+        """Matchs programmés chez l'équipe que l'historique ne désignait pas
+        (même règle que _add_history_based_home_constraints)."""
+        breaks = 0
+        for match in self.matches:
+            home, away = match.equipe_domicile, match.equipe_exterieur
+            if home.club_id == away.club_id:
+                continue
+            must = self.db_loader.get_equipe_qui_doit_recevoir(home.id, away.id)
+            if must == away.id and away.time_slots:
+                breaks += 1
+        return breaks
+
+    def _plan_home_teams(self) -> dict:
+        """Choisit, pour chaque rencontre, l'équipe qui reçoit, avant le calendrier.
+
+        Petit modèle à part, résolu à l'optimum en quelques secondes : chaque
+        équipe avec créneau reçoit autant qu'elle se déplace, à un match près,
+        une équipe sans créneau ne reçoit jamais, et l'alternance historique est
+        respectée au mieux (pas entre deux équipes d'un même club). Le
+        calendrier se construit ensuite sur ces réceptions fixées : traitée
+        dans le grand modèle, l'alternance laissait de 8 à 97 entorses selon le
+        lancement, à la limite de temps (essai d'octobre 2026).
+
+        Retourne {(id1, id2) trié: id de l'équipe qui reçoit}, vide si le
+        modèle n'a pas de solution.
+        """
+        model = cp_model.CpModel()
+        first_hosts = {}            # paire triée -> (t1, t2, BoolVar « t1 reçoit »)
+        home_terms = {}             # id équipe -> [expressions « reçoit »]
+        penalties = []
+        for division in self.divisions:
+            teams = division.teams
+            if len(teams) < 3:
+                continue
+            for i in range(len(teams)):
+                for j in range(i + 1, len(teams)):
+                    t1, t2 = teams[i], teams[j]
+                    if not t1.time_slots and not t2.time_slots:
+                        continue
+                    t1_hosts = model.NewBoolVar(f"recoit_{t1.id}_{t2.id}")
+                    if not t1.time_slots:
+                        model.Add(t1_hosts == 0)
+                    if not t2.time_slots:
+                        model.Add(t1_hosts == 1)
+                    first_hosts[tuple(sorted([t1.id, t2.id]))] = (t1, t2, t1_hosts)
+                    home_terms.setdefault(t1.id, []).append(t1_hosts)
+                    home_terms.setdefault(t2.id, []).append(1 - t1_hosts)
+                    if t1.club_id == t2.club_id:
+                        continue
+                    must = self.db_loader.get_equipe_qui_doit_recevoir(t1.id, t2.id)
+                    if must == t1.id and t1.time_slots:
+                        penalties.append(1 - t1_hosts)
+                    elif must == t2.id and t2.time_slots:
+                        penalties.append(t1_hosts)
+        for team in self.teams:
+            terms = home_terms.get(team.id)
+            if team.time_slots and terms:
+                # |réceptions - déplacements| <= 1
+                model.Add(2 * sum(terms) - len(terms) <= 1)
+                model.Add(2 * sum(terms) - len(terms) >= -1)
+        if penalties:
+            model.Minimize(sum(penalties))
+        solver = cp_model.CpSolver()
+        solver.parameters.max_time_in_seconds = 30.0
+        status = solver.Solve(model)
+        if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+            print(f"[ATTENTION] Choix des réceptions impossible ({solver.StatusName(status)})")
+            return {}
+        against = int(solver.ObjectiveValue()) if penalties else 0
+        print(f"[OK] Réceptions choisies ({solver.StatusName(status)}) : "
+              f"alternance historique non respectée pour {against} rencontre(s)")
+        return {pair: (t1.id if solver.Value(var) else t2.id)
+                for pair, (t1, t2, var) in first_hosts.items()}
+
+    def generate_schedule(self, plan_home_teams: bool = True, free_team_ids: frozenset = frozenset(),
+                          attempt: int = 1) -> bool:
+        """Génère le calendrier complet avec OR-Tools.
+
+        Avec plan_home_teams, les réceptions sont choisies d'abord
+        (_plan_home_teams). S'il reste alors des matchs sans date, leurs
+        équipes sont libérées du choix (free_team_ids : qui reçoit redevient
+        libre, l'alternance en préférence) et l'on recommence, au plus
+        MAX_PLAN_ATTEMPTS fois ; puis sans choix d'avance du tout.
+        """
         total_matches = self._calculate_matches_needed()
         valid_dates = self._generate_valid_dates()
 
@@ -691,7 +792,21 @@ class UfolepMySQLScheduler:
                             'team2': teams[j],
                             'division': division
                         })
-        
+
+        # Réceptions choisies d'avance : seules restent les possibilités où
+        # reçoit l'équipe désignée. Les équipes libérées (matchs restés sans
+        # date au tour précédent) n'y sont plus tenues.
+        home_plan = {}
+        if plan_home_teams and not self.predefined_matches:
+            if self._home_plan is None:
+                self._home_plan = self._plan_home_teams()
+            home_plan = {pair: host for pair, host in self._home_plan.items()
+                         if not set(pair) & free_team_ids}
+            if home_plan:
+                matches_data = [d for d in matches_data
+                                if home_plan.get(tuple(sorted([d['home_team'].id, d['away_team'].id])),
+                                                 d['home_team'].id) == d['home_team'].id]
+
         # Application des contraintes SIMPLIFIÉES
         # 1. Chaque match programmé exactement une fois (si possible)
         self._add_match_assignment_constraints_flexible(model, matches_data, match_id)
@@ -710,10 +825,22 @@ class UfolepMySQLScheduler:
         if not self.predefined_matches:
             self._add_home_balance_constraints(model, matches_data)
         
-        # 6. Alternance dom/ext basée sur l'historique (sauf pour matchs prédéfinis où dom/ext est déjà fixé)
+        # 6. Alternance dom/ext basée sur l'historique (sauf pour matchs prédéfinis où dom/ext est déjà fixé) :
+        #    pénalisée dans l'objectif, là où les réceptions ne sont pas
+        #    choisies d'avance (le choix en tient déjà compte). Un match
+        #    programmé de plus vaut toujours mieux que toutes les entorses.
+        history_penalty_vars = []
         if not self.predefined_matches:
-            self._add_history_based_home_constraints(model, matches_data)
-        
+            if not home_plan:
+                history_penalty_vars = self._add_history_based_home_constraints(model, matches_data)
+            elif free_team_ids:
+                freed = [d for d in matches_data
+                         if {d['home_team'].id, d['away_team'].id} & free_team_ids]
+                history_penalty_vars = self._add_history_based_home_constraints(model, freed)
+            if history_penalty_vars:
+                weight = len(self._all_matches_info) + 1
+                model.Maximize(weight * sum(d['var'] for d in matches_data) - sum(history_penalty_vars))
+
         # 7. Éviter que 2 équipes avec effectif commun jouent le même soir (sauf pour matchs prédéfinis)
         if not self.predefined_matches:
             self._add_shared_roster_constraints(model, matches_data)
@@ -731,9 +858,10 @@ class UfolepMySQLScheduler:
             model.AddDecisionStrategy(decision_vars, cp_model.CHOOSE_FIRST, cp_model.SELECT_MAX_VALUE)
         
         status = solver.Solve(model)
-        
+
         if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
-            
+            print(f"[INFO] Solveur : {solver.StatusName(status)} en {solver.WallTime():.0f} s")
+
             # Extraire les matchs programmés
             self.matches = []
             programmed_pairs = set()  # Pour identifier les matchs programmés
@@ -778,6 +906,18 @@ class UfolepMySQLScheduler:
                     )
                     self.unscheduled_matches.append(match)
             
+            if self.unscheduled_matches and home_plan:
+                stuck = {team.id for m in self.unscheduled_matches
+                         for team in (m.equipe_domicile, m.equipe_exterieur)}
+                if attempt < MAX_PLAN_ATTEMPTS:
+                    names = ', '.join(sorted(t.nom for t in self.teams if t.id in stuck - free_team_ids))
+                    print(f"[ATTENTION] {len(self.unscheduled_matches)} matchs sans date : réceptions "
+                          f"libérées pour {names}, nouvel essai")
+                    return self.generate_schedule(True, free_team_ids | stuck, attempt + 1)
+                print(f"[ATTENTION] {len(self.unscheduled_matches)} matchs sans date après "
+                      f"{attempt} essais : réceptions sans choix d'avance, alternance en préférence")
+                return self.generate_schedule(plan_home_teams=False)
+            print(f"[INFO] Alternance historique non respectée : {self._count_history_breaks()} match(s)")
             print(f"[OK] {len(self.matches)} matchs programmés")
             if self.unscheduled_matches:
                 print(f"[ATTENTION] {len(self.unscheduled_matches)} matchs non programmés (sans date)")
