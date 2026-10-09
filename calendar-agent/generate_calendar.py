@@ -7,20 +7,38 @@ Usage:
     python generate_calendar.py c kh             # Idem
     python generate_calendar.py m f mo           # Championnats uniquement
     python generate_calendar.py c                # Coupes uniquement
+    python generate_calendar.py m f mo --reference insert_matches_m_f_mo.sql
+                                                 # Garde au mieux un calendrier
+                                                 # déjà généré : seules bougent
+                                                 # les rencontres que les
+                                                 # changements de créneaux,
+                                                 # d'équipes ou de fermetures
+                                                 # de gymnases imposent
 """
 
 import sys
 from ufolep_mysql_final import main
 
 if __name__ == "__main__":
+    args = sys.argv[1:]
+    reference_file = None
+    if '--reference' in args:
+        index = args.index('--reference')
+        if index + 1 >= len(args):
+            sys.exit("--reference attend un fichier insert_matches_*.sql")
+        reference_file = args[index + 1]
+        del args[index:index + 2]
+
     # Récupérer les codes de compétition depuis les arguments
-    if len(sys.argv) > 1:
-        competition_codes = sys.argv[1:]
+    if args:
+        competition_codes = args
     else:
         # Par défaut: coupes et kh
         competition_codes = ['c', 'kh']
-    
+
     print(f"Génération du calendrier pour: {', '.join(competition_codes)}")
+    if reference_file:
+        print(f"Calendrier de référence: {reference_file}")
     print("=" * 60)
-    
-    main(competition_codes)
+
+    main(competition_codes, reference_file)

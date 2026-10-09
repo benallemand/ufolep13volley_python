@@ -18,6 +18,8 @@ Exemples d'utilisation:
 
 import calendar
 import math
+import re
+from collections import defaultdict
 import unicodedata
 from dataclasses import dataclass
 from datetime import datetime, date, timedelta, time
@@ -46,6 +48,8 @@ EVENT_EXCLUDED_PREFIXES = ('vacances', 'ferie')
 # Essais du calendrier avec réceptions choisies d'avance, avant de laisser
 # l'alternance en simple préférence pour tout le monde (generate_schedule).
 MAX_PLAN_ATTEMPTS = 3
+
+JOURS = ("lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche")
 
 
 def normalize_label(label: str) -> str:
@@ -116,15 +120,22 @@ class PredefinedMatch:
 class UfolepMySQLScheduler:
     """Générateur de calendrier UFOLEP utilisant les données MySQL réelles."""
     
-    def __init__(self, competition_codes: List[str] = None, predefined_matches: List[PredefinedMatch] = None):
+    def __init__(self, competition_codes: List[str] = None, predefined_matches: List[PredefinedMatch] = None,
+                 reference_file: str = None):
         """Initialise le scheduler.
-        
+
         Args:
             competition_codes: Liste des codes de compétition à traiter (ex: ['m'], ['c'], ['m', 'f', 'mo'])
                               Par défaut: ['m', 'f', 'mo']
             predefined_matches: Liste de matchs prédéfinis (pour les phases finales).
                                Si fourni, ces matchs sont utilisés au lieu de générer un round-robin.
+            reference_file: Calendrier de référence (fichier `insert_matches_*.sql`
+                            d'une génération précédente) : on en garde le plus
+                            possible, voir _load_reference.
         """
+        self.reference_file = reference_file
+        # {paire d'équipes triée: (date, id de l'équipe qui reçoit)}
+        self.reference = {}
         self.competition_codes = competition_codes or ['m', 'f', 'mo']
         self.db_loader = UfolepDatabaseLoader(self.competition_codes)
         self.divisions: List[Division] = []
@@ -173,8 +184,12 @@ class UfolepMySQLScheduler:
         print(f"[OK] Données chargées: {len(self.db_loader.equipes)} équipes, "
               f"{len(self.db_loader.divisions_virtuelles)} divisions, "
               f"{len(self.db_loader.creneaux)} créneaux")
-        
-        return self._convert_data()
+
+        if not self._convert_data():
+            return False
+        if self.reference_file:
+            self._load_reference()
+        return True
     
     def _convert_data(self) -> bool:
         """Convertit les données MySQL vers les structures du scheduler."""
@@ -578,6 +593,120 @@ class UfolepMySQLScheduler:
             if len(paires_effectif_commun) > 5:
                 print(f"       ... et {len(paires_effectif_commun) - 5} autres paires")
         
+    def _load_reference(self) -> None:
+        """Lit le calendrier de référence : un fichier `insert_matches_*.sql`
+        d'une génération précédente (ou reconstitué au même format).
+
+        Le générateur repart sinon de zéro à chaque lancement : des milliers de
+        calendriers sont également valables, et deux lancements sur les mêmes
+        données n'avaient que 14 % de rencontres à la même date (octobre
+        2026). Avec une référence, il n'en déplace que ce que les changements
+        de données imposent.
+        """
+        pattern = re.compile(r"\('[^']*', '(\w+)', '(\w+)', '(\d+)', '(\d+)', '(\d{4})-(\d\d)-(\d\d)'")
+        with open(self.reference_file, encoding='utf-8') as f:
+            for comp, division, dom, ext, year, month, day in pattern.findall(f.read()):
+                if comp not in self.competition_codes:
+                    continue
+                pair = tuple(sorted([dom, ext]))
+                self.reference[pair] = (date(int(year), int(month), int(day)), dom)
+        print(f"[OK] Calendrier de référence : {len(self.reference)} rencontres ({self.reference_file})")
+
+    def _reference_terms(self, model: cp_model.CpModel, matches_data: list) -> list:
+        """Termes de l'objectif qui récompensent les choix de la référence :
+        2 pour la même date chez la même équipe, 1 pour la même équipe qui
+        reçoit à une autre date. Les possibilités de la référence servent aussi
+        de point de départ au solveur."""
+        terms = []
+        for d in matches_data:
+            pair = tuple(sorted([d['home_team'].id, d['away_team'].id]))
+            ref = self.reference.get(pair)
+            if ref is None or ref[1] != d['home_team'].id:
+                continue
+            if ref[0] == d['date']:
+                terms.append(2 * d['var'])
+                model.AddHint(d['var'], 1)
+            else:
+                terms.append(d['var'])
+        return terms
+
+    def _reference_conflicts(self) -> list:
+        """Ce que la référence enfreint avec les données actuelles : la cause
+        première des rencontres déplacées, les autres suivant par enchaînement.
+        Exemple (octobre 2026) : deux paires d'équipes à effectif commun,
+        apparues avec les licences importées en prod, jouaient le même soir."""
+        teams = {t.id: t for t in self.teams}
+        name = lambda team_id: teams[team_id].nom if team_id in teams else team_id
+        conflicts = []
+        by_gym_date = defaultdict(list)
+        team_dates = defaultdict(set)
+        for (a, b), (day, host) in self.reference.items():
+            away = b if a == host else a
+            team_dates[host].add(day)
+            team_dates[away].add(day)
+            slots = [ts for ts in teams[host].time_slots
+                     if ts.jour_semaine == day.weekday() + 1] if host in teams else []
+            usable = [ts for ts in slots if self.db_loader.is_gymnase_available(ts.gymnase_id, day)]
+            if not slots:
+                conflicts.append(f"{name(host)} n'a plus de créneau le {JOURS[day.weekday()]} : {name(host)} - {name(away)} "
+                                 f"du {day:%d/%m}")
+            elif not usable:
+                conflicts.append(f"gymnase fermé le {day:%d/%m} : {name(host)} - {name(away)}")
+            else:
+                by_gym_date[(usable[0].gymnase_id, day)].append(f"{name(host)} - {name(away)}")
+        for (gym_id, day), games in by_gym_date.items():
+            gym = self.db_loader.gymnases.get(gym_id)
+            if gym and len(games) > gym.nb_terrains:
+                conflicts.append(f"{gym.nom} plein le {day:%d/%m} ({len(games)} matchs, "
+                                 f"{gym.nb_terrains} terrain(s)) : {', '.join(games)}")
+        for e1, e2, count, ratio in self.db_loader.get_equipes_avec_effectif_commun():
+            same_evenings = sorted(team_dates[e1] & team_dates[e2])
+            if same_evenings:
+                conflicts.append(f"effectif commun {name(e1)} / {name(e2)} ({count} joueurs, {int(ratio * 100)} %) "
+                                 f"le même soir : {', '.join(f'{d:%d/%m}' for d in same_evenings)}")
+        return conflicts
+
+    def _report_reference_changes(self) -> None:
+        """Compare le calendrier obtenu à la référence : causes premières
+        (_reference_conflicts), puis chaque rencontre déplacée, avec ce qui la
+        concerne directement (créneau supprimé, gymnase fermé) ou, sinon, un
+        enchaînement depuis ces causes."""
+        conflicts = self._reference_conflicts()
+        print("\n[INFO] La référence n'est plus tenable telle quelle : "
+              + ("" if conflicts else "aucune règle enfreinte, rien n'aurait dû bouger"))
+        for conflict in conflicts:
+            print(f"   - {conflict}")
+        teams = {t.id: t for t in self.teams}
+        obtained = {tuple(sorted([m.equipe_domicile.id, m.equipe_exterieur.id])): m for m in self.matches}
+        kept = same_host = 0
+        changes = []
+        for pair, (ref_date, ref_host) in sorted(self.reference.items(), key=lambda item: item[1][0]):
+            match = obtained.get(pair)
+            if match and match.date == ref_date and match.equipe_domicile.id == ref_host:
+                kept += 1
+                continue
+            if match and match.equipe_domicile.id == ref_host:
+                same_host += 1
+            host = teams.get(ref_host)
+            slots = [ts for ts in host.time_slots if ts.jour_semaine == ref_date.weekday() + 1] if host else []
+            if not slots:
+                reason = "créneau du jour supprimé ou déplacé"
+            elif not any(self.db_loader.is_gymnase_available(ts.gymnase_id, ref_date) for ts in slots):
+                reason = "gymnase fermé ce jour-là"
+            else:
+                reason = "par enchaînement"
+            other = teams.get(pair[0] if pair[1] == ref_host else pair[1])
+            now = (f"{match.date:%d/%m} chez {match.equipe_domicile.nom}" if match and match.date
+                   else "sans date")
+            changes.append(f"   - {host.nom if host else ref_host} - {other.nom if other else '?'} : "
+                           f"{ref_date:%d/%m} → {now} ({reason})")
+        total = len(self.reference)
+        print(f"\n[INFO] Par rapport à la référence : {kept}/{total} rencontres inchangées, "
+              f"{same_host} à une autre date chez la même équipe, "
+              f"{total - kept - same_host} reçues par l'autre équipe ou sans date")
+        for line in changes:
+            print(line)
+
     def _count_history_breaks(self) -> int:
         """Matchs programmés chez l'équipe que l'historique ne désignait pas
         (même règle que _add_history_based_home_constraints)."""
@@ -797,7 +926,9 @@ class UfolepMySQLScheduler:
         # reçoit l'équipe désignée. Les équipes libérées (matchs restés sans
         # date au tour précédent) n'y sont plus tenues.
         home_plan = {}
-        if plan_home_teams and not self.predefined_matches:
+        # Avec un calendrier de référence, c'est lui qui guide les réceptions
+        # (voir l'objectif) : pas de choix d'avance, qui pourrait le contredire.
+        if plan_home_teams and not self.predefined_matches and not self.reference:
             if self._home_plan is None:
                 self._home_plan = self._plan_home_teams()
             home_plan = {pair: host for pair, host in self._home_plan.items()
@@ -837,9 +968,15 @@ class UfolepMySQLScheduler:
                 freed = [d for d in matches_data
                          if {d['home_team'].id, d['away_team'].id} & free_team_ids]
                 history_penalty_vars = self._add_history_based_home_constraints(model, freed)
-            if history_penalty_vars:
-                weight = len(self._all_matches_info) + 1
-                model.Maximize(weight * sum(d['var'] for d in matches_data) - sum(history_penalty_vars))
+            reference_terms = self._reference_terms(model, matches_data)
+            if history_penalty_vars or reference_terms:
+                # Par ordre de priorité, chaque niveau l'emportant sur tous
+                # les suivants réunis : programmer les matchs, garder ceux de
+                # la référence (date et équipe qui reçoit : 2 ; équipe qui
+                # reçoit seule : 1), puis respecter l'alternance historique.
+                unit = len(self._all_matches_info) + 1
+                model.Maximize(2 * unit * unit * sum(d['var'] for d in matches_data)
+                               + unit * sum(reference_terms) - sum(history_penalty_vars))
 
         # 7. Éviter que 2 équipes avec effectif commun jouent le même soir (sauf pour matchs prédéfinis)
         if not self.predefined_matches:
@@ -918,6 +1055,8 @@ class UfolepMySQLScheduler:
                       f"{attempt} essais : réceptions sans choix d'avance, alternance en préférence")
                 return self.generate_schedule(plan_home_teams=False)
             print(f"[INFO] Alternance historique non respectée : {self._count_history_breaks()} match(s)")
+            if self.reference:
+                self._report_reference_changes()
             print(f"[OK] {len(self.matches)} matchs programmés")
             if self.unscheduled_matches:
                 print(f"[ATTENTION] {len(self.unscheduled_matches)} matchs non programmés (sans date)")
@@ -1363,12 +1502,14 @@ class UfolepMySQLScheduler:
             print(f"[ERREUR] Impossible de générer le fichier SQL: {e}")
             return False
 
-def main(competition_codes: List[str] = None):
+def main(competition_codes: List[str] = None, reference_file: str = None):
     """Fonction principale.
-    
+
     Args:
         competition_codes: Liste des codes de compétition (ex: ['c', 'kh'], ['m', 'f', 'mo'])
                           Par défaut: ['m', 'f', 'mo']
+        reference_file: calendrier de référence à conserver au mieux (voir
+                        UfolepMySQLScheduler._load_reference)
     """
     import sys
     import os
@@ -1385,7 +1526,9 @@ def main(competition_codes: List[str] = None):
     class TeeOutput:
         def __init__(self, filename):
             self.terminal = sys.stdout
-            self.log = open(filename, 'w', encoding='utf-8')
+            # Écrit ligne à ligne : on suit une génération de plusieurs
+            # minutes en lisant le journal, au lieu de le découvrir à la fin.
+            self.log = open(filename, 'w', encoding='utf-8', buffering=1)
         def write(self, message):
             self.terminal.write(message)
             self.log.write(message)
@@ -1403,8 +1546,8 @@ def main(competition_codes: List[str] = None):
     print(f"Fichier log: {log_filename}")
     print("="*60)
     
-    scheduler = UfolepMySQLScheduler(codes)
-    
+    scheduler = UfolepMySQLScheduler(codes, reference_file=reference_file)
+
     # Charger les données
     if not scheduler.load_data():
         return
