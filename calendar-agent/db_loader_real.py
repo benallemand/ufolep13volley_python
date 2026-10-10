@@ -40,6 +40,7 @@ class CreneauData:
     gymnase_id: str
     jour_semaine: int  # 1=Lundi, 2=Mardi, etc.
     heure_debut: time
+    priorite: int = 1  # creneau.usage_priority : 1 = créneau demandé en premier
 
 
 @dataclass
@@ -429,7 +430,8 @@ class UfolepDatabaseLoader:
                         equipe_id=equipe_id,
                         gymnase_id=str(row['gymnase_id_1']),
                         jour_semaine=jour_1,
-                        heure_debut=heure_1
+                        heure_debut=heure_1,
+                        priorite=1
                     )
                     self.creneaux[creneau.id] = creneau
                 
@@ -443,7 +445,8 @@ class UfolepDatabaseLoader:
                         equipe_id=equipe_id,
                         gymnase_id=str(row['gymnase_id_2']),
                         jour_semaine=jour_2,
-                        heure_debut=heure_2
+                        heure_debut=heure_2,
+                        priorite=2
                     )
                     self.creneaux[creneau.id] = creneau
             
@@ -458,7 +461,8 @@ class UfolepDatabaseLoader:
                 c.id_equipe as equipe_id,
                 c.id_gymnase as gymnase_id,
                 c.jour as jour_semaine,
-                c.heure as heure_debut
+                c.heure as heure_debut,
+                c.usage_priority as priorite
             FROM creneau c
             JOIN classements cl ON cl.id_equipe = c.id_equipe 
             JOIN equipes e ON e.id_equipe = c.id_equipe
@@ -482,7 +486,8 @@ class UfolepDatabaseLoader:
                         equipe_id=str(row['equipe_id']),
                         gymnase_id=str(row['gymnase_id']),
                         jour_semaine=jour_semaine,
-                        heure_debut=heure_debut
+                        heure_debut=heure_debut,
+                        priorite=row['priorite'] or 1
                     )
                     self.creneaux[creneau.id] = creneau
             
@@ -499,7 +504,8 @@ class UfolepDatabaseLoader:
                 c.id_equipe as equipe_id,
                 c.id_gymnase as gymnase_id,
                 c.jour as jour_semaine,
-                c.heure as heure_debut
+                c.heure as heure_debut,
+                c.usage_priority as priorite
             FROM creneau c
             JOIN classements cl ON cl.id_equipe = c.id_equipe 
             WHERE cl.code_competition IN {comp_filter}
@@ -521,7 +527,8 @@ class UfolepDatabaseLoader:
                         equipe_id=str(row['equipe_id']),
                         gymnase_id=str(row['gymnase_id']),
                         jour_semaine=jour_semaine,
-                        heure_debut=heure_debut
+                        heure_debut=heure_debut,
+                        priorite=row['priorite'] or 1
                     )
                     self.creneaux[creneau.id] = creneau
         

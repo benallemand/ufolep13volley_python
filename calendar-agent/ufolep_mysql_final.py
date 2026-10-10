@@ -66,6 +66,7 @@ class TimeSlot:
     heure_debut: time
     club_id: str
     nb_terrains: int = 1
+    priorite: int = 1  # 1 = créneau demandé en premier à l'inscription
 
 @dataclass
 class Team:
@@ -209,7 +210,8 @@ class UfolepMySQLScheduler:
                         jour_semaine=creneau_data.jour_semaine,
                         heure_debut=creneau_data.heure_debut,
                         club_id=club_data.id,
-                        nb_terrains=gymnase_data.nb_terrains
+                        nb_terrains=gymnase_data.nb_terrains,
+                        priorite=creneau_data.priorite
                     )
                     self.time_slots.append(time_slot)
             
@@ -612,23 +614,31 @@ class UfolepMySQLScheduler:
                 self.reference[pair] = (date(int(year), int(month), int(day)), dom)
         print(f"[OK] Calendrier de référence : {len(self.reference)} rencontres ({self.reference_file})")
 
-    def _reference_terms(self, model: cp_model.CpModel, matches_data: list) -> list:
+    def _reference_terms(self, model: cp_model.CpModel, matches_data: list) -> tuple:
         """Termes de l'objectif qui récompensent les choix de la référence :
-        2 pour la même date chez la même équipe, 1 pour la même équipe qui
-        reçoit à une autre date. Les possibilités de la référence servent aussi
-        de point de départ au solveur."""
-        terms = []
+        les possibilités chez l'équipe qui y reçoit, puis celles qui gardent
+        aussi la date. Ces dernières servent de point de départ au solveur."""
+        hosts, dates = [], []
         for d in matches_data:
             pair = tuple(sorted([d['home_team'].id, d['away_team'].id]))
             ref = self.reference.get(pair)
             if ref is None or ref[1] != d['home_team'].id:
                 continue
+            hosts.append(d['var'])
             if ref[0] == d['date']:
-                terms.append(2 * d['var'])
+                dates.append(d['var'])
                 model.AddHint(d['var'], 1)
-            else:
-                terms.append(d['var'])
-        return terms
+        return hosts, dates
+
+    @staticmethod
+    def _secondary_slot_vars(matches_data: list) -> list:
+        """Possibilités sur un créneau que l'équipe qui reçoit a demandé après
+        un autre (creneau.usage_priority) : pénalisées dans l'objectif, pour
+        qu'elle reçoive au mieux sur son créneau 1. Exemple (octobre 2026) :
+        Meyrargues Filles, créneau 1 le jeudi, recevait 2 fois sur 3 le
+        mercredi (créneau 2)."""
+        return [d['var'] for d in matches_data
+                if d['time_slot'].priorite > min(ts.priorite for ts in d['home_team'].time_slots)]
 
     def _reference_conflicts(self) -> list:
         """Ce que la référence enfreint avec les données actuelles : la cause
@@ -693,6 +703,9 @@ class UfolepMySQLScheduler:
                 reason = "créneau du jour supprimé ou déplacé"
             elif not any(self.db_loader.is_gymnase_available(ts.gymnase_id, ref_date) for ts in slots):
                 reason = "gymnase fermé ce jour-là"
+            elif (match and match.date and match.equipe_domicile.id == ref_host
+                  and match.time_slot.priorite < min(ts.priorite for ts in slots)):
+                reason = "vers le créneau 1"
             else:
                 reason = "par enchaînement"
             other = teams.get(pair[0] if pair[1] == ref_host else pair[1])
@@ -719,6 +732,24 @@ class UfolepMySQLScheduler:
             if must == away.id and away.time_slots:
                 breaks += 1
         return breaks
+
+    def _report_secondary_slots(self) -> None:
+        """Réceptions des équipes à plusieurs créneaux : combien sur leur
+        créneau 1, et les équipes qui reçoivent ailleurs."""
+        by_team = defaultdict(lambda: [0, 0])
+        for match in self.matches:
+            home = match.equipe_domicile
+            if len({ts.priorite for ts in home.time_slots}) < 2:
+                continue
+            by_team[home.nom][1] += 1
+            if match.time_slot.priorite == min(ts.priorite for ts in home.time_slots):
+                by_team[home.nom][0] += 1
+        first = sum(n for n, _ in by_team.values())
+        total = sum(t for _, t in by_team.values())
+        print(f"[INFO] Réceptions sur le créneau 1 : {first}/{total} ({len(by_team)} équipes à plusieurs créneaux)")
+        for name, (n, t) in sorted(by_team.items(), key=lambda item: (item[1][0] / item[1][1], item[0])):
+            if n < t:
+                print(f"   - {name} : {n}/{t}")
 
     def _plan_home_teams(self) -> dict:
         """Choisit, pour chaque rencontre, l'équipe qui reçoit, avant le calendrier.
@@ -968,15 +999,21 @@ class UfolepMySQLScheduler:
                 freed = [d for d in matches_data
                          if {d['home_team'].id, d['away_team'].id} & free_team_ids]
                 history_penalty_vars = self._add_history_based_home_constraints(model, freed)
-            reference_terms = self._reference_terms(model, matches_data)
-            if history_penalty_vars or reference_terms:
+            reference_hosts, reference_dates = self._reference_terms(model, matches_data)
+            secondary_slots = self._secondary_slot_vars(matches_data)
+            if history_penalty_vars or reference_hosts or secondary_slots:
                 # Par ordre de priorité, chaque niveau l'emportant sur tous
-                # les suivants réunis : programmer les matchs, garder ceux de
-                # la référence (date et équipe qui reçoit : 2 ; équipe qui
-                # reçoit seule : 1), puis respecter l'alternance historique.
+                # les suivants réunis : programmer les matchs, garder l'équipe
+                # qui reçoit de la référence, respecter l'alternance
+                # historique, recevoir sur son créneau 1, puis garder la date
+                # de la référence. Qui reçoit se décide avant quel jour : le
+                # créneau 1 ne fait bouger que des dates.
                 unit = len(self._all_matches_info) + 1
-                model.Maximize(2 * unit * unit * sum(d['var'] for d in matches_data)
-                               + unit * sum(reference_terms) - sum(history_penalty_vars))
+                model.Maximize(unit ** 4 * sum(d['var'] for d in matches_data)
+                               + unit ** 3 * sum(reference_hosts)
+                               - unit ** 2 * sum(history_penalty_vars)
+                               - unit * sum(secondary_slots)
+                               + sum(reference_dates))
 
         # 7. Éviter que 2 équipes avec effectif commun jouent le même soir (sauf pour matchs prédéfinis)
         if not self.predefined_matches:
@@ -1055,6 +1092,8 @@ class UfolepMySQLScheduler:
                       f"{attempt} essais : réceptions sans choix d'avance, alternance en préférence")
                 return self.generate_schedule(plan_home_teams=False)
             print(f"[INFO] Alternance historique non respectée : {self._count_history_breaks()} match(s)")
+            if not self.predefined_matches:
+                self._report_secondary_slots()
             if self.reference:
                 self._report_reference_changes()
             print(f"[OK] {len(self.matches)} matchs programmés")
