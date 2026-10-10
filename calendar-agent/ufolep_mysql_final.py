@@ -55,6 +55,12 @@ MAX_PLAN_ATTEMPTS = 3
 # centaines de dates contre quelques créneaux 1 (octobre 2026 : 287 dates
 # changées pour 95/99 réceptions sur le créneau 1).
 SLOT_PRIORITY_WEIGHT = 4
+# Chaque réception de plus hors du créneau 1, pour une même équipe, coûte ce
+# supplément de plus que la précédente : deux équipes qui se disputent le même
+# créneau 1 (gymnase à 1 terrain) se le partagent plutôt que l'une n'en ait
+# jamais. Plus que 2 (échanger deux dates d'une même semaine), pour que
+# l'équité l'emporte sur la date de la référence.
+SLOT_PRIORITY_FAIRNESS = 3
 
 JOURS = ("lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche")
 
@@ -642,7 +648,8 @@ class UfolepMySQLScheduler:
             ref = self.reference.get(pair)
             kept = ref is not None and ref[1] == d['home_team'].id and ref[0] == d['date']
             if self.reference:
-                model.AddHint(d['var'], 1 if kept and pair not in hinted else 0)
+                d['hint'] = 1 if kept and pair not in hinted else 0
+                model.AddHint(d['var'], d['hint'])
                 if kept:
                     hinted.add(pair)
             if ref is None or ref[1] != d['home_team'].id:
@@ -652,18 +659,45 @@ class UfolepMySQLScheduler:
                 dates.append(d['var'])
         return hosts, dates
 
-    def _secondary_slot_vars(self, matches_data: list) -> list:
-        """Possibilités sur un créneau que l'équipe qui reçoit a demandé après
-        un autre (creneau.usage_priority) : pénalisées dans l'objectif, pour
-        qu'elle reçoive au mieux sur son créneau 1. Exemple (octobre 2026) :
+    def _secondary_slot_costs(self, model: cp_model.CpModel, matches_data: list) -> tuple:
+        """Coût, dans l'objectif, des réceptions sur un créneau que l'équipe
+        a demandé après un autre (creneau.usage_priority), pour qu'elle
+        reçoive au mieux sur son créneau 1. Exemple (octobre 2026) :
         Meyrargues Filles, créneau 1 le jeudi, recevait 2 fois sur 3 le
         mercredi (créneau 2).
 
-        Pas de pénalité les semaines où le créneau mieux placé n'existe pas
+        Pas de coût les semaines où le créneau mieux placé n'existe pas
         (férié, vacances, gymnase fermé, hors période) : le créneau 2 sert à
-        ça, inutile de déplacer le match à une autre semaine."""
-        return [d['var'] for d in matches_data
-                if self._better_slot_usable(d['home_team'], d['time_slot'], d['date'])]
+        ça, inutile de déplacer le match à une autre semaine.
+
+        Le coût croît avec le nombre de ces réceptions pour une même équipe
+        (SLOT_PRIORITY_FAIRNESS) : la k-ième en vaut un palier, et les
+        paliers se remplissent dans l'ordre.
+
+        Retourne (termes, plus grande valeur possible de leur somme)."""
+        by_team = defaultdict(list)
+        hinted = defaultdict(int)  # réceptions de ce genre dans la référence
+        for d in matches_data:
+            if self._better_slot_usable(d['home_team'], d['time_slot'], d['date']):
+                by_team[d['home_team'].id].append(d['var'])
+                hinted[d['home_team'].id] += d.get('hint', 0)
+        opponents = defaultdict(int)
+        for info in self._all_matches_info:
+            opponents[info['team1'].id] += 1
+            opponents[info['team2'].id] += 1
+        terms, bound = [], 0
+        for team_id, team_vars in by_team.items():
+            steps = [model.NewBoolVar(f"secondary_{team_id}_{k}") for k in range(opponents[team_id])]
+            model.Add(sum(steps) == sum(team_vars))
+            for k, step in enumerate(steps):
+                if self.reference:
+                    model.AddHint(step, 1 if k < hinted[team_id] else 0)
+                if k:
+                    model.AddImplication(step, steps[k - 1])
+                cost = SLOT_PRIORITY_WEIGHT + SLOT_PRIORITY_FAIRNESS * k
+                terms.append(cost * step)
+                bound += cost
+        return terms, bound
 
     def _better_slot_usable(self, home: Team, slot: TimeSlot, day: date) -> bool:
         """L'équipe qui reçoit sur `slot` le jour `day` avait-elle, cette
@@ -1040,20 +1074,24 @@ class UfolepMySQLScheduler:
                          if {d['home_team'].id, d['away_team'].id} & free_team_ids]
                 history_penalty_vars = self._add_history_based_home_constraints(model, freed)
             reference_hosts, reference_dates = self._reference_terms(model, matches_data)
-            secondary_slots = self._secondary_slot_vars(matches_data)
-            if history_penalty_vars or reference_hosts or secondary_slots:
+            secondary_costs, secondary_bound = self._secondary_slot_costs(model, matches_data)
+            if history_penalty_vars or reference_hosts or secondary_costs:
                 # Par ordre de priorité, chaque niveau l'emportant sur tous
                 # les suivants réunis : programmer les matchs, garder l'équipe
                 # qui reçoit de la référence, respecter l'alternance
-                # historique, puis, mis en balance (SLOT_PRIORITY_WEIGHT),
+                # historique, puis, mis en balance (SLOT_PRIORITY_WEIGHT et
+                # SLOT_PRIORITY_FAIRNESS),
                 # recevoir sur son créneau 1 et garder la date de la
                 # référence. Qui reçoit se décide avant quel jour : le
                 # créneau 1 ne fait bouger que des dates.
-                unit = (SLOT_PRIORITY_WEIGHT + 1) * (len(self._all_matches_info) + 1)
-                model.Maximize(unit ** 3 * sum(d['var'] for d in matches_data)
-                               + unit ** 2 * sum(reference_hosts)
-                               - unit * sum(history_penalty_vars)
-                               - SLOT_PRIORITY_WEIGHT * sum(secondary_slots)
+                total = len(self._all_matches_info) + 1
+                history_weight = secondary_bound + total
+                host_weight = history_weight * total
+                match_weight = host_weight * total
+                model.Maximize(match_weight * sum(d['var'] for d in matches_data)
+                               + host_weight * sum(reference_hosts)
+                               - history_weight * sum(history_penalty_vars)
+                               - sum(secondary_costs)
                                + sum(reference_dates))
 
         # 7. Éviter que 2 équipes avec effectif commun jouent le même soir (sauf pour matchs prédéfinis)
