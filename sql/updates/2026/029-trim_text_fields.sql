@@ -8,6 +8,11 @@
 -- générées (`emails.body`, `activity.comment`) ne sont pas touchées.
 -- Au 04/11/2026 sur le dump de prod : 150 valeurs.
 
+-- Le client mysql de l'hébergement (MariaDB) ouvre la session en
+-- utf8mb4_general_ci : @blancs et les colonnes (0900_ai_ci) ne se
+-- comparaient pas (« Illegal mix of collations »).
+SET NAMES utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
 SET @blancs = '^[\\s\\p{Z}\\x{FEFF}\\x{200B}]+|[\\s\\p{Z}\\x{FEFF}\\x{200B}]+$';
 
 -- 1. À regarder avant : les joueurs dont le nom ou le prénom va changer.
