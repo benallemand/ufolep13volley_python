@@ -33,16 +33,17 @@ SELECT s.id,
        c.penalite              AS nb_penalites
 FROM survey s
          JOIN matches m on s.id_match = m.id_match
-         JOIN comptes_acces ca on ca.id = s.user_id
-         JOIN users_teams ut on ca.id = ut.user_id
-         JOIN equipes e_sondeuse on ut.team_id = e_sondeuse.id_equipe
+         -- équipe qui a rempli le sondage (ufolep13volley#482, migration 2026/033)
+         JOIN equipes e_sondeuse on e_sondeuse.id_equipe = s.id_equipe
+                                AND e_sondeuse.id_equipe IN (m.id_equipe_dom, m.id_equipe_ext)
          JOIN equipes e_sondee
-              on ((e_sondee.id_equipe IN (m.id_equipe_dom, m.id_equipe_ext) AND
-                   e_sondeuse.id_equipe IN (m.id_equipe_dom, m.id_equipe_ext))
-                  AND e_sondee.id_equipe != e_sondeuse.id_equipe)
+              on e_sondee.id_equipe = IF(s.id_equipe = m.id_equipe_dom, m.id_equipe_ext, m.id_equipe_dom)
          JOIN clubs c_sondee ON e_sondee.id_club = c_sondee.id
          JOIN classements c ON e_sondee.id_equipe = c.id_equipe AND c.code_competition = m.code_competition
 -- Issue #350 : seule l'échelle courante (-- - = + ++, en -2..+2) compte. Un
 -- sondage tout à `=` vaut 0 : l'ancien filtre « somme > 0 » l'aurait écarté.
 WHERE s.scale_version = 2
+  -- un sondage par équipe et par match : le dernier envoyé. Les envois
+  -- répétés comptaient chacun dans la note de fair-play (#482).
+  AND s.id = (SELECT MAX(s2.id) FROM survey s2 WHERE s2.id_match = s.id_match AND s2.id_equipe = s.id_equipe)
 ORDER BY id;

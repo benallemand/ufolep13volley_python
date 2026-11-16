@@ -134,14 +134,10 @@ FROM matches m
     AND cr.id_gymnase = m.id_gymnasium
          LEFT JOIN gymnase g ON m.id_gymnasium = g.id
          LEFT JOIN match_players_count_view mpcv ON mpcv.id_match = m.id_match
-         LEFT JOIN survey s_dom ON m.id_match = s_dom.id_match AND s_dom.user_id IN (SELECT ca.id
-                                                                                     FROM comptes_acces ca
-                                                                                              JOIN users_teams ut ON ca.id = ut.user_id
-                                                                                     WHERE ut.team_id = m.id_equipe_dom)
-         LEFT JOIN survey s_ext ON m.id_match = s_ext.id_match AND s_ext.user_id IN (SELECT ca.id
-                                                                                     FROM comptes_acces ca
-                                                                                              JOIN users_teams ut ON ca.id = ut.user_id
-                                                                                     WHERE ut.team_id = m.id_equipe_ext)
+         -- sondage rattaché à l'équipe qui l'a rempli (ufolep13volley#482,
+         -- migration 2026/033), et non plus retrouvée par son auteur
+         LEFT JOIN survey s_dom ON m.id_match = s_dom.id_match AND s_dom.id_equipe = m.id_equipe_dom
+         LEFT JOIN survey s_ext ON m.id_match = s_ext.id_match AND s_ext.id_equipe = m.id_equipe_ext
          LEFT JOIN commission_division cd ON cd.division = CONCAT(m.code_competition,'/', m.division)
          LEFT JOIN commission com ON cd.id_commission = com.id_commission
 WHERE 1 = 1
